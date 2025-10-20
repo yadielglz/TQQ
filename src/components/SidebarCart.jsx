@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShoppingCart, 
   User, 
@@ -11,7 +11,11 @@ import {
   CheckCircle,
   AlertCircle,
   Tablet,
-  Watch
+  Watch,
+  ChevronDown,
+  ChevronUp,
+  Menu,
+  X
 } from 'lucide-react';
 
 const SidebarCart = ({ 
@@ -22,6 +26,19 @@ const SidebarCart = ({
   portInData,
   steps 
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const getStepStatus = (stepId) => {
     if (stepId < currentStep) return 'completed';
     if (stepId === currentStep) return 'current';
@@ -77,11 +94,10 @@ const SidebarCart = ({
       Object.values(quoteData.plans || {}).forEach(planId => {
         const plan = planOptions.find(p => p.id === planId);
         if (plan) {
-          const pricing = plan.pricing;
           if (quoteData.lines <= 6) {
-            planTotal += pricing[quoteData.lines] || 0;
+            planTotal += plan.pricing[quoteData.lines] || 0;
           } else {
-            planTotal += pricing[6] + ((quoteData.lines - 6) * pricing.additional);
+            planTotal += plan.pricing[6] + (quoteData.lines - 6) * plan.pricing.additional;
           }
         }
       });
@@ -89,29 +105,46 @@ const SidebarCart = ({
     };
 
     const calculateDeviceTotal = () => {
-      let total = 0;
+      let deviceTotal = 0;
+      const deviceOptions = [
+        { id: 'iphone-16', price: 999 },
+        { id: 'iphone-16-plus', price: 1099 },
+        { id: 'iphone-16-pro', price: 1199 },
+        { id: 'iphone-16-pro-max', price: 1299 },
+        { id: 'galaxy-s25', price: 999 },
+        { id: 'galaxy-s25-plus', price: 1099 },
+        { id: 'galaxy-s25-ultra', price: 1299 },
+        { id: 'pixel-10-pro', price: 999 },
+        { id: 'pixel-10-pro-xl', price: 1099 }
+      ];
+
       Object.values(quoteData.devices || {}).forEach(deviceId => {
-        const device = getDeviceById(deviceId);
+        const device = deviceOptions.find(d => d.id === deviceId);
         if (device) {
-          const tradeInValue = quoteData.tradeIns && quoteData.tradeIns[deviceId] ? 
-            parseFloat(quoteData.tradeIns[deviceId]) || 0 : 0;
-          const netPrice = device.price - tradeInValue;
-          const monthlyPayment = Math.max(0, Math.ceil(netPrice / 24));
-          total += monthlyPayment;
+          deviceTotal += Math.ceil(device.price / 24); // Monthly payment
         }
       });
-      return total;
+      return deviceTotal;
     };
 
     const calculateProtectionTotal = () => {
-      let total = 0;
+      let protectionTotal = 0;
+      const protectionPlans = [
+        { id: 'p360-tier1', price: 7 },
+        { id: 'p360-tier2', price: 9 },
+        { id: 'p360-tier3', price: 13 },
+        { id: 'p360-tier4', price: 16 },
+        { id: 'p360-tier5', price: 18 },
+        { id: 'p360-tier6', price: 25 }
+      ];
+
       Object.values(quoteData.protection || {}).forEach(protectionId => {
-        if (protectionId && protectionId !== 'none') {
-          const protection = getProtectionById(protectionId);
-          if (protection) total += protection.price;
+        const protection = protectionPlans.find(p => p.id === protectionId);
+        if (protection) {
+          protectionTotal += protection.price;
         }
       });
-      return total;
+      return protectionTotal;
     };
 
     const calculateMonthlyFinancing = () => {
@@ -119,46 +152,45 @@ const SidebarCart = ({
     };
 
     const calculateAutoPaySavings = () => {
-      if (!quoteData.discounts?.autoPay) return 0;
       return Math.min(quoteData.lines * 5, 40); // $5 per line, max $40
     };
 
     const calculateSeniorSavings = () => {
-      if (!quoteData.discounts?.senior55) return 0;
-      return quoteData.lines <= 2 ? quoteData.lines * 5 : 0; // $5 per line for 1-2 lines only
+      if (!quoteData.discounts?.senior) return 0;
+      const eligiblePlans = Object.values(quoteData.plans || {}).filter(planId => 
+        ['essentials', 'more', 'beyond'].includes(planId)
+      );
+      return eligiblePlans.length * 10; // $10 per eligible plan
     };
 
     const calculateInsiderSavings = () => {
       if (!quoteData.discounts?.tmobileInsider) return 0;
-      // 20% discount on More or Beyond plans only
-      let eligibleTotal = 0;
-      Object.values(quoteData.plans || {}).forEach(planId => {
-        if (planId === 'more' || planId === 'beyond') {
-          const planOptions = [
-            { id: 'more', pricing: { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 }},
-            { id: 'beyond', pricing: { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 }}
-          ];
-          const plan = planOptions.find(p => p.id === planId);
-          if (plan) {
-            const pricing = plan.pricing;
-            if (quoteData.lines <= 6) {
-              eligibleTotal += pricing[quoteData.lines] || 0;
-            } else {
-              eligibleTotal += pricing[6] + ((quoteData.lines - 6) * pricing.additional);
-            }
+      const eligiblePlans = Object.values(quoteData.plans || {}).filter(planId => 
+        ['more', 'beyond'].includes(planId)
+      );
+      const eligibleTotal = eligiblePlans.reduce((total, planId) => {
+        const planOptions = [
+          { id: 'more', pricing: { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 }},
+          { id: 'beyond', pricing: { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 }}
+        ];
+        const plan = planOptions.find(p => p.id === planId);
+        if (plan) {
+          if (quoteData.lines <= 6) {
+            return total + (plan.pricing[quoteData.lines] || 0);
+          } else {
+            return total + plan.pricing[6] + (quoteData.lines - 6) * plan.pricing.additional;
           }
         }
-      });
+        return total;
+      }, 0);
       return Math.round(eligibleTotal * 0.2);
     };
 
     const calculateTaxesAndFees = () => {
-      // Estimate taxes and fees (typically 8-12% of service charges)
-      const serviceTotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal();
+      const serviceTotal = calculatePlanTotal() - calculateAutoPaySavings() - calculateSeniorSavings() - calculateInsiderSavings();
       return Math.round(serviceTotal * 0.1); // 10% estimate
     };
 
-    // Calculate total monthly (same logic as QuoteSummary)
     const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing();
     const discounts = calculateAutoPaySavings() + calculateSeniorSavings() + calculateInsiderSavings();
     const taxesAndFees = calculateTaxesAndFees();
@@ -166,55 +198,29 @@ const SidebarCart = ({
     return subtotal - discounts + taxesAndFees;
   };
 
-  // Helper functions
-  const getDeviceById = (deviceId) => {
+  const getDeviceName = (deviceId) => {
     const devices = [
-      // Google
-      { id: 'pixel-10-pro-xl', name: 'Pixel 10 Pro XL', price: 1099 },
-      { id: 'pixel-10-pro', name: 'Pixel 10 Pro', price: 999 },
-      { id: 'pixel-10', name: 'Pixel 10', price: 699 },
-      { id: 'pixel-9a', name: 'Pixel 9A', price: 499 },
-      // Samsung
-      { id: 'galaxy-a36', name: 'Galaxy A36', price: 299 },
-      { id: 'galaxy-s25-fe', name: 'Galaxy S25 FE', price: 699 },
-      { id: 'galaxy-s25-plus', name: 'Galaxy S25+', price: 999 },
-      { id: 'galaxy-s25', name: 'Galaxy S25', price: 799 },
-      { id: 'galaxy-s25-ultra', name: 'Galaxy S25 Ultra', price: 1299 },
-      { id: 'galaxy-s25-edge', name: 'Galaxy S25 Edge', price: 899 },
-      { id: 'galaxy-z-flip-7', name: 'Galaxy Z Flip 7', price: 999 },
-      { id: 'galaxy-z-fold-7', name: 'Galaxy Z Fold 7', price: 1799 },
-      // Apple
-      { id: 'iphone-15', name: 'iPhone 15', price: 799 },
-      { id: 'iphone-16', name: 'iPhone 16', price: 799 },
-      { id: 'iphone-16-plus', name: 'iPhone 16 Plus', price: 899 },
-      { id: 'iphone-16-pro', name: 'iPhone 16 Pro', price: 999 },
-      { id: 'iphone-16-pro-max', name: 'iPhone 16 Pro Max', price: 1199 },
-      { id: 'iphone-16e', name: 'iPhone 16e', price: 599 },
-      { id: 'iphone-17', name: 'iPhone 17', price: 899 },
-      { id: 'iphone-17-pro', name: 'iPhone 17 Pro', price: 1099 },
-      { id: 'iphone-17-pro-max', name: 'iPhone 17 Pro Max', price: 1299 },
-      { id: 'iphone-air', name: 'iPhone Air', price: 699 },
-      // Motorola
-      { id: 'edge-2025', name: 'Edge 2025', price: 599 },
-      { id: 'g-power-2025', name: 'G Power 2025', price: 299 },
-      { id: 'g-2025', name: 'G 2025', price: 199 },
-      { id: 'razr-2025', name: 'Razr 2025', price: 699 },
-      { id: 'razr-plus-2025', name: 'Razr+ 2025', price: 999 },
-      { id: 'razr-ultra-2025', name: 'Razr Ultra 2025', price: 1299 },
-      // Revvl
-      { id: 'revvl-pro-8', name: 'Revvl Pro 8', price: 199 }
+      { id: 'iphone-16', name: 'iPhone 16' },
+      { id: 'iphone-16-plus', name: 'iPhone 16 Plus' },
+      { id: 'iphone-16-pro', name: 'iPhone 16 Pro' },
+      { id: 'iphone-16-pro-max', name: 'iPhone 16 Pro Max' },
+      { id: 'galaxy-s25', name: 'Galaxy S25' },
+      { id: 'galaxy-s25-plus', name: 'Galaxy S25+' },
+      { id: 'galaxy-s25-ultra', name: 'Galaxy S25 Ultra' },
+      { id: 'pixel-10-pro', name: 'Pixel 10 Pro' },
+      { id: 'pixel-10-pro-xl', name: 'Pixel 10 Pro XL' }
     ];
     return devices.find(d => d.id === deviceId);
   };
 
-  const getProtectionById = (protectionId) => {
+  const getProtectionName = (protectionId) => {
     const protectionPlans = [
-      { id: 'p360-tier-1', name: 'P360 Tier 1', price: 7 },
-      { id: 'p360-tier-2', name: 'P360 Tier 2', price: 9 },
-      { id: 'p360-tier-3', name: 'P360 Tier 3', price: 13 },
-      { id: 'p360-tier-4', name: 'P360 Tier 4', price: 16 },
-      { id: 'p360-tier-5', name: 'P360 Tier 5', price: 18 },
-      { id: 'p360-tier-6', name: 'P360 Tier 6', price: 25 }
+      { id: 'p360-tier1', name: 'P360 Tier 1' },
+      { id: 'p360-tier2', name: 'P360 Tier 2' },
+      { id: 'p360-tier3', name: 'P360 Tier 3' },
+      { id: 'p360-tier4', name: 'P360 Tier 4' },
+      { id: 'p360-tier5', name: 'P360 Tier 5' },
+      { id: 'p360-tier6', name: 'P360 Tier 6' }
     ];
     return protectionPlans.find(p => p.id === protectionId);
   };
@@ -228,6 +234,252 @@ const SidebarCart = ({
     return getCompletionPercentage() === 100;
   };
 
+  const renderCartContent = () => (
+    <>
+      {/* Progress Bar */}
+      <div style={{
+        background: '#f0f0f0',
+        borderRadius: '8px',
+        height: '8px',
+        marginBottom: '15px',
+        overflow: 'hidden'
+      }}>
+        <div style={{
+          height: '100%',
+          background: isFlowComplete() ? '#4CAF50' : '#E20074',
+          width: `${getCompletionPercentage()}%`,
+          transition: 'width 0.3s ease'
+        }} />
+      </div>
+
+      {/* Progress Text */}
+      <div style={{
+        marginBottom: '20px',
+        textAlign: 'center'
+      }}>
+        <div style={{
+          fontSize: '18px',
+          fontWeight: '600',
+          color: '#333',
+          marginBottom: '4px'
+        }}>
+          {isFlowComplete() ? '✅ Quote Complete!' : `${getCompletionPercentage()}% Complete`}
+        </div>
+      </div>
+
+      {/* Steps List */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '10px 0'
+      }}>
+        {steps.map((step, index) => {
+          const status = getStepStatus(index);
+          const isCurrent = index === currentStep;
+          const isComplete = isStepComplete(index);
+          
+          return (
+            <div key={index} style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '12px 16px',
+              marginBottom: '8px',
+              borderRadius: '8px',
+              background: isComplete ? '#4CAF50' : isCurrent ? '#E20074' : '#f0f0f0',
+              color: isComplete || isCurrent ? 'white' : '#666'
+            }}>
+              <div style={{ marginRight: '12px' }}>
+                {isComplete ? <CheckCircle size={14} /> : getStepIcon(index, status)}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: isCurrent ? '#E20074' : isComplete ? '#333' : '#666'
+                }}>
+                  {step.title}
+                </div>
+                {index === 0 && customerData && (
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                    {customerData.firstName} {customerData.lastName}
+                  </div>
+                )}
+                {index === 1 && quoteData.lines && (
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                    {quoteData.lines} line{quoteData.lines > 1 ? 's' : ''}
+                  </div>
+                )}
+                {index === 2 && Object.keys(quoteData.plans || {}).length > 0 && (
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                    {Object.keys(quoteData.plans).length} plan{Object.keys(quoteData.plans).length > 1 ? 's' : ''} selected
+                  </div>
+                )}
+                {index === 3 && Object.keys(quoteData.devices || {}).length > 0 && (
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                    {Object.keys(quoteData.devices).length} device{Object.keys(quoteData.devices).length > 1 ? 's' : ''} selected
+                  </div>
+                )}
+              </div>
+              {!isComplete && !isCurrent && (
+                <AlertCircle size={14} color="#E20074" />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Estimated Total */}
+      <div style={{
+        background: '#f8f9fa',
+        padding: '15px',
+        borderRadius: '8px',
+        marginTop: '15px',
+        border: '1px solid #e0e0e0'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px'
+        }}>
+          <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>
+            Estimated Monthly
+          </span>
+          <span style={{ fontSize: '18px', fontWeight: '700', color: '#E20074' }}>
+            ${calculateTotalMonthly()}
+          </span>
+        </div>
+        <div style={{ fontSize: '12px', color: '#666', textAlign: 'center' }}>
+          {isFlowComplete() ? 'Final quote ready!' : 'Complete all steps for accurate pricing'}
+        </div>
+      </div>
+
+      {/* Completion Messages */}
+      {isFlowComplete() && (
+        <div style={{
+          background: '#d4edda',
+          color: '#155724',
+          padding: '12px',
+          borderRadius: '8px',
+          marginTop: '15px',
+          fontSize: '14px',
+          textAlign: 'center',
+          border: '1px solid #c3e6cb'
+        }}>
+          🎉 Your quote is ready! All steps completed successfully.
+        </div>
+      )}
+      
+      {!isFlowComplete() && (
+        <div style={{
+          background: '#f8f9fa',
+          color: '#856404',
+          padding: '8px 12px',
+          borderRadius: '6px',
+          fontSize: '12px',
+          textAlign: 'center'
+        }}>
+          Complete all steps to generate quote
+        </div>
+      )}
+    </>
+  );
+
+  // Mobile collapsed view
+  if (isMobile && isCollapsed) {
+    return (
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        zIndex: 1000
+      }}>
+        <button
+          onClick={() => setIsCollapsed(false)}
+          style={{
+            background: '#E20074',
+            color: 'white',
+            border: 'none',
+            borderRadius: '50px',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 16px rgba(226, 0, 116, 0.3)',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}
+        >
+          <ShoppingCart size={18} />
+          <span>{getCompletionPercentage()}%</span>
+          <ChevronUp size={16} />
+        </button>
+      </div>
+    );
+  }
+
+  // Mobile expanded view
+  if (isMobile && !isCollapsed) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0,0,0,0.5)',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'flex-end'
+      }}>
+        <div style={{
+          width: '100%',
+          background: 'white',
+          borderRadius: '20px 20px 0 0',
+          maxHeight: '80vh',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {/* Mobile Header */}
+          <div style={{
+            background: '#E20074',
+            color: 'white',
+            padding: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderRadius: '20px 20px 0 0'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <ShoppingCart size={20} />
+              <span style={{ fontSize: '18px', fontWeight: '600' }}>Quote Progress</span>
+            </div>
+            <button
+              onClick={() => setIsCollapsed(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                padding: '4px'
+              }}
+            >
+              <X size={24} />
+            </button>
+          </div>
+          
+          {/* Mobile Content */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+            {renderCartContent()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop view
   return (
     <div style={{
       position: 'fixed',
@@ -267,190 +519,9 @@ const SidebarCart = ({
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div style={{
-        padding: '15px 20px',
-        background: '#f8f9fa',
-        borderBottom: '1px solid #e0e0e0'
-      }}>
-        <div style={{
-          width: '100%',
-          height: '6px',
-          background: '#e0e0e0',
-          borderRadius: '3px',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            width: `${getCompletionPercentage()}%`,
-            height: '100%',
-            background: isFlowComplete() ? '#4CAF50' : '#E20074',
-            transition: 'width 0.3s ease'
-          }} />
-        </div>
-        <div style={{
-          marginTop: '8px',
-          fontSize: '12px',
-          color: '#666',
-          textAlign: 'center'
-        }}>
-          {isFlowComplete() ? '✅ Quote Complete!' : `${getCompletionPercentage()}% Complete`}
-        </div>
-      </div>
-
-      {/* Steps List */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '10px 0'
-      }}>
-        {steps.map((step, index) => {
-          const status = getStepStatus(index);
-          const isComplete = isStepComplete(index);
-          const isCurrent = status === 'current';
-          
-          return (
-            <div key={index} style={{
-              padding: '12px 20px',
-              borderLeft: isCurrent ? '3px solid #E20074' : '3px solid transparent',
-              background: isCurrent ? 'rgba(226, 0, 116, 0.05)' : 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                background: isComplete ? '#4CAF50' : isCurrent ? '#E20074' : '#f0f0f0',
-                color: isComplete || isCurrent ? 'white' : '#666'
-              }}>
-                {isComplete ? <CheckCircle size={14} /> : getStepIcon(index, status)}
-              </div>
-              
-              <div style={{ flex: 1 }}>
-                <div style={{
-                  fontSize: '14px',
-                  fontWeight: isCurrent ? '600' : '500',
-                  color: isCurrent ? '#E20074' : isComplete ? '#333' : '#666'
-                }}>
-                  {step.title}
-                </div>
-                
-                {/* Step-specific details */}
-                {index === 0 && customerData && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {customerData.firstName} {customerData.lastName}
-                  </div>
-                )}
-                
-                {index === 1 && quoteData.lines && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {quoteData.lines} line{quoteData.lines > 1 ? 's' : ''}
-                  </div>
-                )}
-                
-                {index === 2 && Object.keys(quoteData.plans || {}).length > 0 && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {Object.keys(quoteData.plans).length} plan{Object.keys(quoteData.plans).length > 1 ? 's' : ''} selected
-                  </div>
-                )}
-                
-                {index === 3 && Object.keys(quoteData.devices || {}).length > 0 && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {Object.keys(quoteData.devices).length} device{Object.keys(quoteData.devices).length > 1 ? 's' : ''} selected
-                  </div>
-                )}
-                
-                {index === 4 && tabletWearableData && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {tabletWearableData.category} ({tabletWearableData.lines} lines)
-                  </div>
-                )}
-                
-                {index === 5 && Object.keys(quoteData.protection || {}).length > 0 && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {Object.values(quoteData.protection).filter(Boolean).length} protection plan{Object.values(quoteData.protection).filter(Boolean).length > 1 ? 's' : ''}
-                  </div>
-                )}
-                
-                {index === 6 && quoteData.discounts && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {Object.values(quoteData.discounts).filter(Boolean).length} discount{Object.values(quoteData.discounts).filter(Boolean).length > 1 ? 's' : ''} applied
-                  </div>
-                )}
-                
-                {index === 7 && quoteData.equipmentCredit && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    EC: ${quoteData.equipmentCredit}
-                  </div>
-                )}
-                
-                {index === 8 && Object.keys(portInData || {}).length > 0 && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    {Object.values(portInData).filter(data => data.type === 'port-in').length} port-in{Object.values(portInData).filter(data => data.type === 'port-in').length > 1 ? 's' : ''}
-                  </div>
-                )}
-              </div>
-              
-              {!isComplete && !isCurrent && (
-                <AlertCircle size={14} color="#E20074" />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Summary Footer */}
-      <div style={{
-        padding: '15px 20px',
-        background: '#f8f9fa',
-        borderTop: '1px solid #e0e0e0'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '8px'
-        }}>
-          <span style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>
-            Estimated Monthly
-          </span>
-          <span style={{ fontSize: '16px', fontWeight: '700', color: '#E20074' }}>
-            ${calculateTotalMonthly()}/mo
-          </span>
-        </div>
-        
-        {isFlowComplete() && (
-          <div style={{
-            background: '#d4edda',
-            color: '#155724',
-            padding: '8px 12px',
-            borderRadius: '6px',
-            fontSize: '12px',
-            textAlign: 'center',
-            fontWeight: '600'
-          }}>
-            🎉 Ready for Summary!
-          </div>
-        )}
-        
-        {!isFlowComplete() && (
-          <div style={{
-            background: '#f8f9fa',
-            color: '#856404',
-            padding: '8px 12px',
-            borderRadius: '6px',
-            fontSize: '12px',
-            textAlign: 'center'
-          }}>
-            Complete all steps to generate quote
-          </div>
-        )}
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+        {renderCartContent()}
       </div>
     </div>
   );

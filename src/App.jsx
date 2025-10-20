@@ -465,17 +465,15 @@ const App = () => {
       </div>
 
       {/* Sidebar Cart */}
-      {!isMobile && (
-        <SidebarCart
-          currentStep={currentStep}
-          customerData={customerData}
-          tabletWearableData={tabletWearableData}
-          quoteData={quoteData}
-          portInData={portInData}
-          promotionsData={promotionsData}
-          steps={steps}
-        />
-      )}
+      <SidebarCart
+        currentStep={currentStep}
+        customerData={customerData}
+        tabletWearableData={tabletWearableData}
+        quoteData={quoteData}
+        portInData={portInData}
+        promotionsData={promotionsData}
+        steps={steps}
+      />
 
       {/* App Footer */}
       <div style={{

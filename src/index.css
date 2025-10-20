@@ -298,7 +298,7 @@ body {
 
 @media (max-width: 768px) {
   .app {
-    padding: 0;
+    padding: 0 0 80px 0; /* Add bottom padding for mobile cart button */
     margin: 0;
     max-height: 100vh;
     overflow-y: auto;
