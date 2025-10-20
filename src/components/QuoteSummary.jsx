@@ -332,13 +332,87 @@ const QuoteSummary = ({
     return tierInfo ? tierInfo.price : 0;
   };
 
+  // Tablet/Wearable helper functions
+  const getTabletWearableDeviceName = (deviceId) => {
+    const tabletWearableDevices = [
+      // Tablets
+      { id: 'ipad-10', name: 'Apple iPad 10 (A16)', monthlyPrice: 25 },
+      { id: 'ipad-mini-7', name: 'Apple iPad Mini 7th Gen', monthlyPrice: 30 },
+      { id: 'ipad-pro-11', name: 'Apple iPad Pro 11"', monthlyPrice: 45 },
+      { id: 'ipad-pro-13', name: 'Apple iPad Pro 13"', monthlyPrice: 55 },
+      { id: 'galaxy-tab-a9', name: 'Samsung Galaxy Tab A9', monthlyPrice: 20 },
+      { id: 'galaxy-tab-s10-plus', name: 'Samsung Galaxy Tab S10+ 5G', monthlyPrice: 40 },
+      { id: 'revvl-tab-5g', name: 'Revvl Tab 5G', monthlyPrice: 15 },
+      // Wearables
+      { id: 'apple-watch-se-3-40mm', name: 'Apple Watch SE 3rd Gen 40mm', monthlyPrice: 15 },
+      { id: 'apple-watch-se-3-44mm', name: 'Apple Watch SE 3rd Gen 44mm', monthlyPrice: 18 },
+      { id: 'apple-watch-11-42mm', name: 'Apple Watch 11th Gen 42mm', monthlyPrice: 25 },
+      { id: 'apple-watch-11-45mm', name: 'Apple Watch 11th Gen 45mm', monthlyPrice: 28 },
+      { id: 'apple-watch-ultra-3', name: 'Apple Watch Ultra 3rd Gen', monthlyPrice: 35 },
+      { id: 'galaxy-watch-8-40mm', name: 'Samsung Galaxy Watch 8 40mm', monthlyPrice: 20 },
+      { id: 'galaxy-watch-8-44mm', name: 'Samsung Galaxy Watch 8 44mm', monthlyPrice: 23 },
+      { id: 'galaxy-watch-8-classic-46mm', name: 'Samsung Galaxy Watch 8 Classic 46mm', monthlyPrice: 30 },
+      { id: 'galaxy-watch-ultra', name: 'Samsung Galaxy Watch Ultra', monthlyPrice: 35 },
+      { id: 'pixel-watch-3', name: 'Google Pixel Watch 3', monthlyPrice: 22 },
+      { id: 'pixel-watch-4', name: 'Google Pixel Watch 4', monthlyPrice: 25 }
+    ];
+    const device = tabletWearableDevices.find(d => d.id === deviceId);
+    return device || { name: 'Unknown Device', monthlyPrice: 0 };
+  };
+
+  const getTabletWearablePlanName = (planId) => {
+    const tabletWearablePlans = [
+      { id: 'tablet-unlimited', name: 'Tablet Unlimited', price: 20 },
+      { id: 'tablet-2gb', name: 'Tablet 2GB', price: 10 },
+      { id: 'tablet-6gb', name: 'Tablet 6GB', price: 15 },
+      { id: 'wearable-unlimited', name: 'Wearable Unlimited', price: 5 },
+      { id: 'wearable-500mb', name: 'Wearable 500MB', price: 5 }
+    ];
+    const plan = tabletWearablePlans.find(p => p.id === planId);
+    return plan || { name: 'Unknown Plan', price: 0 };
+  };
+
+  const getTabletWearableProtectionPrice = (deviceId) => {
+    // Tablet/Wearable protection pricing (simplified)
+    const protectionPrices = {
+      'ipad-10': 7, 'ipad-mini-7': 7, 'ipad-pro-11': 13, 'ipad-pro-13': 16,
+      'galaxy-tab-a9': 7, 'galaxy-tab-s10-plus': 13, 'revvl-tab-5g': 7,
+      'apple-watch-se-3-40mm': 7, 'apple-watch-se-3-44mm': 7,
+      'apple-watch-11-42mm': 9, 'apple-watch-11-45mm': 9,
+      'apple-watch-ultra-3': 13, 'galaxy-watch-8-40mm': 7,
+      'galaxy-watch-8-44mm': 7, 'galaxy-watch-8-classic-46mm': 9,
+      'galaxy-watch-ultra': 13, 'pixel-watch-3': 7, 'pixel-watch-4': 7
+    };
+    return protectionPrices[deviceId] || 7;
+  };
+
   const calculateTaxesAndFees = () => {
-    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal();
+    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateTabletWearableTotal();
     return Math.round(subtotal * 0.15); // Approximate 15% for taxes and fees
   };
 
+  const calculateTabletWearableTotal = () => {
+    if (!tabletWearableData || !tabletWearableData.lines) return 0;
+    
+    let total = 0;
+    for (let i = 0; i < tabletWearableData.lines; i++) {
+      const deviceId = tabletWearableData.devices[i];
+      const planId = tabletWearableData.plans[i];
+      const device = getTabletWearableDeviceName(deviceId);
+      const plan = getTabletWearablePlanName(planId);
+      
+      total += device.monthlyPrice + plan.price;
+      
+      // Add protection if selected
+      if (tabletWearableData.protection && tabletWearableData.protection[i]) {
+        total += getTabletWearableProtectionPrice(deviceId);
+      }
+    }
+    return total;
+  };
+
   const getTotalMonthly = () => {
-    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing();
+    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing() + calculateTabletWearableTotal();
     const discounts = calculateAutoPaySavings() + calculateSeniorSavings() + calculateInsiderSavings();
     const taxesAndFees = calculateTaxesAndFees();
     return subtotal - discounts + taxesAndFees;
@@ -679,6 +753,59 @@ Generated on: ${new Date().toLocaleDateString()}
             );
           })}
         </div>
+
+        {/* Data Lines (Tablet/Wearable) */}
+        {tabletWearableData && tabletWearableData.lines > 0 && (
+          <div style={{
+            background: '#f8f9fa',
+            padding: '20px',
+            borderRadius: '12px',
+            marginTop: '20px',
+            border: '1px solid #e0e0e0'
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
+              Data Lines
+            </h3>
+            {Array.from({ length: tabletWearableData.lines }, (_, i) => {
+              const deviceId = tabletWearableData.devices[i];
+              const planId = tabletWearableData.plans[i];
+              const device = getTabletWearableDeviceName(deviceId);
+              const plan = getTabletWearablePlanName(planId);
+              
+              return (
+                <div key={i} style={{ 
+                  marginBottom: '15px', 
+                  padding: '15px', 
+                  background: 'white', 
+                  borderRadius: '8px',
+                  border: '1px solid #e0e0e0'
+                }}>
+                  <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074' }}>
+                    Data Line {i + 1}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ color: '#666' }}>Device:</span>
+                    <span>{device.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ color: '#666' }}>Plan:</span>
+                    <span>{plan.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ color: '#666' }}>Monthly Cost:</span>
+                    <span>${device.monthlyPrice + plan.price}/mo</span>
+                  </div>
+                  {tabletWearableData.protection && tabletWearableData.protection[i] && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#666' }}>Protection:</span>
+                      <span>P360 - ${getTabletWearableProtectionPrice(deviceId)}/mo</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div style={{ 

@@ -191,7 +191,51 @@ const SidebarCart = ({
       return Math.round(serviceTotal * 0.1); // 10% estimate
     };
 
-    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing();
+    const calculateTabletWearableTotal = () => {
+      if (!tabletWearableData || !tabletWearableData.lines) return 0;
+      
+      let total = 0;
+      for (let i = 0; i < tabletWearableData.lines; i++) {
+        const deviceId = tabletWearableData.devices[i];
+        const planId = tabletWearableData.plans[i];
+        
+        // Device monthly costs (simplified pricing)
+        const devicePrices = {
+          'ipad-10': 25, 'ipad-mini-7': 30, 'ipad-pro-11': 45, 'ipad-pro-13': 55,
+          'galaxy-tab-a9': 20, 'galaxy-tab-s10-plus': 40, 'revvl-tab-5g': 15,
+          'apple-watch-se-3-40mm': 15, 'apple-watch-se-3-44mm': 18,
+          'apple-watch-11-42mm': 25, 'apple-watch-11-45mm': 28,
+          'apple-watch-ultra-3': 35, 'galaxy-watch-8-40mm': 20,
+          'galaxy-watch-8-44mm': 23, 'galaxy-watch-8-classic-46mm': 30,
+          'galaxy-watch-ultra': 35, 'pixel-watch-3': 22, 'pixel-watch-4': 25
+        };
+        
+        // Plan costs
+        const planPrices = {
+          'tablet-unlimited': 20, 'tablet-2gb': 10, 'tablet-6gb': 15,
+          'wearable-unlimited': 5, 'wearable-500mb': 5
+        };
+        
+        total += (devicePrices[deviceId] || 0) + (planPrices[planId] || 0);
+        
+        // Add protection if selected
+        if (tabletWearableData.protection && tabletWearableData.protection[i]) {
+          const protectionPrices = {
+            'ipad-10': 7, 'ipad-mini-7': 7, 'ipad-pro-11': 13, 'ipad-pro-13': 16,
+            'galaxy-tab-a9': 7, 'galaxy-tab-s10-plus': 13, 'revvl-tab-5g': 7,
+            'apple-watch-se-3-40mm': 7, 'apple-watch-se-3-44mm': 7,
+            'apple-watch-11-42mm': 9, 'apple-watch-11-45mm': 9,
+            'apple-watch-ultra-3': 13, 'galaxy-watch-8-40mm': 7,
+            'galaxy-watch-8-44mm': 7, 'galaxy-watch-8-classic-46mm': 9,
+            'galaxy-watch-ultra': 13, 'pixel-watch-3': 7, 'pixel-watch-4': 7
+          };
+          total += protectionPrices[deviceId] || 7;
+        }
+      }
+      return total;
+    };
+
+    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing() + calculateTabletWearableTotal();
     const discounts = calculateAutoPaySavings() + calculateSeniorSavings() + calculateInsiderSavings();
     const taxesAndFees = calculateTaxesAndFees();
     
