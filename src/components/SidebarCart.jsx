@@ -56,7 +56,7 @@ const SidebarCart = ({
       case 8: // Port-In
         return Object.keys(portInData || {}).length === quoteData.lines;
       case 9: // Summary
-        return true; // Always accessible once reached
+        return currentStep >= 9; // Complete when user reaches summary step
       default:
         return false;
     }
