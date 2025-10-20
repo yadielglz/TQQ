@@ -26,8 +26,8 @@ const PromotionsSelection = ({
   }, [lines]);
 
   const handleNext = () => {
-    // Don't call onPromotionsChange to avoid infinite loop
-    // onPromotionsChange(selectedPromotions);
+    // Save promotions data to parent
+    onPromotionsChange(selectedPromotions);
     onNext();
   };
 

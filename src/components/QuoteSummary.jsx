@@ -6,6 +6,8 @@ const QuoteSummary = ({
   quoteData, 
   customerData, 
   tabletWearableData,
+  mobileInternetData,
+  homeInternetData,
   portInData,
   onPrev, 
   onRestart 
@@ -187,14 +189,43 @@ const QuoteSummary = ({
   };
 
   const calculateMonthlyFinancing = () => {
-    const ecBalance = calculateECBalance();
-    const downPaymentAmount = calculateDownPaymentRequired();
-    const financedAmount = ecBalance - downPaymentAmount;
+    let financingTotal = 0;
     
-    if (financedAmount <= 0) return 0;
+    // Calculate financing for voice line devices
+    for (let i = 0; i < quoteData.lines; i++) {
+      const deviceId = quoteData.devices[i];
+      if (deviceId) {
+        const device = deviceOptions.find(d => d.id === deviceId);
+        if (device) {
+          // Check if this line has a promotion that makes the device free
+          const promotionData = quoteData.promotions?.[i];
+          const isDeviceFree = promotionData && promotionData.promotionId && 
+                              promotionData.promotionId.includes('on-us');
+          
+          if (!isDeviceFree) {
+            // Get equipment credit for this line
+            const equipmentCredit = parseFloat(quoteData.equipmentCredit) || 0;
+            const tradeInValue = parseFloat(quoteData.tradeIns?.[i]) || 0;
+            const downPayment = parseFloat(quoteData.downPayment) || 0;
+            
+            // Calculate amount to be financed
+            const devicePrice = device.price;
+            const ecCredit = equipmentCredit; // Total EC available
+            
+            // Amount financed = device price - EC credit - trade-in - down payment
+            const amountFinanced = Math.max(0, devicePrice - ecCredit - tradeInValue - downPayment);
+            
+            // Monthly payment = amount financed / 24 months
+            const monthlyPayment = Math.ceil(amountFinanced / 24);
+            
+            financingTotal += monthlyPayment;
+          }
+          // If device is free due to promotion, no financing needed
+        }
+      }
+    }
     
-    // T-Mobile typically offers 24-month financing
-    return Math.ceil(financedAmount / 24);
+    return financingTotal;
   };
 
   const calculateDeviceTaxes = () => {
@@ -387,8 +418,55 @@ const QuoteSummary = ({
     return protectionPrices[deviceId] || 7;
   };
 
+  // Mobile Internet helper functions
+  const getMobileInternetDeviceName = (deviceId) => {
+    const mobileInternetDevices = [
+      { id: 'tcl-linkport-ik511', name: 'TCL Linkport IK511', price: 0 },
+      { id: 'lenovo-100e-chromebook-gen4', name: 'Lenovo 100e Chromebook Gen 4', price: 0 },
+      { id: 'tcl-syncup-tracker-2', name: 'TCL SyncUP Tracker 2', price: 0 },
+      { id: 'tmobile-syncup-drive', name: 'T-Mobile SyncUP Drive', price: 0 },
+      { id: 'inseego-mifi-x-pro-5g', name: 'Inseego MiFi X Pro 5G', price: 0 },
+      { id: 'jextream-rg2100-5g-hotspot', name: 'JEXtream RG2100 5G Mobile Hotspot', price: 0 },
+      { id: 'franklin-t10-mobile-hotspot', name: 'Franklin T10 Mobile Hotspot', price: 0 }
+    ];
+    const device = mobileInternetDevices.find(d => d.id === deviceId);
+    return device || { name: 'Unknown Device', price: 0 };
+  };
+
+  const getMobileInternetPlanName = (planId) => {
+    const mobileInternetPlans = [
+      { id: '15gb-data-plan', name: '15GB Data Plan', price: 20 },
+      { id: '25gb-data-plan', name: '25GB Data Plan', price: 25 },
+      { id: '100gb-data-plan', name: '100GB Data Plan', price: 50 }
+    ];
+    const plan = mobileInternetPlans.find(p => p.id === planId);
+    return plan || { name: 'Unknown Plan', price: 0 };
+  };
+
+  // Home Internet helper functions
+  const getHomeInternetDeviceName = (deviceId) => {
+    const homeInternetDevices = [
+      { id: 'tmobile-home-internet-gateway', name: 'T-Mobile Home Internet Gateway', price: 0 }
+    ];
+    const device = homeInternetDevices.find(d => d.id === deviceId);
+    return device || { name: 'Unknown Device', price: 0 };
+  };
+
+  const getHomeInternetPlanName = (planId) => {
+    const homeInternetPlans = [
+      { id: 'rely-home-internet', name: 'Rely Home Internet', price: 50 },
+      { id: 'amplified-home-internet', name: 'Amplified Home Internet', price: 60 },
+      { id: 'all-in-home-internet', name: 'All-In Home Internet', price: 70 },
+      { id: 'home-internet-backup', name: 'Home Internet Backup', price: 20 },
+      { id: 'tmobile-away-unlimited-plan', name: 'T-Mobile Away Unlimited Plan', price: 160 },
+      { id: 'tmobile-away-200gb-plan', name: 'T-Mobile Away 200GB Plan', price: 110 }
+    ];
+    const plan = homeInternetPlans.find(p => p.id === planId);
+    return plan || { name: 'Unknown Plan', price: 0 };
+  };
+
   const calculateTaxesAndFees = () => {
-    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateTabletWearableTotal();
+    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateTabletWearableTotal() + calculateMobileInternetTotal() + calculateHomeInternetTotal();
     return Math.round(subtotal * 0.15); // Approximate 15% for taxes and fees
   };
 
@@ -412,8 +490,28 @@ const QuoteSummary = ({
     return total;
   };
 
+  const calculateMobileInternetTotal = () => {
+    if (!mobileInternetData || !mobileInternetData.device || !mobileInternetData.plan) return 0;
+    
+    const device = getMobileInternetDeviceName(mobileInternetData.device);
+    const plan = getMobileInternetPlanName(mobileInternetData.plan);
+    
+    // Mobile Internet devices are free, only plan cost
+    return plan.price;
+  };
+
+  const calculateHomeInternetTotal = () => {
+    if (!homeInternetData || !homeInternetData.device || !homeInternetData.plan) return 0;
+    
+    const device = getHomeInternetDeviceName(homeInternetData.device);
+    const plan = getHomeInternetPlanName(homeInternetData.plan);
+    
+    // Home Internet gateway is free, only plan cost
+    return plan.price;
+  };
+
   const getTotalMonthly = () => {
-    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing() + calculateTabletWearableTotal();
+    const subtotal = calculatePlanTotal() + calculateProtectionTotal() + calculateMonthlyFinancing() + calculateTabletWearableTotal() + calculateMobileInternetTotal() + calculateHomeInternetTotal();
     const discounts = calculateAutoPaySavings() + calculateSeniorSavings() + calculateInsiderSavings();
     const taxesAndFees = calculateTaxesAndFees();
     return subtotal - discounts + taxesAndFees;
@@ -504,6 +602,18 @@ const QuoteSummary = ({
     yPosition += 7;
     doc.text(`Monthly Financing: $${calculateMonthlyFinancing()}/mo`, 20, yPosition);
     yPosition += 7;
+    if (calculateTabletWearableTotal() > 0) {
+      doc.text(`Data Lines: $${calculateTabletWearableTotal()}/mo`, 20, yPosition);
+      yPosition += 7;
+    }
+    if (calculateMobileInternetTotal() > 0) {
+      doc.text(`Mobile Internet: $${calculateMobileInternetTotal()}/mo`, 20, yPosition);
+      yPosition += 7;
+    }
+    if (calculateHomeInternetTotal() > 0) {
+      doc.text(`Home Internet: $${calculateHomeInternetTotal()}/mo`, 20, yPosition);
+      yPosition += 7;
+    }
     
     if (calculateAutoPaySavings() > 0) {
       doc.text(`Auto Pay Discount: -$${calculateAutoPaySavings()}/mo`, 20, yPosition);
@@ -689,10 +799,28 @@ const QuoteSummary = ({
               <span className="summary-label">Monthly Financing</span>
               <span className="summary-value">${calculateMonthlyFinancing()}/mo</span>
             </div>
+            {calculateTabletWearableTotal() > 0 && (
+              <div className="summary-item">
+                <span className="summary-label">Data Lines</span>
+                <span className="summary-value">${calculateTabletWearableTotal()}/mo</span>
+              </div>
+            )}
+            {calculateMobileInternetTotal() > 0 && (
+              <div className="summary-item">
+                <span className="summary-label">Mobile Internet</span>
+                <span className="summary-value">${calculateMobileInternetTotal()}/mo</span>
+              </div>
+            )}
+            {calculateHomeInternetTotal() > 0 && (
+              <div className="summary-item">
+                <span className="summary-label">Home Internet</span>
+                <span className="summary-value">${calculateHomeInternetTotal()}/mo</span>
+              </div>
+            )}
             <div className="summary-item">
               <span className="summary-label">Subtotal</span>
               <span className="summary-value">
-                ${calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing()}/mo
+                ${calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing() + calculateTabletWearableTotal() + calculateMobileInternetTotal() + calculateHomeInternetTotal()}/mo
               </span>
             </div>
             {calculateAutoPaySavings() > 0 && (
@@ -904,6 +1032,88 @@ const QuoteSummary = ({
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Mobile Internet */}
+        {mobileInternetData && mobileInternetData.device && mobileInternetData.plan && (
+          <div style={{
+            background: '#f8f9fa',
+            padding: '20px',
+            borderRadius: '12px',
+            marginTop: '20px',
+            border: '1px solid #e0e0e0'
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
+              Mobile Internet
+            </h3>
+            <div style={{ 
+              padding: '15px', 
+              background: 'white', 
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074' }}>
+                Mobile Internet Line
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: '#666' }}>Device:</span>
+                <span>{getMobileInternetDeviceName(mobileInternetData.device).name}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: '#666' }}>Plan:</span>
+                <span>{getMobileInternetPlanName(mobileInternetData.plan).name}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: '#666' }}>Monthly Cost:</span>
+                <span>${getMobileInternetPlanName(mobileInternetData.plan).price}/mo</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Device Cost:</span>
+                <span style={{ color: '#4CAF50' }}>Free</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Home Internet */}
+        {homeInternetData && homeInternetData.device && homeInternetData.plan && (
+          <div style={{
+            background: '#f8f9fa',
+            padding: '20px',
+            borderRadius: '12px',
+            marginTop: '20px',
+            border: '1px solid #e0e0e0'
+          }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
+              Home Internet
+            </h3>
+            <div style={{ 
+              padding: '15px', 
+              background: 'white', 
+              borderRadius: '8px',
+              border: '1px solid #e0e0e0'
+            }}>
+              <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074' }}>
+                Home Internet Line
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: '#666' }}>Device:</span>
+                <span>{getHomeInternetDeviceName(homeInternetData.device).name}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: '#666' }}>Plan:</span>
+                <span>{getHomeInternetPlanName(homeInternetData.plan).name}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <span style={{ color: '#666' }}>Monthly Cost:</span>
+                <span>${getHomeInternetPlanName(homeInternetData.plan).price}/mo</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#666' }}>Gateway Cost:</span>
+                <span style={{ color: '#4CAF50' }}>Free</span>
+              </div>
+            </div>
           </div>
         )}
       </div>

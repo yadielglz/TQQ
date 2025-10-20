@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { User, Phone, CreditCard, Smartphone, Shield, Percent, Calculator, CheckCircle, Gift } from 'lucide-react';
+import { User, Phone, CreditCard, Smartphone, Shield, Percent, Calculator, CheckCircle, Gift, Wifi, Home } from 'lucide-react';
+import StatusBar from './components/StatusBar';
 import WelcomeScreen from './components/WelcomeScreen';
 import CustomerIntake from './components/CustomerIntake';
+import VoiceLinesFlow from './components/VoiceLinesFlow';
 import TabletWearableFlow from './components/TabletWearableFlow';
-import LineSelection from './components/LineSelection';
-import PlanSelection from './components/PlanSelection';
-import DeviceSelection from './components/DeviceSelection';
+import MobileInternetFlow from './components/MobileInternetFlow';
+import HomeInternetFlow from './components/HomeInternetFlow';
 import PromotionsSelection from './components/PromotionsSelection';
-import ProtectionSelection from './components/ProtectionSelection';
 import DiscountSelection from './components/DiscountSelection';
 import EquipmentCreditSelection from './components/EquipmentCreditSelection';
 import PortInSelection from './components/PortInSelection';
@@ -21,6 +21,8 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [customerData, setCustomerData] = useState(null);
   const [tabletWearableData, setTabletWearableData] = useState(null);
+  const [mobileInternetData, setMobileInternetData] = useState(null);
+  const [homeInternetData, setHomeInternetData] = useState(null);
   const [portInData, setPortInData] = useState({});
   const [promotionsData, setPromotionsData] = useState({});
   const [quoteData, setQuoteData] = useState({
@@ -65,24 +67,24 @@ const App = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '30px',
-          padding: '15px',
+          marginBottom: '20px',
+          padding: '10px 15px',
           background: 'rgba(255,255,255,0.1)',
-          borderRadius: '12px',
+          borderRadius: '8px',
           backdropFilter: 'blur(10px)'
         }}>
           <div style={{
             background: '#E20074',
             borderRadius: '50%',
-            padding: '12px',
-            marginRight: '15px',
+            padding: '8px',
+            marginRight: '12px',
             color: 'white'
           }}>
-            <Icon size={24} />
+            <Icon size={20} />
           </div>
           <div>
             <div style={{ 
-              fontSize: '16px', 
+              fontSize: '14px', 
               fontWeight: '600', 
               color: 'white',
               marginBottom: '2px'
@@ -90,18 +92,18 @@ const App = () => {
               Step {currentStep} of {steps.length}
             </div>
             <div style={{ 
-              fontSize: '14px', 
+              fontSize: '12px', 
               color: 'rgba(255,255,255,0.8)'
             }}>
               {currentStepData?.title}
             </div>
           </div>
           <div style={{
-            marginLeft: '15px',
+            marginLeft: '12px',
             background: 'rgba(255,255,255,0.2)',
-            borderRadius: '10px',
-            padding: '8px 12px',
-            fontSize: '12px',
+            borderRadius: '8px',
+            padding: '6px 10px',
+            fontSize: '11px',
             color: 'white',
             fontWeight: '600'
           }}>
@@ -110,15 +112,16 @@ const App = () => {
         </div>
       );
     } else {
-      // Desktop: Show full step indicator
+      // Desktop: Show compact horizontal step indicator
       return (
         <div style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: '40px',
+          marginBottom: '20px',
+          padding: '8px 0',
           flexWrap: 'wrap',
-          gap: '10px'
+          gap: '8px'
         }}>
           {steps.map((step, index) => {
             const Icon = step.icon;
@@ -130,13 +133,13 @@ const App = () => {
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '12px 20px',
+                  padding: '8px 16px',
                   background: isActive 
                     ? '#E20074' 
                     : isCompleted 
                       ? '#4CAF50' 
                       : 'rgba(255,255,255,0.1)',
-                  borderRadius: '25px',
+                  borderRadius: '20px',
                   color: 'white',
                   transition: 'all 0.3s ease',
                   cursor: 'pointer',
@@ -144,14 +147,14 @@ const App = () => {
                   border: isActive ? '2px solid rgba(255,255,255,0.3)' : '2px solid transparent'
                 }}>
                   <div style={{
-                    marginRight: '8px',
+                    marginRight: '6px',
                     display: 'flex',
                     alignItems: 'center'
                   }}>
-                    {isCompleted ? <CheckCircle size={20} /> : <Icon size={20} />}
+                    {isCompleted ? <CheckCircle size={16} /> : <Icon size={16} />}
                   </div>
                   <span style={{ 
-                    fontSize: '14px', 
+                    fontSize: '12px', 
                     fontWeight: '600',
                     whiteSpace: 'nowrap'
                   }}>
@@ -161,7 +164,7 @@ const App = () => {
                 
                 {index < steps.length - 1 && (
                   <div style={{
-                    width: '30px',
+                    width: '20px',
                     height: '2px',
                     background: currentStep > step.id ? '#4CAF50' : 'rgba(255,255,255,0.3)',
                     transition: 'background 0.3s ease'
@@ -176,17 +179,16 @@ const App = () => {
   };
 
   const steps = [
-    { id: 0, title: 'Welcome', icon: User },
-    { id: 1, title: 'Lines', icon: Phone },
-    { id: 2, title: 'Plans', icon: CreditCard },
-    { id: 3, title: 'Devices', icon: Smartphone },
-    { id: 4, title: 'Promotions', icon: Gift },
-    { id: 5, title: 'Tablet/Wearable', icon: Phone },
-    { id: 6, title: 'Protection', icon: Shield },
-    { id: 7, title: 'Discounts', icon: Percent },
-    { id: 8, title: 'Equipment Credit', icon: Calculator },
-    { id: 9, title: 'Choose Your Number', icon: Phone },
-    { id: 10, title: 'Summary', icon: CheckCircle }
+    { id: 0, title: 'Welcome', icon: User, flowTitle: null },
+    { id: 1, title: 'Voice Lines', icon: Phone, flowTitle: 'Voice Lines Configuration' },
+    { id: 2, title: 'Tablet/Wearable', icon: Phone, flowTitle: 'Tablet & Wearable Configuration' },
+    { id: 3, title: 'Mobile Internet', icon: Wifi, flowTitle: 'Mobile Internet Configuration' },
+    { id: 4, title: 'Home Internet', icon: Home, flowTitle: 'Home Internet Configuration' },
+    { id: 5, title: 'Promotions', icon: Gift, flowTitle: 'Promotions Selection' },
+    { id: 6, title: 'Discounts', icon: Percent, flowTitle: 'Discounts Selection' },
+    { id: 7, title: 'Equipment Credit', icon: Calculator, flowTitle: 'Equipment Credit Selection' },
+    { id: 8, title: 'Choose Your Number', icon: Phone, flowTitle: 'Port-In Selection' },
+    { id: 9, title: 'Summary', icon: CheckCircle, flowTitle: 'Quote Summary' }
   ];
 
   const updateQuoteData = useCallback((updates) => {
@@ -227,6 +229,24 @@ const App = () => {
     setPortInData(data);
   };
 
+  const handleMobileInternetChange = (data) => {
+    setMobileInternetData(data);
+  };
+
+  const handleHomeInternetChange = (data) => {
+    setHomeInternetData(data);
+  };
+
+  const handleMobileInternetSkip = () => {
+    setMobileInternetData(null);
+    nextStep();
+  };
+
+  const handleHomeInternetSkip = () => {
+    setHomeInternetData(null);
+    nextStep();
+  };
+
   const nextStep = () => {
     if (currentStep < steps.length) {
       setIsLoading(true);
@@ -258,33 +278,47 @@ const App = () => {
         );
       case 1:
         return (
-          <LineSelection
+          <VoiceLinesFlow
             lines={quoteData.lines}
+            plans={quoteData.plans}
+            devices={quoteData.devices}
+            protection={quoteData.protection}
             onLinesChange={(lines) => updateQuoteData({ lines })}
+            onPlansChange={(plans) => updateQuoteData({ plans })}
+            onDevicesChange={(devices) => updateQuoteData({ devices })}
+            onProtectionChange={(protection) => updateQuoteData({ protection })}
             onNext={nextStep}
+            onPrev={prevStep}
           />
         );
       case 2:
         return (
-          <PlanSelection
-            lines={quoteData.lines}
-            plans={quoteData.plans}
-            onPlansChange={(plans) => updateQuoteData({ plans })}
-            onNext={nextStep}
-            onPrev={prevStep}
+          <TabletWearableFlow 
+            onNext={handleTabletWearableNext}
+            onSkip={handleTabletWearableSkip}
           />
         );
       case 3:
         return (
-          <DeviceSelection
-            lines={quoteData.lines}
-            devices={quoteData.devices}
-            onDevicesChange={(devices) => updateQuoteData({ devices })}
+          <MobileInternetFlow
+            mobileInternetData={mobileInternetData}
+            onMobileInternetChange={handleMobileInternetChange}
             onNext={nextStep}
             onPrev={prevStep}
+            onSkip={handleMobileInternetSkip}
           />
         );
       case 4:
+        return (
+          <HomeInternetFlow
+            homeInternetData={homeInternetData}
+            onHomeInternetChange={handleHomeInternetChange}
+            onNext={nextStep}
+            onPrev={prevStep}
+            onSkip={handleHomeInternetSkip}
+          />
+        );
+      case 5:
         return (
           <PromotionsSelection
             lines={quoteData.lines}
@@ -295,25 +329,7 @@ const App = () => {
             onPrev={prevStep}
           />
         );
-      case 5:
-        return (
-          <TabletWearableFlow 
-            onNext={handleTabletWearableNext}
-            onSkip={handleTabletWearableSkip}
-          />
-        );
       case 6:
-        return (
-          <ProtectionSelection
-            lines={quoteData.lines}
-            devices={quoteData.devices}
-            protection={quoteData.protection}
-            onProtectionChange={(protection) => updateQuoteData({ protection })}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 7:
         return (
           <DiscountSelection
             lines={quoteData.lines}
@@ -323,7 +339,7 @@ const App = () => {
             onPrev={prevStep}
           />
         );
-      case 8:
+      case 7:
         return (
           <EquipmentCreditSelection
             lines={quoteData.lines}
@@ -338,7 +354,7 @@ const App = () => {
             onPrev={prevStep}
           />
         );
-      case 9:
+      case 8:
         return (
           <PortInSelection
             lines={quoteData.lines}
@@ -348,18 +364,22 @@ const App = () => {
             onPrev={prevStep}
           />
         );
-      case 10:
+      case 9:
         return (
           <QuoteSummary
             quoteData={quoteData}
             customerData={customerData}
             tabletWearableData={tabletWearableData}
+            mobileInternetData={mobileInternetData}
+            homeInternetData={homeInternetData}
             portInData={portInData}
             onPrev={prevStep}
             onRestart={() => {
               setCurrentStep(0);
               setCustomerData(null);
               setTabletWearableData(null);
+              setMobileInternetData(null);
+              setHomeInternetData(null);
               setPortInData({});
               setPromotionsData({});
               setQuoteData({
@@ -389,39 +409,8 @@ const App = () => {
 
   return (
     <div className="app">
-      {/* App Header */}
-      <div className="header">
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '12px',
-          padding: '12px 20px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            background: '#E20074',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            color: '#FFFFFF'
-          }}>
-            T
-          </div>
-          <h1 style={{
-            margin: 0,
-            fontSize: '24px',
-            fontWeight: '600',
-            color: '#FFFFFF'
-          }}>
-            T-Mobile Quick Quote
-          </h1>
-        </div>
-      </div>
+      {/* Status Bar */}
+      <StatusBar currentFlowTitle={steps[currentStep]?.flowTitle} />
 
       {/* Dynamic Step Indicator */}
       {renderStepIndicator()}
@@ -429,16 +418,26 @@ const App = () => {
       {/* Main Content Area */}
       <div style={{ 
         background: '#f8f9fa', 
-        minHeight: 'calc(100vh - 200px)',
-        padding: '40px 0'
+        height: 'calc(100vh - 140px)',
+        padding: '10px 0',
+        overflow: 'hidden'
       }}>
         <div style={{
-          maxWidth: '1200px',
+          width: isMobile ? '100%' : 'calc(100% - 320px)', // Account for cart width + margin
           margin: '0 auto',
-          padding: '0 20px'
+          padding: '0 20px',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          maxWidth: 'none' // Remove max-width constraint
         }}>
           {/* Step Content */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ 
+            position: 'relative', 
+            flex: 1, 
+            overflowY: 'auto',
+            padding: '10px 0'
+          }}>
             {isLoading && (
               <div style={{
                 position: 'absolute',
@@ -483,31 +482,14 @@ const App = () => {
         currentStep={currentStep}
         customerData={customerData}
         tabletWearableData={tabletWearableData}
+        mobileInternetData={mobileInternetData}
+        homeInternetData={homeInternetData}
         quoteData={quoteData}
         portInData={portInData}
         promotionsData={promotionsData}
         steps={steps}
       />
 
-      {/* App Footer */}
-      <div style={{
-        marginTop: '0',
-        padding: '20px',
-        background: '#E20074',
-        textAlign: 'center',
-        color: '#FFFFFF',
-        fontSize: '14px'
-      }}>
-        <div style={{ marginBottom: '10px' }}>
-          <strong>T-Mobile Quote App</strong> - Get accurate wireless quotes instantly
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
-          <span>📱 Mobile Optimized</span>
-          <span>💰 Real-time Pricing</span>
-          <span>🛡️ Protection Plans</span>
-          <span>📊 Complete Quotes</span>
-        </div>
-      </div>
     </div>
   );
 };

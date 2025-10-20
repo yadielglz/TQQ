@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wifi, Shield, Zap } from 'lucide-react';
+import { Wifi, Shield, Zap, CreditCard } from 'lucide-react';
 
 const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
   const planOptions = [
@@ -151,9 +151,12 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
     }
   };
 
-  const handlePlanSelect = (lineIndex, planId) => {
-    const newPlans = { ...plans };
-    newPlans[lineIndex] = planId;
+  const handlePlanSelect = (planId) => {
+    // For multi-line accounts, all lines must be on the same plan
+    const newPlans = {};
+    for (let i = 0; i < lines; i++) {
+      newPlans[i] = planId;
+    }
     onPlansChange(newPlans);
   };
 
@@ -188,93 +191,78 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
 
   return (
     <div className="form-section">
-      <h2 className="section-title">Select plans for each line</h2>
+      <h2 className="section-title">Choose Your Plan</h2>
       
-      {Array.from({ length: lines }, (_, lineIndex) => (
-        <div key={lineIndex} className="line-item">
-          <div className="line-header">
-            <span className="line-number">Line {lineIndex + 1}</span>
-            <span className="line-price">
-              {getSelectedPlan(lineIndex) 
-                ? (() => {
-                    const planId = getSelectedPlan(lineIndex);
-                    const plan = planOptions.find(p => p.id === planId);
-                    if (!plan) return 'Select a plan';
-                    
-                    // Calculate price for this specific line
-                    const planCounts = {};
-                    for (let i = 0; i < lines; i++) {
-                      const pid = plans[i];
-                      if (pid === planId) {
-                        planCounts[pid] = (planCounts[pid] || 0) + 1;
-                      }
-                    }
-                    
-                    const count = planCounts[planId] || 1;
-                    const totalPrice = calculatePlanPrice(planId, count);
-                    const perLinePrice = Math.round(totalPrice / count);
-                    
-                    return `$${perLinePrice}/mo`;
-                  })()
-                : 'Select a plan'
-              }
-            </span>
+      {lines > 1 && (
+        <div style={{
+          background: '#e3f2fd',
+          border: '1px solid #2196f3',
+          borderRadius: '8px',
+          padding: '15px',
+          marginBottom: '20px',
+          color: '#1565c0'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            <div style={{ fontSize: '20px', marginRight: '10px' }}>ℹ️</div>
+            <strong>Multi-Line Account</strong>
           </div>
-          
-          <div className="card-grid">
-            {planOptions.map((plan) => {
-              const Icon = plan.icon;
-              const isSelected = getSelectedPlan(lineIndex) === plan.id;
-              
-              return (
-                <div
-                  key={plan.id}
-                  className={`card ${isSelected ? 'selected' : ''}`}
-                  onClick={() => handlePlanSelect(lineIndex, plan.id)}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                    <div style={{
-                      background: plan.color,
-                      borderRadius: '8px',
-                      padding: '8px',
-                      marginRight: '10px',
-                      color: 'white'
-                    }}>
-                      <Icon size={20} />
-                    </div>
-                    <div>
-                      <h3 className="card-title">{plan.name}</h3>
-                      <div className="card-price">
-                        {(() => {
-                          if (plan.senior && lines > 2) {
-                            return 'Max 2 lines';
-                          }
-                          const price = calculatePlanPrice(plan.id, lines);
-                          const perLine = Math.round(price / lines);
-                          return `$${perLine}/mo per line`;
-                        })()}
-                      </div>
-                      {plan.senior && (
-                        <div style={{ fontSize: '12px', color: '#E20074', fontWeight: 'bold' }}>
-                          55+ Senior Plan
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="card-description" style={{ marginBottom: '4px' }}>
-                        • {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
+          <p style={{ margin: 0, fontSize: '14px' }}>
+            All {lines} lines must be on the same plan. T-Mobile no longer allows independent plans on multi-line accounts.
+          </p>
         </div>
-      ))}
+      )}
+      
+      <div className="card-grid">
+        {planOptions.map(plan => {
+          const Icon = plan.icon;
+          const isSelected = getSelectedPlan(0) === plan.id; // Check first line since all lines are the same
+          
+          return (
+            <div
+              key={plan.id}
+              className={`card ${isSelected ? 'selected' : ''}`}
+              onClick={() => handlePlanSelect(plan.id)}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <div style={{
+                  background: plan.color,
+                  borderRadius: '8px',
+                  padding: '8px',
+                  marginRight: '10px',
+                  color: 'white'
+                }}>
+                  <Icon size={20} />
+                </div>
+                <div>
+                  <h3 className="card-title">{plan.name}</h3>
+                  <div className="card-price">
+                    {(() => {
+                      if (plan.senior && lines > 2) {
+                        return 'Max 2 lines';
+                      }
+                      const totalPrice = calculatePlanPrice(plan.id, lines);
+                      return `$${totalPrice}/mo total`;
+                    })()}
+                  </div>
+                  {plan.senior && (
+                    <div style={{ fontSize: '12px', color: '#E20074', fontWeight: 'bold' }}>
+                      55+ Senior Plan
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {plan.features.map((feature, index) => (
+                  <li key={index} className="card-description" style={{ marginBottom: '4px' }}>
+                    • {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
 
       <div className="summary">
         <div className="summary-title">Plan Summary</div>
