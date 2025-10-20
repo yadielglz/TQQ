@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { User, Phone, CreditCard, Smartphone, Shield, Percent, Calculator, CheckCircle, Gift } from 'lucide-react';
+import WelcomeScreen from './components/WelcomeScreen';
 import CustomerIntake from './components/CustomerIntake';
 import TabletWearableFlow from './components/TabletWearableFlow';
 import LineSelection from './components/LineSelection';
@@ -175,7 +176,7 @@ const App = () => {
   };
 
   const steps = [
-    { id: 0, title: 'Customer Info', icon: User },
+    { id: 0, title: 'Welcome', icon: User },
     { id: 1, title: 'Lines', icon: Phone },
     { id: 2, title: 'Plans', icon: CreditCard },
     { id: 3, title: 'Devices', icon: Smartphone },
@@ -194,6 +195,16 @@ const App = () => {
 
   const handleCustomerIntake = (customerInfo) => {
     setCustomerData(customerInfo);
+    nextStep();
+  };
+
+  const handleWelcomeNext = (customerInfo) => {
+    setCustomerData(customerInfo);
+    nextStep();
+  };
+
+  const handleWelcomeSkip = () => {
+    setCustomerData({ firstName: 'T-Mobile', lastName: 'Guest' });
     nextStep();
   };
 
@@ -240,7 +251,10 @@ const App = () => {
     switch (currentStep) {
       case 0:
         return (
-          <CustomerIntake onNext={handleCustomerIntake} />
+          <WelcomeScreen 
+            onNext={handleWelcomeNext} 
+            onSkip={handleWelcomeSkip} 
+          />
         );
       case 1:
         return (

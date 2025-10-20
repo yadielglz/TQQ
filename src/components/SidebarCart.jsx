@@ -54,7 +54,7 @@ const SidebarCart = ({
 
   const isStepComplete = (stepId) => {
     switch (stepId) {
-      case 0: // Customer Info
+      case 0: // Welcome
         return customerData && customerData.firstName && customerData.lastName;
       case 1: // Lines
         return quoteData.lines && quoteData.lines > 0;

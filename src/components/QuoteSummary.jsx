@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle, Download, Share2, Phone } from 'lucide-react';
+import jsPDF from 'jspdf';
 
 const QuoteSummary = ({ 
   quoteData, 
@@ -419,67 +420,166 @@ const QuoteSummary = ({
   };
 
   const handleDownloadQuote = () => {
-    const quoteText = `
-T-Mobile Quote Summary
-=====================
-
-Customer Information:
-Name: ${customerData ? `${customerData.firstName} ${customerData.lastName}` : 'Not provided'}
-Email: ${customerData ? customerData.email : 'Not provided'}
-Phone: ${customerData ? customerData.phone : 'Not provided'}
-Expected EC: ${customerData ? customerData.expectedEC : 'Not provided'}
-
-Quote Details:
-Lines: ${quoteData.lines}
-
-Plan Details:
-${Array.from({ length: quoteData.lines }, (_, i) => {
-  const planId = quoteData.plans[i];
-  const deviceId = quoteData.devices[i];
-  return `Line ${i + 1}: ${getPlanName(planId)} - $${planOptions.find(p => p.id === planId)?.price}/mo, ${getDeviceName(deviceId)} - $${getDevicePrice(deviceId)}/mo`;
-}).join('\n')}
-
-Monthly Totals:
-- Plan Total: $${calculatePlanTotal()}/mo
-- Device Payments: $${calculateDeviceTotal()}/mo
-- Protection Plans: $${calculateProtectionTotal()}/mo
-- Monthly Financing: $${calculateMonthlyFinancing()}/mo
-- Subtotal: $${calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing()}/mo
-${calculateAutoPaySavings() > 0 ? `- Auto Pay Discount: -$${calculateAutoPaySavings()}/mo` : ''}
-${calculateSeniorSavings() > 0 ? `- Senior 55+ Discount: -$${calculateSeniorSavings()}/mo` : ''}
-${calculateInsiderSavings() > 0 ? `- T-Mobile Insider Discount: -$${calculateInsiderSavings()}/mo` : ''}
-${calculateTradeInCredit() > 0 ? `- Trade-In Credit (Instant): -$${calculateTradeInCredit()}` : ''}
-- Taxes & Fees: $${calculateTaxesAndFees()}/mo
-- Total Monthly: $${getTotalMonthly()}/mo
-
-Equipment Credit Summary:
-- Total Device Cost: $${calculateDeviceCost()}
-- Total Trade-In Value: $${calculateTradeInTotal()}
-- Equipment Credit: $${parseFloat(quoteData.equipmentCredit) || 0}
-- Remaining Balance: $${calculateECBalance()}
-${calculateECBalance() > 0 ? `- Down Payment Required: $${calculateDownPaymentRequired()}` : ''}
-${calculateECBalance() > 0 ? `- Monthly Financing: $${calculateMonthlyFinancing()}/mo` : ''}
-
-Due Today:
-- Device Taxes: $${calculateDeviceTaxes()}
-- Activation Fees: $${calculateActivationFees()}
-- Down Payment: $${calculateDownPaymentRequired()}
-- Total Due Today: $${calculateTotalDueToday()}
-
-Total Device Cost: $${calculateDeviceCost()}
-
-Generated on: ${new Date().toLocaleDateString()}
-    `;
+    const doc = new jsPDF();
     
-    const blob = new Blob([quoteText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `t-mobile-quote-${customerData ? customerData.lastName.toLowerCase() : 'customer'}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Set up the PDF
+    doc.setFontSize(20);
+    doc.setTextColor(226, 0, 116); // T-Mobile magenta
+    doc.text('T-Mobile Quote Summary', 20, 30);
+    
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 45);
+    
+    let yPosition = 60;
+    
+    // Customer Information
+    doc.setFontSize(14);
+    doc.setTextColor(226, 0, 116);
+    doc.text('Customer Information:', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Name: ${customerData ? `${customerData.firstName} ${customerData.lastName}` : 'Not provided'}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Email: ${customerData ? customerData.email : 'Not provided'}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Phone: ${customerData ? customerData.phone : 'Not provided'}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Expected EC: ${customerData ? customerData.expectedEC : 'Not provided'}`, 20, yPosition);
+    yPosition += 15;
+    
+    // Quote Details
+    doc.setFontSize(14);
+    doc.setTextColor(226, 0, 116);
+    doc.text('Quote Details:', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Lines: ${quoteData.lines}`, 20, yPosition);
+    yPosition += 10;
+    
+    // Plan Details
+    doc.setFontSize(12);
+    doc.setTextColor(226, 0, 116);
+    doc.text('Plan Details:', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    Array.from({ length: quoteData.lines }, (_, i) => {
+      const planId = quoteData.plans[i];
+      const deviceId = quoteData.devices[i];
+      const plan = planOptions.find(p => p.id === planId);
+      const device = deviceOptions.find(d => d.id === deviceId);
+      
+      doc.text(`Line ${i + 1}: ${getPlanName(planId)} - $${plan?.price || 0}/mo`, 20, yPosition);
+      yPosition += 7;
+      doc.text(`         ${getDeviceName(deviceId)} - $${getDevicePrice(deviceId)}/mo`, 20, yPosition);
+      yPosition += 7;
+      
+      if (yPosition > 250) {
+        doc.addPage();
+        yPosition = 20;
+      }
+    });
+    
+    yPosition += 10;
+    
+    // Monthly Totals
+    doc.setFontSize(12);
+    doc.setTextColor(226, 0, 116);
+    doc.text('Monthly Totals:', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Plan Total: $${calculatePlanTotal()}/mo`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Device Payments: $${calculateDeviceTotal()}/mo`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Protection Plans: $${calculateProtectionTotal()}/mo`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Monthly Financing: $${calculateMonthlyFinancing()}/mo`, 20, yPosition);
+    yPosition += 7;
+    
+    if (calculateAutoPaySavings() > 0) {
+      doc.text(`Auto Pay Discount: -$${calculateAutoPaySavings()}/mo`, 20, yPosition);
+      yPosition += 7;
+    }
+    if (calculateSeniorSavings() > 0) {
+      doc.text(`Senior 55+ Discount: -$${calculateSeniorSavings()}/mo`, 20, yPosition);
+      yPosition += 7;
+    }
+    if (calculateInsiderSavings() > 0) {
+      doc.text(`T-Mobile Insider Discount: -$${calculateInsiderSavings()}/mo`, 20, yPosition);
+      yPosition += 7;
+    }
+    if (calculateTradeInCredit() > 0) {
+      doc.text(`Trade-In Credit (Instant): -$${calculateTradeInCredit()}`, 20, yPosition);
+      yPosition += 7;
+    }
+    
+    doc.text(`Taxes & Fees: $${calculateTaxesAndFees()}/mo`, 20, yPosition);
+    yPosition += 7;
+    doc.setFontSize(12);
+    doc.setTextColor(226, 0, 116);
+    doc.text(`Total Monthly: $${getTotalMonthly()}/mo`, 20, yPosition);
+    yPosition += 15;
+    
+    // Equipment Credit Summary
+    doc.setFontSize(12);
+    doc.setTextColor(226, 0, 116);
+    doc.text('Equipment Credit Summary:', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Total Device Cost: $${calculateDeviceCost()}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Total Trade-In Value: $${calculateTradeInTotal()}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Equipment Credit: $${parseFloat(quoteData.equipmentCredit) || 0}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Remaining Balance: $${calculateECBalance()}`, 20, yPosition);
+    yPosition += 7;
+    
+    if (calculateECBalance() > 0) {
+      doc.text(`Down Payment Required: $${calculateDownPaymentRequired()}`, 20, yPosition);
+      yPosition += 7;
+      doc.text(`Monthly Financing: $${calculateMonthlyFinancing()}/mo`, 20, yPosition);
+      yPosition += 7;
+    }
+    
+    // Due Today
+    doc.setFontSize(12);
+    doc.setTextColor(226, 0, 116);
+    doc.text('Due Today:', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Device Taxes: $${calculateDeviceTaxes()}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Activation Fees: $${calculateActivationFees()}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Down Payment: $${calculateDownPaymentRequired()}`, 20, yPosition);
+    yPosition += 7;
+    doc.setFontSize(12);
+    doc.setTextColor(226, 0, 116);
+    doc.text(`Total Due Today: $${calculateTotalDueToday()}`, 20, yPosition);
+    
+    // Add T-Mobile branding
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('T-Mobile Quick Quote Tool', 20, 280);
+    doc.text('Visit t-mobile.com for more information', 20, 287);
+    
+    // Save the PDF
+    const fileName = `t-mobile-quote-${customerData ? customerData.lastName.toLowerCase() : 'customer'}.pdf`;
+    doc.save(fileName);
   };
 
   const handleShareQuote = () => {
@@ -807,6 +907,83 @@ Generated on: ${new Date().toLocaleDateString()}
           </div>
         )}
       </div>
+
+      {/* Customer Information Update */}
+      {customerData && customerData.firstName === 'T-Mobile' && customerData.lastName === 'Guest' && (
+        <div style={{
+          background: '#f8f9fa',
+          padding: '20px',
+          borderRadius: '12px',
+          marginTop: '20px',
+          border: '1px solid #e0e0e0'
+        }}>
+          <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
+            Add Your Information
+          </h3>
+          <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+            You're currently viewing as a guest. Add your information to personalize your quote and make it easier to contact you.
+          </p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '15px',
+            marginBottom: '15px'
+          }}>
+            <input
+              type="text"
+              placeholder="First Name"
+              style={{
+                padding: '10px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '6px',
+                fontSize: '14px'
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              style={{
+                padding: '10px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '6px',
+                fontSize: '14px'
+              }}
+            />
+            <input
+              type="email"
+              placeholder="Email Address"
+              style={{
+                padding: '10px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '6px',
+                fontSize: '14px'
+              }}
+            />
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              style={{
+                padding: '10px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '6px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+          <button style={{
+            background: '#E20074',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '6px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer'
+          }}>
+            Save Information
+          </button>
+        </div>
+      )}
 
       <div style={{ 
         background: '#E20074',
