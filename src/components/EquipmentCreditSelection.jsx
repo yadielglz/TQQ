@@ -2,20 +2,52 @@ import React, { useState } from 'react';
 import { CreditCard, Calculator, DollarSign, ArrowRight, ArrowLeft } from 'lucide-react';
 
 const EquipmentCreditSelection = ({ 
-  lines, 
-  devices, 
-  expectedEC, 
-  onECChange, 
-  downPayment, 
-  onDownPaymentChange, 
-  tradeIns, 
-  onTradeInsChange, 
+  data, 
+  onDataChange, 
+  voiceLinesData, 
+  dataLinesData, 
+  iotLinesData, 
+  homeInternetData, 
   onNext, 
   onPrev 
 }) => {
-  const [ecAmount, setEcAmount] = useState(expectedEC || '');
-  const [selectedDownPayment, setSelectedDownPayment] = useState(downPayment || '');
-  const [tradeInValues, setTradeInValues] = useState(tradeIns || {});
+  const [ecAmount, setEcAmount] = useState(data?.amount || '');
+  const [downPayment, setDownPayment] = useState(data?.downPayment || '');
+  const [tradeIns, setTradeIns] = useState(data?.tradeIns || {});
+
+  // Get all devices from all services
+  const getAllDevices = () => {
+    const devices = [];
+    
+    // Voice line devices
+    if (voiceLinesData?.devices) {
+      Object.values(voiceLinesData.devices).forEach(deviceId => {
+        if (deviceId && deviceId !== 'byod') {
+          devices.push({ id: deviceId, service: 'Voice', line: Object.keys(voiceLinesData.devices).find(key => voiceLinesData.devices[key] === deviceId) });
+        }
+      });
+    }
+    
+    // Data line devices
+    if (dataLinesData?.devices) {
+      Object.values(dataLinesData.devices).forEach(deviceId => {
+        if (deviceId) {
+          devices.push({ id: deviceId, service: 'Data', line: Object.keys(dataLinesData.devices).find(key => dataLinesData.devices[key] === deviceId) });
+        }
+      });
+    }
+    
+    // IoT line devices
+    if (iotLinesData?.devices) {
+      Object.values(iotLinesData.devices).forEach(deviceId => {
+        if (deviceId) {
+          devices.push({ id: deviceId, service: 'IoT', line: Object.keys(iotLinesData.devices).find(key => iotLinesData.devices[key] === deviceId) });
+        }
+      });
+    }
+    
+    return devices;
+  };
 
   const deviceOptions = [
     { id: 'iphone-air', name: 'iPhone Air', price: 0, monthlyPrice: 0 },
@@ -50,110 +82,9 @@ const EquipmentCreditSelection = ({
     { id: 'byod', name: 'BYOD (Bring Your Own Device)', price: 0, monthlyPrice: 0 }
   ];
 
-  const downPaymentOptions = [
-    { value: '33', label: '33% Down Payment', description: 'Minimum down payment' },
-    { value: '66', label: '66% Down Payment', description: 'Moderate down payment' },
-    { value: '75', label: '75% Down Payment', description: 'Maximum down payment' }
-  ];
-
-  const calculateDeviceTotal = () => {
-    let total = 0;
-    for (let i = 0; i < lines; i++) {
-      const deviceId = devices[i];
-      if (deviceId) {
-        const device = deviceOptions.find(d => d.id === deviceId);
-        if (device) {
-          total += device.price;
-        }
-      }
-    }
-    return total;
-  };
-
-  const calculateTradeInTotal = () => {
-    let total = 0;
-    for (let i = 0; i < lines; i++) {
-      const tradeInValue = tradeInValues[i] || 0;
-      total += parseFloat(tradeInValue) || 0;
-    }
-    return total;
-  };
-
-  const calculateECBalance = () => {
-    const deviceTotal = calculateDeviceTotal();
-    const tradeInTotal = calculateTradeInTotal();
-    const ecAmountNum = parseFloat(ecAmount) || 0;
-    
-    return Math.max(0, deviceTotal - tradeInTotal - ecAmountNum);
-  };
-
-  const calculateDownPaymentRequired = () => {
-    const ecBalance = calculateECBalance();
-    const downPaymentPercent = parseFloat(selectedDownPayment) || 0;
-    
-    if (ecBalance <= 0) return 0;
-    
-    return Math.ceil(ecBalance * (downPaymentPercent / 100));
-  };
-
-  const calculateMonthlyFinancing = () => {
-    const ecBalance = calculateECBalance();
-    const downPaymentAmount = calculateDownPaymentRequired();
-    const financedAmount = ecBalance - downPaymentAmount;
-    
-    if (financedAmount <= 0) return 0;
-    
-    // T-Mobile typically offers 24-month financing
-    return Math.ceil(financedAmount / 24);
-  };
-
-  const calculateTradeInCredit = () => {
-    const deviceTotal = calculateDeviceTotal();
-    const tradeInTotal = calculateTradeInTotal();
-    
-    // If trade-in value exceeds device cost, return the excess as monthly credit
-    return Math.max(0, tradeInTotal - deviceTotal);
-  };
-
-  const handleECChange = (value) => {
-    setEcAmount(value);
-    onECChange(value);
-  };
-
-  const handleDownPaymentChange = (value) => {
-    setSelectedDownPayment(value);
-    onDownPaymentChange(value);
-  };
-
-  const handleTradeInChange = (lineIndex, value) => {
-    const newTradeIns = { ...tradeInValues };
-    newTradeIns[lineIndex] = value;
-    setTradeInValues(newTradeIns);
-    onTradeInsChange(newTradeIns);
-  };
-
-  const canProceed = () => {
-    return ecAmount.trim() !== '' && (calculateECBalance() <= 0 || selectedDownPayment !== '');
-  };
-
-  const handleNext = async () => {
-    try {
-      // Google Sheets integration disabled
-      console.log('✅ Equipment Credit data collected:', {
-        equipmentCredit: ecAmount,
-        downPayment: selectedDownPayment,
-        tradeIns: tradeInValues
-      });
-    } catch (error) {
-      console.warn('⚠️ Could not save Equipment Credit data:', error);
-    }
-    
-    onNext();
-  };
-
   const getDeviceName = (deviceId) => {
     const device = deviceOptions.find(d => d.id === deviceId);
-    return device ? device.name : 'No device selected';
+    return device ? device.name : 'Unknown Device';
   };
 
   const getDevicePrice = (deviceId) => {
@@ -161,11 +92,215 @@ const EquipmentCreditSelection = ({
     return device ? device.price : 0;
   };
 
+  const calculateMonthlyFinancing = () => {
+    const devices = getAllDevices();
+    let totalFinancing = 0;
+
+    devices.forEach(({ id }) => {
+      const device = deviceOptions.find(d => d.id === id);
+      if (device && device.price > 0) {
+        const devicePrice = device.price;
+        const ecCredit = parseFloat(ecAmount) || 0;
+        const tradeInValue = parseFloat(tradeIns[id]) || 0;
+        const downPaymentValue = parseFloat(downPayment) || 0;
+        
+        // Amount financed = device price - EC credit - trade-in - down payment
+        const amountFinanced = Math.max(0, devicePrice - ecCredit - tradeInValue - downPaymentValue);
+        
+        // Monthly payment (assuming 24-month financing)
+        const monthlyPayment = amountFinanced / 24;
+        totalFinancing += monthlyPayment;
+      }
+    });
+
+    return totalFinancing;
+  };
+
+  const handleTradeInChange = (deviceId, value) => {
+    const newTradeIns = { ...tradeIns };
+    newTradeIns[deviceId] = value;
+    setTradeIns(newTradeIns);
+  };
+
+  const handleNext = () => {
+    const equipmentCreditData = {
+      amount: ecAmount,
+      downPayment,
+      tradeIns,
+      monthlyFinancing: calculateMonthlyFinancing()
+    };
+    
+    onDataChange(equipmentCreditData);
+    onNext();
+  };
+
+  const canProceed = () => {
+    return ecAmount.trim() !== '';
+  };
+
   return (
-    <div className="form-section">
-      <h2 className="section-title">Equipment Credit & Financing</h2>
-      
+    <div style={{
+      maxWidth: '100%',
+      margin: '0 auto',
+      padding: '15px 10px',
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      height: 'calc(100vh - 120px)',
+      overflowY: 'auto'
+    }}>
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '20px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+          marginBottom: '8px'
+        }}>
+          <CreditCard size={24} color="#E20074" />
+          <h2 style={{
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#E20074',
+            margin: 0
+          }}>
+            Equipment Credit & Financing
+          </h2>
+        </div>
+        <p style={{ 
+          color: '#666', 
+          fontSize: '14px',
+          margin: 0,
+          lineHeight: '1.4'
+        }}>
+          Enter your expected Equipment Credit (EC) amount and any trade-in values or down payments.
+        </p>
+      </div>
+
       {/* Equipment Credit Input */}
+      <div style={{ marginBottom: '30px' }}>
+        <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600' }}>
+          Expected Equipment Credit (EC) Amount
+        </label>
+        <div style={{ position: 'relative' }}>
+          <DollarSign 
+            size={20} 
+            style={{ 
+              position: 'absolute', 
+              left: '12px', 
+              top: '50%', 
+              transform: 'translateY(-50%)', 
+              color: '#666' 
+            }} 
+          />
+          <input
+            type="number"
+            value={ecAmount}
+            onChange={(e) => setEcAmount(e.target.value)}
+            placeholder="Enter EC amount"
+            style={{
+              width: '100%',
+              padding: '12px 12px 12px 40px',
+              border: '2px solid #e0e0e0',
+              borderRadius: '8px',
+              fontSize: '16px',
+              background: 'white'
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Down Payment Input */}
+      <div style={{ marginBottom: '30px' }}>
+        <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600' }}>
+          Down Payment (Optional)
+        </label>
+        <div style={{ position: 'relative' }}>
+          <DollarSign 
+            size={20} 
+            style={{ 
+              position: 'absolute', 
+              left: '12px', 
+              top: '50%', 
+              transform: 'translateY(-50%)', 
+              color: '#666' 
+            }} 
+          />
+          <input
+            type="number"
+            value={downPayment}
+            onChange={(e) => setDownPayment(e.target.value)}
+            placeholder="Enter down payment amount"
+            style={{
+              width: '100%',
+              padding: '12px 12px 12px 40px',
+              border: '2px solid #e0e0e0',
+              borderRadius: '8px',
+              fontSize: '16px',
+              background: 'white'
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Trade-in Values */}
+      {getAllDevices().length > 0 && (
+        <div style={{ marginBottom: '30px' }}>
+          <label style={{ display: 'block', marginBottom: '15px', fontWeight: '600' }}>
+            Trade-in Values (Optional)
+          </label>
+          <div style={{
+            background: '#f8f9fa',
+            padding: '20px',
+            borderRadius: '8px',
+            border: '1px solid #e0e0e0'
+          }}>
+            {getAllDevices().map(({ id, service, line }) => (
+              <div key={id} style={{ marginBottom: '15px' }}>
+                <div style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '600', 
+                  marginBottom: '5px',
+                  color: '#333'
+                }}>
+                  {getDeviceName(id)} ({service} Line {parseInt(line) + 1})
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <DollarSign 
+                    size={16} 
+                    style={{ 
+                      position: 'absolute', 
+                      left: '8px', 
+                      top: '50%', 
+                      transform: 'translateY(-50%)', 
+                      color: '#666' 
+                    }} 
+                  />
+                  <input
+                    type="number"
+                    value={tradeIns[id] || ''}
+                    onChange={(e) => handleTradeInChange(id, e.target.value)}
+                    placeholder="Trade-in value"
+                    style={{
+                      width: '100%',
+                      padding: '8px 8px 8px 30px',
+                      border: '1px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      background: 'white'
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Financing Summary */}
       <div style={{
         background: '#f8f9fa',
         padding: '20px',
@@ -173,286 +308,51 @@ const EquipmentCreditSelection = ({
         marginBottom: '30px',
         border: '1px solid #e0e0e0'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-          <CreditCard size={24} style={{ color: '#e20074', marginRight: '10px' }} />
-          <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333' }}>
-            Equipment Credit (EC)
-          </h3>
+        <div style={{ fontWeight: '600', marginBottom: '10px', color: '#E20074' }}>
+          Financing Summary
         </div>
-        
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', fontWeight: '600', color: '#333', marginBottom: '8px' }}>
-            Expected EC Amount *
-          </label>
-          <div style={{ position: 'relative' }}>
-            <DollarSign size={20} style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#666'
-            }} />
-            <input
-              type="number"
-              value={ecAmount}
-              onChange={(e) => handleECChange(e.target.value)}
-              placeholder="0"
-              min="0"
-              step="0.01"
-              style={{
-                width: '100%',
-                padding: '12px 12px 12px 40px',
-                border: '2px solid #e0e0e0',
-                borderRadius: '8px',
-                fontSize: '16px',
-                background: 'white'
-              }}
-            />
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+          <span>EC Amount:</span>
+          <span>${ecAmount || '0'}</span>
         </div>
-        
-        <div style={{ fontSize: '14px', color: '#666' }}>
-          Equipment Credit will be applied to offset device costs. Any remaining balance may require a down payment.
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+          <span>Down Payment:</span>
+          <span>${downPayment || '0'}</span>
         </div>
-      </div>
-
-      {/* Device Summary */}
-      <div style={{
-        background: 'white',
-        border: '2px solid #e0e0e0',
-        borderRadius: '12px',
-        marginBottom: '30px',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          background: '#f8f9fa',
-          padding: '15px 20px',
-          borderBottom: '1px solid #e0e0e0',
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+          <span>Total Trade-ins:</span>
+          <span>${Object.values(tradeIns).reduce((sum, val) => sum + (parseFloat(val) || 0), 0)}</span>
+        </div>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
           fontWeight: '600',
-          color: '#333'
+          borderTop: '1px solid #e0e0e0',
+          paddingTop: '10px'
         }}>
-          Device Summary
-        </div>
-        
-        {Array.from({ length: lines }, (_, lineIndex) => {
-          const deviceId = devices[lineIndex];
-          const devicePrice = getDevicePrice(deviceId);
-          const tradeInValue = tradeInValues[lineIndex] || 0;
-          
-          return (
-            <div key={lineIndex} style={{
-              padding: '15px 20px',
-              borderBottom: lineIndex < lines - 1 ? '1px solid #f0f0f0' : 'none',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
-                <div style={{ fontWeight: '600', color: '#333', marginBottom: '4px' }}>
-                  Line {lineIndex + 1}: {getDeviceName(deviceId)}
-                </div>
-                <div style={{ fontSize: '14px', color: '#666' }}>
-                  Device Price: ${devicePrice}
-                </div>
-              </div>
-              
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ marginBottom: '8px' }}>
-                  <label style={{ fontSize: '12px', color: '#666', display: 'block', marginBottom: '4px' }}>
-                    Trade-In Value
-                  </label>
-                  <div style={{ position: 'relative', display: 'inline-block' }}>
-                    <DollarSign size={14} style={{
-                      position: 'absolute',
-                      left: '8px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#666'
-                    }} />
-                    <input
-                      type="number"
-                      value={tradeInValue}
-                      onChange={(e) => handleTradeInChange(lineIndex, e.target.value)}
-                      placeholder="0"
-                      min="0"
-                      step="0.01"
-                      style={{
-                        width: '120px',
-                        padding: '6px 6px 6px 24px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '4px',
-                        fontSize: '14px'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* EC Calculation */}
-      <div style={{
-        background: '#E20074',
-        color: 'white',
-        padding: '20px',
-        borderRadius: '12px',
-        marginBottom: '30px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-          <Calculator size={24} style={{ marginRight: '10px' }} />
-          <h3 style={{ fontSize: '18px', fontWeight: '600' }}>
-            EC Calculation
-          </h3>
-        </div>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-          <div>
-            <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Total Device Cost</div>
-            <div style={{ fontSize: '20px', fontWeight: '700' }}>${calculateDeviceTotal()}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Total Trade-In</div>
-            <div style={{ fontSize: '20px', fontWeight: '700' }}>${calculateTradeInTotal()}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Equipment Credit</div>
-            <div style={{ fontSize: '20px', fontWeight: '700' }}>${parseFloat(ecAmount) || 0}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Remaining Balance</div>
-            <div style={{ fontSize: '20px', fontWeight: '700' }}>${calculateECBalance()}</div>
-          </div>
+          <span>Estimated Monthly Financing:</span>
+          <span>${calculateMonthlyFinancing().toFixed(2)}</span>
         </div>
       </div>
 
-      {/* Down Payment Selection */}
-      {calculateECBalance() > 0 ? (
-        <div style={{
-          background: '#f8f9fa',
-          padding: '20px',
-          borderRadius: '12px',
-          marginBottom: '30px',
-          border: '1px solid #e0e0e0'
-        }}>
-          <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
-            Down Payment Required
-          </h3>
-          
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ fontSize: '16px', fontWeight: '600', color: '#e20074', marginBottom: '10px' }}>
-              Remaining Balance: ${calculateECBalance()}
-            </div>
-            <div style={{ fontSize: '14px', color: '#666' }}>
-              Select down payment percentage for the remaining balance
-            </div>
-          </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
-            {downPaymentOptions.map((option) => {
-              const downPaymentAmount = calculateDownPaymentRequired();
-              const monthlyFinancing = calculateMonthlyFinancing();
-              const isSelected = selectedDownPayment === option.value;
-              
-              return (
-                <div
-                  key={option.value}
-                  onClick={() => handleDownPaymentChange(option.value)}
-                  style={{
-                    padding: '15px',
-                    border: `2px solid ${isSelected ? '#e20074' : '#e0e0e0'}`,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    background: isSelected ? 'linear-gradient(135deg, rgba(226, 0, 116, 0.1), rgba(255, 107, 53, 0.1))' : 'white',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  <div style={{ fontWeight: '600', color: '#333', marginBottom: '8px' }}>
-                    {option.label}
-                  </div>
-                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-                    {option.description}
-                  </div>
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#e20074' }}>
-                    Down Payment: ${downPaymentAmount}
-                  </div>
-                  <div style={{ fontSize: '14px', color: '#666' }}>
-                    Monthly Financing: ${monthlyFinancing}/mo
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : (
-        <div style={{
-          background: '#e8f5e8',
-          padding: '20px',
-          borderRadius: '12px',
-          marginBottom: '30px',
-          border: '1px solid #4CAF50',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '18px', fontWeight: '600', color: '#2e7d32', marginBottom: '10px' }}>
-            ✅ No Down Payment Required!
-          </div>
-          <div style={{ fontSize: '14px', color: '#2e7d32' }}>
-            Your Equipment Credit and trade-ins cover the full device cost. You can proceed to the summary.
-          </div>
-        </div>
-      )}
-
-      {/* Summary */}
-      <div className="summary">
-        <div className="summary-title">Equipment Credit Summary</div>
-        <div className="summary-item">
-          <span className="summary-label">Total Device Cost</span>
-          <span className="summary-value">${calculateDeviceTotal()}</span>
-        </div>
-        <div className="summary-item">
-          <span className="summary-label">Total Trade-In Value</span>
-          <span className="summary-value">${calculateTradeInTotal()}</span>
-        </div>
-        <div className="summary-item">
-          <span className="summary-label">Equipment Credit</span>
-          <span className="summary-value">${parseFloat(ecAmount) || 0}</span>
-        </div>
-        <div className="summary-item">
-          <span className="summary-label">Remaining Balance</span>
-          <span className="summary-value">${calculateECBalance()}</span>
-        </div>
-        {calculateTradeInCredit() > 0 && (
-          <div className="summary-item" style={{ color: '#4CAF50' }}>
-            <span className="summary-label">Trade-In Credit (Monthly)</span>
-            <span className="summary-value">-${calculateTradeInCredit()}/mo</span>
-          </div>
-        )}
-        {calculateECBalance() > 0 && (
-          <>
-            <div className="summary-item">
-              <span className="summary-label">Down Payment Required</span>
-              <span className="summary-value">${calculateDownPaymentRequired()}</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Monthly Financing</span>
-              <span className="summary-value">${calculateMonthlyFinancing()}/mo</span>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Action Buttons */}
+      {/* Navigation */}
       <div className="button-group">
-        <button className="button button-secondary" onClick={onPrev}>
-          Back to Discounts
+        <button
+          className="button-secondary"
+          onClick={onPrev}
+          style={{ flex: 1 }}
+        >
+          <ArrowLeft size={16} style={{ marginRight: '8px' }} />
+          Back
         </button>
-        <button 
-          className="button" 
+        <button
+          className="button"
           onClick={handleNext}
           disabled={!canProceed()}
+          style={{ flex: 2 }}
         >
-          {calculateECBalance() <= 0 ? 'Continue to Summary' : 'Continue to Summary'}
+          Continue to Discounts
+          <ArrowRight size={16} style={{ marginLeft: '8px' }} />
         </button>
       </div>
     </div>

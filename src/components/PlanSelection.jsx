@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wifi, Shield, Zap, CreditCard } from 'lucide-react';
+import { Wifi, Shield, Zap } from 'lucide-react';
 
 const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
   const planOptions = [
@@ -190,8 +190,43 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
   };
 
   return (
-    <div className="form-section">
-      <h2 className="section-title">Choose Your Plan</h2>
+    <div style={{
+      maxWidth: '100%',
+      margin: '0 auto',
+      padding: '15px 10px',
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      height: 'calc(100vh - 120px)',
+      overflowY: 'auto'
+    }}>
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '20px'
+      }}>
+        <h2 style={{
+          fontSize: '24px',
+          fontWeight: '700',
+          color: '#E20074',
+          margin: 0
+        }}>
+          Choose Your Plan
+        </h2>
+      </div>
+      
+      {/* Action Buttons */}
+      <div className="button-group">
+        <button className="button button-secondary" onClick={onPrev}>
+          Back to Lines
+        </button>
+        <button 
+          className="button" 
+          onClick={onNext}
+          disabled={!canProceed()}
+        >
+          Continue to Devices
+        </button>
+      </div>
       
       {lines > 1 && (
         <div style={{
@@ -270,19 +305,6 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
           <span className="summary-label">Monthly Plan Total</span>
           <span className="summary-value">${calculateTotal()}/mo</span>
         </div>
-      </div>
-
-      <div className="button-group">
-        <button className="button button-secondary" onClick={onPrev}>
-          Back to Lines
-        </button>
-        <button 
-          className="button" 
-          onClick={onNext}
-          disabled={!canProceed()}
-        >
-          Continue to Devices
-        </button>
       </div>
     </div>
   );

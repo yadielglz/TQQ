@@ -29,8 +29,9 @@ function doPost(e) {
     const spreadsheetId = '1bHPeLWo5nQeJuIaOU0Aawg41eRzYZaoszNzgz44yrdI';
     const sheet = SpreadsheetApp.openById(spreadsheetId).getActiveSheet();
     
-    // Prepare the row data
+    // Prepare the row data with enhanced columns
     const rowData = [
+      data.timestamp || new Date().toISOString(),
       data.firstName || '',
       data.lastName || '',
       data.email || '',
@@ -40,7 +41,15 @@ function doPost(e) {
       data.expectedEC || '',
       data.equipmentCredit || '',
       data.downPayment || '',
-      data.tradeIns || ''
+      data.tradeIns || '',
+      data.totalMonthly || 0,
+      data.services || '',
+      data.voiceLines || 0,
+      data.dataLines || 0,
+      data.iotLines || 0,
+      data.homeInternet || 'No',
+      data.discounts || '',
+      data.fullQuoteData || ''
     ];
     
     // Append the data to the sheet
@@ -76,8 +85,9 @@ function doGet(e) {
     const spreadsheetId = '1bHPeLWo5nQeJuIaOU0Aawg41eRzYZaoszNzgz44yrdI';
     const sheet = SpreadsheetApp.openById(spreadsheetId).getActiveSheet();
     
-    // Prepare the row data
+    // Prepare the row data with enhanced columns
     const rowData = [
+      data.timestamp || new Date().toISOString(),
       data.firstName || '',
       data.lastName || '',
       data.email || '',
@@ -87,7 +97,15 @@ function doGet(e) {
       data.expectedEC || '',
       data.equipmentCredit || '',
       data.downPayment || '',
-      data.tradeIns || ''
+      data.tradeIns || '',
+      data.totalMonthly || 0,
+      data.services || '',
+      data.voiceLines || 0,
+      data.dataLines || 0,
+      data.iotLines || 0,
+      data.homeInternet || 'No',
+      data.discounts || '',
+      data.fullQuoteData || ''
     ];
     
     // Append the data to the sheet

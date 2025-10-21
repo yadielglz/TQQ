@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Tablet, Watch, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { Tablet, Watch, ArrowRight, ArrowLeft, Plus, Minus } from 'lucide-react';
 
-const TabletWearableFlow = ({ onNext, onSkip }) => {
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [lines, setLines] = useState(1);
-  const [devices, setDevices] = useState({});
-  const [plans, setPlans] = useState({});
-  const [protection, setProtection] = useState({});
+const DataLinesFlow = ({ data, onDataChange, onComplete, onAddAnother, onPrev }) => {
+  const [selectedCategory, setSelectedCategory] = useState(data.category || '');
+  const [lines, setLines] = useState(data.quantity || 1);
+  const [devices, setDevices] = useState(data.devices || {});
+  const [plans, setPlans] = useState(data.plans || {});
+  const [protection, setProtection] = useState(data.protection || {});
+  const [promotions, setPromotions] = useState(data.promotions || {});
 
   const categories = [
     { id: 'tablet', name: 'Tablet', icon: Tablet, color: '#E20074' },
-    { id: 'wearable', name: 'Wearable', icon: Watch, color: '#E20074' }
+    { id: 'wearable', name: 'Wearable', icon: Watch, color: '#1E88E5' }
   ];
 
   const tabletDevices = [
@@ -56,6 +57,21 @@ const TabletWearableFlow = ({ onNext, onSkip }) => {
     return selectedCategory === 'tablet' ? tabletPlans : wearablePlans;
   };
 
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+    // Reset other data when category changes
+    setDevices({});
+    setPlans({});
+    setProtection({});
+    setPromotions({});
+  };
+
+  const handleLinesChange = (newLines) => {
+    if (newLines >= 1 && newLines <= 5) {
+      setLines(newLines);
+    }
+  };
+
   const handleDeviceChange = (lineIndex, deviceId) => {
     const newDevices = { ...devices };
     newDevices[lineIndex] = deviceId;
@@ -72,6 +88,12 @@ const TabletWearableFlow = ({ onNext, onSkip }) => {
     const newProtection = { ...protection };
     newProtection[lineIndex] = hasProtection;
     setProtection(newProtection);
+  };
+
+  const handlePromotionChange = (lineIndex, promotionId) => {
+    const newPromotions = { ...promotions };
+    newPromotions[lineIndex] = promotionId;
+    setPromotions(newPromotions);
   };
 
   const canProceed = () => {
@@ -94,43 +116,100 @@ const TabletWearableFlow = ({ onNext, onSkip }) => {
     return total;
   };
 
-  const handleNext = () => {
-    const tabletWearableData = {
+  const handleComplete = () => {
+    const dataLinesData = {
       category: selectedCategory,
-      lines,
+      quantity: lines,
       devices,
       plans,
       protection,
+      promotions,
       totalMonthly: calculateTotal()
     };
-    onNext(tabletWearableData);
+    
+    onDataChange(dataLinesData);
+    onComplete();
+  };
+
+  const handleAddAnother = () => {
+    const dataLinesData = {
+      category: selectedCategory,
+      quantity: lines,
+      devices,
+      plans,
+      protection,
+      promotions,
+      totalMonthly: calculateTotal()
+    };
+    
+    onDataChange(dataLinesData);
+    onAddAnother();
   };
 
   return (
-    <div className="form-section">
-      <div className="section-title">
-        <Tablet size={24} />
-        Tablet & Wearable Setup
+    <div style={{
+      maxWidth: '100%',
+      margin: '0 auto',
+      padding: '15px 10px',
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      height: 'calc(100vh - 120px)',
+      overflowY: 'auto'
+    }}>
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '20px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+          marginBottom: '8px'
+        }}>
+          <Tablet size={24} color="#E20074" />
+          <h2 style={{
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#E20074',
+            margin: 0
+          }}>
+            Data Lines Setup
+          </h2>
+        </div>
+        <p style={{ 
+          color: '#666', 
+          fontSize: '14px',
+          margin: 0,
+          lineHeight: '1.4'
+        }}>
+          Configure tablets and wearables for your account. Choose the category and configure each line.
+        </p>
       </div>
-      <p className="section-description">
-        Add tablets and wearables to your account. You can skip this step if not needed.
-      </p>
 
       {/* Category Selection */}
-      <div style={{ marginBottom: '30px' }}>
-        <label style={{ display: 'block', marginBottom: '15px', fontWeight: '600', fontSize: '18px' }}>
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', fontSize: '16px' }}>
           Select Category
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
           {categories.map(category => (
             <div
               key={category.id}
-              className={`card ${selectedCategory === category.id ? 'selected' : ''}`}
-              onClick={() => setSelectedCategory(category.id)}
-              style={{ cursor: 'pointer' }}
+              onClick={() => handleCategoryChange(category.id)}
+              style={{
+                cursor: 'pointer',
+                border: `2px solid ${selectedCategory === category.id ? '#E20074' : '#e0e0e0'}`,
+                borderRadius: '8px',
+                padding: '15px',
+                background: selectedCategory === category.id ? 'rgba(226, 0, 116, 0.05)' : 'white',
+                transition: 'all 0.2s ease',
+                textAlign: 'center'
+              }}
             >
-              <category.icon size={32} color={category.color} style={{ marginBottom: '10px' }} />
-              <div className="card-title">{category.name}</div>
+              <category.icon size={24} color="#E20074" style={{ marginBottom: '8px' }} />
+              <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>{category.name}</div>
             </div>
           ))}
         </div>
@@ -143,22 +222,47 @@ const TabletWearableFlow = ({ onNext, onSkip }) => {
             <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600' }}>
               Number of {selectedCategory === 'tablet' ? 'Tablets' : 'Wearables'}
             </label>
-            <select
-              value={lines}
-              onChange={(e) => setLines(parseInt(e.target.value))}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '2px solid #e0e0e0',
-                borderRadius: '8px',
-                fontSize: '16px',
-                background: 'white'
-              }}
-            >
-              {[1, 2, 3, 4, 5].map(num => (
-                <option key={num} value={num}>{num}</option>
-              ))}
-            </select>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <button
+                onClick={() => handleLinesChange(lines - 1)}
+                disabled={lines <= 1}
+                style={{
+                  background: lines <= 1 ? '#ccc' : '#E20074',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: lines <= 1 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <Minus size={20} />
+              </button>
+              <span style={{ fontSize: '18px', fontWeight: '600', minWidth: '30px', textAlign: 'center' }}>
+                {lines}
+              </span>
+              <button
+                onClick={() => handleLinesChange(lines + 1)}
+                disabled={lines >= 5}
+                style={{
+                  background: lines >= 5 ? '#ccc' : '#E20074',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: lines >= 5 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <Plus size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Device and Plan Selection per Line */}
@@ -232,7 +336,7 @@ const TabletWearableFlow = ({ onNext, onSkip }) => {
                 </div>
 
                 {/* Protection Plan */}
-                <div>
+                <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
@@ -242,6 +346,29 @@ const TabletWearableFlow = ({ onNext, onSkip }) => {
                     />
                     <span>Add P360 Protection Plan</span>
                   </label>
+                </div>
+
+                {/* Promotions */}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600' }}>
+                    Promotions (Optional)
+                  </label>
+                  <select
+                    value={promotions[i] || ''}
+                    onChange={(e) => handlePromotionChange(i, e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '2px solid #e0e0e0',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      background: 'white'
+                    }}
+                  >
+                    <option value="">No Promotion</option>
+                    <option value="tablet-promo">Tablet Promotion</option>
+                    <option value="wearable-promo">Wearable Promotion</option>
+                  </select>
                 </div>
               </div>
             );
@@ -266,30 +393,40 @@ const TabletWearableFlow = ({ onNext, onSkip }) => {
         </>
       )}
 
-      {/* Navigation Buttons */}
+      {/* Navigation */}
       <div className="button-group">
-        <button 
-          className="button secondary" 
-          onClick={onSkip}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+        <button
+          className="button-secondary"
+          onClick={onPrev}
+          style={{ flex: 1 }}
         >
-          Skip Tablet/Wearable Setup
-          <ArrowRight size={20} />
+          <ArrowLeft size={16} style={{ marginRight: '8px' }} />
+          Back
         </button>
-        {selectedCategory && (
-          <button 
-            className="button primary" 
-            onClick={handleNext}
-            disabled={!canProceed()}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-          >
-            Continue to Main Flow
-            <ArrowRight size={20} />
-          </button>
+        {canProceed() && (
+          <>
+            <button
+              className="button-secondary"
+              onClick={handleAddAnother}
+              style={{ flex: 1 }}
+            >
+              Add Another Service
+              <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+            </button>
+            <button
+              className="button"
+              onClick={handleComplete}
+              style={{ flex: 1 }}
+            >
+              Complete Data Lines
+              <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+            </button>
+          </>
         )}
       </div>
     </div>
   );
 };
 
-export default TabletWearableFlow;
+export default DataLinesFlow;
+

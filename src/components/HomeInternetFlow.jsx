@@ -1,27 +1,39 @@
 import React, { useState } from 'react';
-import { Home, Wifi, ArrowRight, ArrowLeft, CheckCircle, SkipForward } from 'lucide-react';
+import { Home, Wifi, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 
 const HomeInternetFlow = ({ 
-  homeInternetData, 
-  onHomeInternetChange, 
-  onNext, 
-  onPrev,
-  onSkip 
+  data, 
+  onDataChange, 
+  onComplete, 
+  onAddAnother, 
+  onPrev 
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize data from props or defaults
+  const [device, setDevice] = useState(data?.device || null);
+  const [plan, setPlan] = useState(data?.plan || null);
 
   const steps = [
     { id: 0, title: 'Gateway Device', icon: Home, component: 'device' },
     { id: 1, title: 'Internet Plans', icon: Wifi, component: 'plans' }
   ];
 
-  const gatewayDevice = {
-    id: 'tmobile-home-internet-gateway',
-    name: 'T-Mobile Home Internet Gateway',
-    price: 0,
-    description: 'High-speed 5G gateway for home internet service'
-  };
+  const gatewayDevices = [
+    {
+      id: 'tmobile-home-internet-gateway',
+      name: 'T-Mobile Home Internet Gateway',
+      price: 0,
+      description: 'High-speed 5G gateway for home internet service'
+    },
+    {
+      id: 'backup-gateway',
+      name: 'Backup Gateway',
+      price: 0,
+      description: 'Backup gateway for redundancy'
+    }
+  ];
 
   const homeInternetPlans = [
     { id: 'rely-home-internet', name: 'Rely Home Internet', price: 50, description: 'Reliable home internet service' },
@@ -40,7 +52,7 @@ const HomeInternetFlow = ({
         setIsLoading(false);
       }, 300);
     } else {
-      onNext();
+      handleComplete();
     }
   };
 
@@ -54,6 +66,28 @@ const HomeInternetFlow = ({
     } else {
       onPrev();
     }
+  };
+
+  const handleComplete = () => {
+    const homeInternetData = {
+      device,
+      plan,
+      totalMonthly: plan ? homeInternetPlans.find(p => p.id === plan)?.price || 0 : 0
+    };
+    
+    onDataChange(homeInternetData);
+    onComplete();
+  };
+
+  const handleAddAnother = () => {
+    const homeInternetData = {
+      device,
+      plan,
+      totalMonthly: plan ? homeInternetPlans.find(p => p.id === plan)?.price || 0 : 0
+    };
+    
+    onDataChange(homeInternetData);
+    onAddAnother();
   };
 
   const renderStepIndicator = () => (
@@ -118,204 +152,106 @@ const HomeInternetFlow = ({
   );
 
   const renderDeviceStep = () => (
-    <div style={{
-      maxWidth: '600px',
-      margin: '0 auto',
-      padding: '40px 20px',
-      background: 'white',
-      borderRadius: '16px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-    }}>
-      <h2 style={{
-        fontSize: '24px',
-        fontWeight: '600',
-        color: '#333',
-        marginBottom: '20px',
-        textAlign: 'center'
-      }}>
-        Gateway Device
-      </h2>
-      
-      <div
-        onClick={() => {
-          const newData = { ...homeInternetData };
-          newData.device = gatewayDevice.id;
-          onHomeInternetChange(newData);
-        }}
-        style={{
-          padding: '30px',
-          border: `2px solid ${homeInternetData?.device === gatewayDevice.id ? '#E20074' : '#e0e0e0'}`,
-          borderRadius: '12px',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          background: homeInternetData?.device === gatewayDevice.id ? '#fdf2f8' : 'white',
-          textAlign: 'center'
-        }}
-      >
-        <div style={{
-          background: '#E20074',
-          borderRadius: '50%',
-          width: '80px',
-          height: '80px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 20px',
-          color: 'white'
-        }}>
-          <Home size={40} />
-        </div>
-        
-        <h3 style={{
-          fontSize: '20px',
-          fontWeight: '600',
-          color: '#333',
-          marginBottom: '10px'
-        }}>
-          {gatewayDevice.name}
-        </h3>
-        
-        <p style={{
-          fontSize: '16px',
-          color: '#666',
-          marginBottom: '15px'
-        }}>
-          {gatewayDevice.description}
-        </p>
-        
-        <div style={{
-          background: '#4CAF50',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: '20px',
-          fontSize: '16px',
-          fontWeight: '600',
-          display: 'inline-block'
-        }}>
-          FREE Gateway
-        </div>
+    <div className="form-section">
+      <div className="section-title">
+        <Home size={24} />
+        Gateway Device Selection
       </div>
-
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        gap: '15px',
-        marginTop: '30px'
-      }}>
-        <button
-          onClick={prevStep}
-          style={{
-            background: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          <ArrowLeft size={20} />
-          Previous
-        </button>
-
-        <button
-          onClick={onSkip}
-          style={{
-            background: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          <SkipForward size={20} />
-          Skip
-        </button>
-        
-        <button
-          onClick={nextStep}
-          disabled={!homeInternetData?.device}
-          style={{
-            background: homeInternetData?.device ? '#E20074' : '#ccc',
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: homeInternetData?.device ? 'pointer' : 'not-allowed',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          Next
-          <ArrowRight size={20} />
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderPlansStep = () => (
-    <div style={{
-      maxWidth: '800px',
-      margin: '0 auto',
-      padding: '40px 20px',
-      background: 'white',
-      borderRadius: '16px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-    }}>
-      <h2 style={{
-        fontSize: '24px',
-        fontWeight: '600',
-        color: '#333',
-        marginBottom: '20px',
-        textAlign: 'center'
-      }}>
-        Select Internet Plans
-      </h2>
       
+      <p style={{ color: '#666', marginBottom: '30px' }}>
+        Choose your home internet gateway device. Both options are free with qualifying plans.
+      </p>
+
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         gap: '20px',
         marginBottom: '30px'
       }}>
-        {homeInternetPlans.map((plan) => (
+        {gatewayDevices.map((gatewayDevice) => (
           <div
-            key={plan.id}
-            onClick={() => {
-              const newData = { ...homeInternetData };
-              if (!newData.plans) newData.plans = [];
-              
-              if (newData.plans.includes(plan.id)) {
-                newData.plans = newData.plans.filter(id => id !== plan.id);
-              } else {
-                newData.plans.push(plan.id);
-              }
-              onHomeInternetChange(newData);
-            }}
-            style={{
-              padding: '20px',
-              border: `2px solid ${homeInternetData?.plans?.includes(plan.id) ? '#E20074' : '#e0e0e0'}`,
-              borderRadius: '12px',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              background: homeInternetData?.plans?.includes(plan.id) ? '#fdf2f8' : 'white'
-            }}
+            key={gatewayDevice.id}
+            onClick={() => setDevice(gatewayDevice.id)}
+            className={`card ${device === gatewayDevice.id ? 'selected' : ''}`}
+            style={{ cursor: 'pointer', textAlign: 'center' }}
+          >
+            <div style={{
+              background: '#E20074',
+              borderRadius: '50%',
+              width: '60px',
+              height: '60px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 15px',
+              color: 'white'
+            }}>
+              <Home size={30} />
+            </div>
+            
+            <h3 className="card-title" style={{ marginBottom: '10px' }}>
+              {gatewayDevice.name}
+            </h3>
+            
+            <p className="card-description" style={{ marginBottom: '15px' }}>
+              {gatewayDevice.description}
+            </p>
+            
+            <div style={{
+              background: '#4CAF50',
+              color: 'white',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              fontSize: '14px',
+              fontWeight: '600',
+              display: 'inline-block'
+            }}>
+              FREE Gateway
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="button-group">
+        <button className="button-secondary" onClick={prevStep}>
+          <ArrowLeft size={16} style={{ marginRight: '8px' }} />
+          Back
+        </button>
+        <button 
+          className="button" 
+          onClick={nextStep}
+          disabled={!device}
+        >
+          Next
+          <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderPlansStep = () => (
+    <div className="form-section">
+      <div className="section-title">
+        <Wifi size={24} />
+        Internet Plan Selection
+      </div>
+      
+      <p style={{ color: '#666', marginBottom: '30px' }}>
+        Select your home internet plan. You can choose multiple plans if needed.
+      </p>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '20px',
+        marginBottom: '30px'
+      }}>
+        {homeInternetPlans.map((planOption) => (
+          <div
+            key={planOption.id}
+            onClick={() => setPlan(planOption.id)}
+            className={`card ${plan === planOption.id ? 'selected' : ''}`}
+            style={{ cursor: 'pointer' }}
           >
             <div style={{
               display: 'flex',
@@ -323,13 +259,8 @@ const HomeInternetFlow = ({
               alignItems: 'center',
               marginBottom: '10px'
             }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#333',
-                margin: 0
-              }}>
-                {plan.name}
+              <h3 className="card-title" style={{ margin: 0 }}>
+                {planOption.name}
               </h3>
               <div style={{
                 background: '#E20074',
@@ -339,15 +270,11 @@ const HomeInternetFlow = ({
                 fontSize: '12px',
                 fontWeight: '600'
               }}>
-                ${plan.price}/Mo
+                ${planOption.price}/Mo
               </div>
             </div>
-            <p style={{
-              fontSize: '14px',
-              color: '#666',
-              margin: 0
-            }}>
-              {plan.description}
+            <p className="card-description" style={{ margin: 0 }}>
+              {planOption.description}
             </p>
           </div>
         ))}
@@ -358,7 +285,7 @@ const HomeInternetFlow = ({
         background: '#e3f2fd',
         padding: '15px',
         borderRadius: '8px',
-        marginBottom: '20px',
+        marginBottom: '30px',
         border: '1px solid #bbdefb'
       }}>
         <p style={{
@@ -371,74 +298,31 @@ const HomeInternetFlow = ({
         </p>
       </div>
 
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        gap: '15px'
-      }}>
-        <button
-          onClick={prevStep}
-          style={{
-            background: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          <ArrowLeft size={20} />
-          Previous
+      <div className="button-group">
+        <button className="button-secondary" onClick={prevStep}>
+          <ArrowLeft size={16} style={{ marginRight: '8px' }} />
+          Back
         </button>
-
-        <button
-          onClick={onSkip}
-          style={{
-            background: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          <SkipForward size={20} />
-          Skip
-        </button>
-        
-        <button
-          onClick={nextStep}
-          disabled={!homeInternetData?.plans?.length}
-          style={{
-            background: homeInternetData?.plans?.length ? '#E20074' : '#ccc',
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: '600',
-            cursor: homeInternetData?.plans?.length ? 'pointer' : 'not-allowed',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'background-color 0.3s ease'
-          }}
-        >
-          Complete
-          <CheckCircle size={20} />
-        </button>
+        {plan && (
+          <>
+            <button
+              className="button-secondary"
+              onClick={handleAddAnother}
+              style={{ flex: 1 }}
+            >
+              Add Another Service
+              <ArrowRight size={16} style={{ marginLeft: '8px' }} />
+            </button>
+            <button
+              className="button"
+              onClick={handleComplete}
+              style={{ flex: 1 }}
+            >
+              Complete Home Internet
+              <CheckCircle size={16} style={{ marginLeft: '8px' }} />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -456,10 +340,46 @@ const HomeInternetFlow = ({
 
   return (
     <div style={{
-      width: '100%',
-      margin: '0',
-      padding: '0'
+      maxWidth: '100%',
+      margin: '0 auto',
+      padding: '15px 10px',
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      height: 'calc(100vh - 120px)',
+      overflowY: 'auto'
     }}>
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '20px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+          marginBottom: '8px'
+        }}>
+          <Home size={24} color="#E20074" />
+          <h2 style={{
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#E20074',
+            margin: 0
+          }}>
+            Home Internet Setup
+          </h2>
+        </div>
+        <p style={{ 
+          color: '#666', 
+          fontSize: '14px',
+          margin: 0,
+          lineHeight: '1.4'
+        }}>
+          Configure home internet service for your account. Simple 2-step process.
+        </p>
+      </div>
+
       {/* Step Indicator */}
       {renderStepIndicator()}
 
@@ -501,6 +421,31 @@ const HomeInternetFlow = ({
         )}
         {renderStepContent()}
       </div>
+
+      {/* Summary */}
+      {device && plan && (
+        <div style={{
+          background: '#f8f9fa',
+          padding: '20px',
+          borderRadius: '12px',
+          marginTop: '30px',
+          border: '1px solid #e0e0e0'
+        }}>
+          <div style={{ fontWeight: '600', marginBottom: '10px', color: '#E20074' }}>
+            Home Internet Summary
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>Device: {gatewayDevices.find(d => d.id === device)?.name}</span>
+            <span>Plan: {homeInternetPlans.find(p => p.id === plan)?.name}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
+            <span>Monthly Cost:</span>
+            <span style={{ fontWeight: '600' }}>
+              ${homeInternetPlans.find(p => p.id === plan)?.price || 0}/mo
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

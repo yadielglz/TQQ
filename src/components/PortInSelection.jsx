@@ -26,7 +26,7 @@ const PortInSelection = ({
       setLocalPortInData(newData);
       onPortInDataChange(newData);
     }
-  }, [lines]);
+  }, [lines, localPortInData, onPortInDataChange]);
 
   const handlePortInChange = (lineIndex, field, value) => {
     const newData = { ...localPortInData };
@@ -94,6 +94,33 @@ const PortInSelection = ({
       <div className="section-title">
         <Phone size={24} />
         Choose Your Number
+      </div>
+      
+      {/* Navigation Buttons */}
+      <div className="button-group">
+        <button 
+          className="button secondary" 
+          onClick={onPrev}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          <ArrowLeft size={20} />
+          Back to Equipment Credit
+        </button>
+        <button 
+          className="button primary" 
+          onClick={onNext}
+          disabled={!canProceed()}
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            opacity: canProceed() ? 1 : 0.6,
+            cursor: canProceed() ? 'pointer' : 'not-allowed'
+          }}
+        >
+          Continue to Summary
+          <ArrowRight size={20} />
+        </button>
       </div>
       <p className="section-description">
         Choose whether each line will get a new number or port-in an existing number.
@@ -294,33 +321,6 @@ const PortInSelection = ({
           </div>
         </div>
       )}
-
-      {/* Navigation Buttons */}
-      <div className="button-group">
-        <button 
-          className="button secondary" 
-          onClick={onPrev}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-        >
-          <ArrowLeft size={20} />
-          Back to Equipment Credit
-        </button>
-        <button 
-          className="button primary" 
-          onClick={onNext}
-          disabled={!canProceed()}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px',
-            opacity: canProceed() ? 1 : 0.6,
-            cursor: canProceed() ? 'pointer' : 'not-allowed'
-          }}
-        >
-          Continue to Summary
-          <ArrowRight size={20} />
-        </button>
-      </div>
     </div>
   );
 };

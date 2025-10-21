@@ -1,5 +1,4 @@
 import React from 'react';
-import { Shield, Smartphone, CheckCircle } from 'lucide-react';
 
 const ProtectionSelection = ({ lines, devices, protection, onProtectionChange, onNext, onPrev }) => {
   const deviceOptions = [
@@ -87,6 +86,20 @@ const ProtectionSelection = ({ lines, devices, protection, onProtectionChange, o
   return (
     <div className="form-section">
       <h2 className="section-title">Select Protection Plans</h2>
+      
+      {/* Action Buttons */}
+      <div className="button-group">
+        <button className="button button-secondary" onClick={onPrev}>
+          Back to Devices
+        </button>
+        <button 
+          className="button" 
+          onClick={onNext}
+          disabled={!canProceed()}
+        >
+          Continue to Discounts
+        </button>
+      </div>
       <p style={{ color: '#666', marginBottom: '30px', textAlign: 'center' }}>
         P360 Protection covers device damage, loss, and theft with deductible-based claims
       </p>
@@ -134,7 +147,7 @@ const ProtectionSelection = ({ lines, devices, protection, onProtectionChange, o
                 <h3 className="card-title">No Protection</h3>
                 <div className="card-price">$0/mo</div>
                 <p className="card-description">
-                  You're responsible for all device repairs and replacements
+                  You&apos;re responsible for all device repairs and replacements
                 </p>
               </div>
               
@@ -182,18 +195,6 @@ const ProtectionSelection = ({ lines, devices, protection, onProtectionChange, o
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className="button-group">
-        <button className="button button-secondary" onClick={onPrev}>
-          Back to Devices
-        </button>
-        <button 
-          className="button" 
-          onClick={onNext}
-        >
-          Continue to Discounts
-        </button>
       </div>
     </div>
   );

@@ -48,7 +48,7 @@ const CustomerIntake = ({ onNext }) => {
 
     if (!customerData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
-    } else if (!/^[\d\s\-\(\)\+]{10,}$/.test(customerData.phone.replace(/\D/g, ''))) {
+    } else if (!/^[\d\s\-()+]{10,}$/.test(customerData.phone.replace(/\D/g, ''))) {
       newErrors.phone = 'Please enter a valid phone number';
     }
 
@@ -77,12 +77,11 @@ const CustomerIntake = ({ onNext }) => {
 
     try {
       // Google Sheets integration disabled
-      console.log('✅ Customer data collected:', customerData);
       
       // Pass customer data to next step
       onNext(customerData);
     } catch (error) {
-      console.error('Error in customer intake:', error);
+      // Handle error silently in production
       setErrors({ submit: 'Failed to process customer information. Please try again.' });
     } finally {
       setIsSubmitting(false);

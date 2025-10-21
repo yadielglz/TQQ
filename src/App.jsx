@@ -1,495 +1,222 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { User, Phone, CreditCard, Smartphone, Shield, Percent, Calculator, CheckCircle, Gift, Wifi, Home } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import StatusBar from './components/StatusBar';
-import WelcomeScreen from './components/WelcomeScreen';
-import CustomerIntake from './components/CustomerIntake';
-import VoiceLinesFlow from './components/VoiceLinesFlow';
-import TabletWearableFlow from './components/TabletWearableFlow';
-import MobileInternetFlow from './components/MobileInternetFlow';
-import HomeInternetFlow from './components/HomeInternetFlow';
-import PromotionsSelection from './components/PromotionsSelection';
-import DiscountSelection from './components/DiscountSelection';
-import EquipmentCreditSelection from './components/EquipmentCreditSelection';
-import PortInSelection from './components/PortInSelection';
-import QuoteSummary from './components/QuoteSummary';
-import SidebarCart from './components/SidebarCart';
+import MasterFlow from './components/MasterFlow';
 
 const App = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLoading, setIsLoading] = useState(false);
-  const [customerData, setCustomerData] = useState(null);
-  const [tabletWearableData, setTabletWearableData] = useState(null);
-  const [mobileInternetData, setMobileInternetData] = useState(null);
-  const [homeInternetData, setHomeInternetData] = useState(null);
-  const [portInData, setPortInData] = useState({});
-  const [promotionsData, setPromotionsData] = useState({});
-  const [quoteData, setQuoteData] = useState({
-    lines: 1,
-    plans: {},
-    devices: {},
-    promotions: {},
-    protection: {},
-    discounts: {
-      autoPay: false,
-      senior55: false,
-      tmobileInsider: false
-    },
-    equipmentCredit: '',
-    downPayment: '',
-    tradeIns: {},
-    totalMonthly: 0,
-    totalDeviceCost: 0
-  });
 
-  // Handle responsive design
+  // Handle loading state
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setWindowWidth(width);
-      setIsMobile(width < 768);
+    const handleLoad = () => {
+      setIsLoading(false);
     };
 
-    handleResize(); // Set initial state
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    // Simulate initial loading
+    setIsLoading(true);
+    setTimeout(handleLoad, 1000);
   }, []);
 
-  const renderStepIndicator = () => {
-    if (isMobile) {
-      // Mobile: Show current step with progress
-      const currentStepData = steps.find(step => step.id === currentStep);
-      const Icon = currentStepData?.icon || Phone;
-      
-      return (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '20px',
-          padding: '10px 15px',
-          background: 'rgba(255,255,255,0.1)',
-          borderRadius: '8px',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <div style={{
-            background: '#E20074',
-            borderRadius: '50%',
-            padding: '8px',
-            marginRight: '12px',
-            color: 'white'
-          }}>
-            <Icon size={20} />
-          </div>
-          <div>
-            <div style={{ 
-              fontSize: '14px', 
-              fontWeight: '600', 
-              color: 'white',
-              marginBottom: '2px'
-            }}>
-              Step {currentStep} of {steps.length}
-            </div>
-            <div style={{ 
-              fontSize: '12px', 
-              color: 'rgba(255,255,255,0.8)'
-            }}>
-              {currentStepData?.title}
-            </div>
-          </div>
-          <div style={{
-            marginLeft: '12px',
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '8px',
-            padding: '6px 10px',
-            fontSize: '11px',
-            color: 'white',
-            fontWeight: '600'
-          }}>
-            {Math.round((currentStep / steps.length) * 100)}%
-          </div>
-        </div>
-      );
-    } else {
-      // Desktop: Show compact horizontal step indicator
-      return (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: '20px',
-          padding: '8px 0',
-          flexWrap: 'wrap',
-          gap: '8px'
-        }}>
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            const isActive = currentStep === step.id;
-            const isCompleted = currentStep > step.id;
-            
-            return (
-              <React.Fragment key={step.id}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '8px 16px',
-                  background: isActive 
-                    ? '#E20074' 
-                    : isCompleted 
-                      ? '#4CAF50' 
-                      : 'rgba(255,255,255,0.1)',
-                  borderRadius: '20px',
-                  color: 'white',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                  backdropFilter: 'blur(10px)',
-                  border: isActive ? '2px solid rgba(255,255,255,0.3)' : '2px solid transparent'
-                }}>
-                  <div style={{
-                    marginRight: '6px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
-                    {isCompleted ? <CheckCircle size={16} /> : <Icon size={16} />}
-                  </div>
-                  <span style={{ 
-                    fontSize: '12px', 
-                    fontWeight: '600',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    {step.title}
-                  </span>
-                </div>
-                
-                {index < steps.length - 1 && (
-                  <div style={{
-                    width: '20px',
-                    height: '2px',
-                    background: currentStep > step.id ? '#4CAF50' : 'rgba(255,255,255,0.3)',
-                    transition: 'background 0.3s ease'
-                  }} />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
-      );
-    }
-  };
-
-  const steps = [
-    { id: 0, title: 'Welcome', icon: User, flowTitle: null },
-    { id: 1, title: 'Voice Lines', icon: Phone, flowTitle: 'Voice Lines Configuration' },
-    { id: 2, title: 'Tablet/Wearable', icon: Phone, flowTitle: 'Tablet & Wearable Configuration' },
-    { id: 3, title: 'Mobile Internet', icon: Wifi, flowTitle: 'Mobile Internet Configuration' },
-    { id: 4, title: 'Home Internet', icon: Home, flowTitle: 'Home Internet Configuration' },
-    { id: 5, title: 'Promotions', icon: Gift, flowTitle: 'Promotions Selection' },
-    { id: 6, title: 'Discounts', icon: Percent, flowTitle: 'Discounts Selection' },
-    { id: 7, title: 'Equipment Credit', icon: Calculator, flowTitle: 'Equipment Credit Selection' },
-    { id: 8, title: 'Choose Your Number', icon: Phone, flowTitle: 'Port-In Selection' },
-    { id: 9, title: 'Summary', icon: CheckCircle, flowTitle: 'Quote Summary' }
-  ];
-
-  const updateQuoteData = useCallback((updates) => {
-    setQuoteData(prev => ({ ...prev, ...updates }));
-  }, []);
-
-  const handleCustomerIntake = (customerInfo) => {
-    setCustomerData(customerInfo);
-    nextStep();
-  };
-
-  const handleWelcomeNext = (customerInfo) => {
-    setCustomerData(customerInfo);
-    nextStep();
-  };
-
-  const handleWelcomeSkip = () => {
-    setCustomerData({ firstName: 'T-Mobile', lastName: 'Guest' });
-    nextStep();
-  };
-
-  const handlePromotionsChange = useCallback((promotions) => {
-    setPromotionsData(promotions);
-    updateQuoteData({ promotions });
-  }, [updateQuoteData]);
-
-  const handleTabletWearableNext = (data) => {
-    setTabletWearableData(data);
-    nextStep();
-  };
-
-  const handleTabletWearableSkip = () => {
-    setTabletWearableData(null);
-    nextStep();
-  };
-
-  const handlePortInDataChange = (data) => {
-    setPortInData(data);
-  };
-
-  const handleMobileInternetChange = (data) => {
-    setMobileInternetData(data);
-  };
-
-  const handleHomeInternetChange = (data) => {
-    setHomeInternetData(data);
-  };
-
-  const handleMobileInternetSkip = () => {
-    setMobileInternetData(null);
-    nextStep();
-  };
-
-  const handleHomeInternetSkip = () => {
-    setHomeInternetData(null);
-    nextStep();
-  };
-
-  const nextStep = () => {
-    if (currentStep < steps.length) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setCurrentStep(currentStep + 1);
-        setIsLoading(false);
-      }, 300);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setIsLoading(true);
-      setTimeout(() => {
-        setCurrentStep(currentStep - 1);
-        setIsLoading(false);
-      }, 300);
-    }
-  };
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
-        return (
-          <WelcomeScreen 
-            onNext={handleWelcomeNext} 
-            onSkip={handleWelcomeSkip} 
-          />
-        );
-      case 1:
-        return (
-          <VoiceLinesFlow
-            lines={quoteData.lines}
-            plans={quoteData.plans}
-            devices={quoteData.devices}
-            protection={quoteData.protection}
-            onLinesChange={(lines) => updateQuoteData({ lines })}
-            onPlansChange={(plans) => updateQuoteData({ plans })}
-            onDevicesChange={(devices) => updateQuoteData({ devices })}
-            onProtectionChange={(protection) => updateQuoteData({ protection })}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 2:
-        return (
-          <TabletWearableFlow 
-            onNext={handleTabletWearableNext}
-            onSkip={handleTabletWearableSkip}
-          />
-        );
-      case 3:
-        return (
-          <MobileInternetFlow
-            mobileInternetData={mobileInternetData}
-            onMobileInternetChange={handleMobileInternetChange}
-            onNext={nextStep}
-            onPrev={prevStep}
-            onSkip={handleMobileInternetSkip}
-          />
-        );
-      case 4:
-        return (
-          <HomeInternetFlow
-            homeInternetData={homeInternetData}
-            onHomeInternetChange={handleHomeInternetChange}
-            onNext={nextStep}
-            onPrev={prevStep}
-            onSkip={handleHomeInternetSkip}
-          />
-        );
-      case 5:
-        return (
-          <PromotionsSelection
-            lines={quoteData.lines}
-            quoteData={quoteData}
-            portInData={portInData}
-            onPromotionsChange={handlePromotionsChange}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 6:
-        return (
-          <DiscountSelection
-            lines={quoteData.lines}
-            discounts={quoteData.discounts}
-            onDiscountsChange={(discounts) => updateQuoteData({ discounts })}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 7:
-        return (
-          <EquipmentCreditSelection
-            lines={quoteData.lines}
-            devices={quoteData.devices}
-            expectedEC={customerData?.expectedEC || ''}
-            onECChange={(equipmentCredit) => updateQuoteData({ equipmentCredit })}
-            downPayment={quoteData.downPayment}
-            onDownPaymentChange={(downPayment) => updateQuoteData({ downPayment })}
-            tradeIns={quoteData.tradeIns}
-            onTradeInsChange={(tradeIns) => updateQuoteData({ tradeIns })}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 8:
-        return (
-          <PortInSelection
-            lines={quoteData.lines}
-            portInData={portInData}
-            onPortInDataChange={handlePortInDataChange}
-            onNext={nextStep}
-            onPrev={prevStep}
-          />
-        );
-      case 9:
-        return (
-          <QuoteSummary
-            quoteData={quoteData}
-            customerData={customerData}
-            tabletWearableData={tabletWearableData}
-            mobileInternetData={mobileInternetData}
-            homeInternetData={homeInternetData}
-            portInData={portInData}
-            onPrev={prevStep}
-            onRestart={() => {
-              setCurrentStep(0);
-              setCustomerData(null);
-              setTabletWearableData(null);
-              setMobileInternetData(null);
-              setHomeInternetData(null);
-              setPortInData({});
-              setPromotionsData({});
-              setQuoteData({
-                lines: 1,
-                plans: {},
-                devices: {},
-                promotions: {},
-                protection: {},
-                discounts: {
-                  autoPay: false,
-                  senior55: false,
-                  tmobileInsider: false
-                },
-                equipmentCredit: '',
-                downPayment: '',
-                tradeIns: {},
-                totalMonthly: 0,
-                totalDeviceCost: 0
-              });
-            }}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="app">
-      {/* Status Bar */}
-      <StatusBar currentFlowTitle={steps[currentStep]?.flowTitle} />
-
-      {/* Dynamic Step Indicator */}
-      {renderStepIndicator()}
-
-      {/* Main Content Area */}
-      <div style={{ 
-        background: '#f8f9fa', 
-        height: 'calc(100vh - 140px)',
-        padding: '10px 0',
-        overflow: 'hidden'
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #E20074 0%, #1E88E5 100%)',
+        color: 'white',
+        fontSize: '24px',
+        fontWeight: '600'
       }}>
         <div style={{
-          width: isMobile ? '100%' : 'calc(100% - 320px)', // Account for cart width + margin
-          margin: '0 auto',
-          padding: '0 20px',
-          height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          maxWidth: 'none' // Remove max-width constraint
+          alignItems: 'center',
+          gap: '20px'
         }}>
-          {/* Step Content */}
-          <div style={{ 
-            position: 'relative', 
-            flex: 1, 
-            overflowY: 'auto',
-            padding: '10px 0'
-          }}>
-            {isLoading && (
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(255,255,255,0.9)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-                borderRadius: '12px'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  color: '#e20074',
-                  fontSize: '16px',
-                  fontWeight: '600'
-                }}>
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    border: '2px solid #e20074',
-                    borderTop: '2px solid transparent',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
-                  }} />
-                  Loading...
-                </div>
-              </div>
-            )}
-            {renderStepContent()}
-          </div>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(255,255,255,0.3)',
+            borderTop: '4px solid white',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <div>Loading T-Mobile Quote App...</div>
         </div>
       </div>
+    );
+  }
 
-      {/* Sidebar Cart */}
-      <SidebarCart
-        currentStep={currentStep}
-        customerData={customerData}
-        tabletWearableData={tabletWearableData}
-        mobileInternetData={mobileInternetData}
-        homeInternetData={homeInternetData}
-        quoteData={quoteData}
-        portInData={portInData}
-        promotionsData={promotionsData}
-        steps={steps}
-      />
-
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#f8f9fa',
+      color: '#333'
+    }}>
+      {/* Status Bar */}
+      <StatusBar />
+      
+      {/* Main Application */}
+      <MasterFlow />
+      
+      {/* Global Styles */}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        * {
+          box-sizing: border-box;
+        }
+        
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+            sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .form-section {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 15px 10px;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+          color: #333;
+          height: calc(100vh - 110px);
+          overflow-y: auto;
+        }
+        
+        .section-title {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+          font-size: 24px;
+          font-weight: 600;
+          color: #E20074;
+        }
+        
+        .card {
+          background: white;
+          border: 2px solid #e0e0e0;
+          border-radius: 12px;
+          padding: 20px;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+        
+        .card:hover {
+          border-color: #E20074;
+          box-shadow: 0 4px 16px rgba(226, 0, 116, 0.1);
+        }
+        
+        .card.selected {
+          border-color: #E20074;
+          background: #fdf2f8;
+        }
+        
+        .card-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 8px;
+        }
+        
+        .card-description {
+          font-size: 14px;
+          color: #666;
+          line-height: 1.5;
+        }
+        
+        .card-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+          margin-bottom: 30px;
+        }
+        
+        .button-group {
+          display: flex;
+          gap: 15px;
+          margin-top: 30px;
+        }
+        
+        .button {
+          background: #E20074;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          flex: 1;
+        }
+        
+        .button:hover:not(:disabled) {
+          background: #c1005f;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 16px rgba(226, 0, 116, 0.3);
+        }
+        
+        .button:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+        
+        .button-secondary {
+          background: #6c757d;
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          flex: 1;
+        }
+        
+        .button-secondary:hover {
+          background: #5a6268;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 16px rgba(108, 117, 125, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+          .form-section {
+            margin: 5px;
+            padding: 10px 8px;
+            height: calc(100vh - 90px);
+          }
+          
+          .card-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .button-group {
+            flex-direction: column;
+          }
+        }
+      `}</style>
     </div>
   );
 };

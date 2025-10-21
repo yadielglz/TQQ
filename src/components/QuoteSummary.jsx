@@ -1,346 +1,90 @@
-import React from 'react';
-import { CheckCircle, Download, Share2, Phone } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Download, Share2, Phone, ArrowLeft, RotateCcw, Copy, Mail, MessageSquare, Calendar, TrendingUp, BarChart3, FileText, QrCode, Eye, EyeOff, Star, Clock, DollarSign, Users, Wifi, Smartphone, Home, Watch, Scale } from 'lucide-react';
 import jsPDF from 'jspdf';
 
 const QuoteSummary = ({ 
-  quoteData, 
   customerData, 
-  tabletWearableData,
-  mobileInternetData,
+  voiceLinesData, 
+  dataLinesData, 
+  iotLinesData, 
   homeInternetData,
-  portInData,
+  equipmentCreditData, 
+  discountsData, 
   onPrev, 
   onRestart 
 }) => {
+  const [showDetailedBreakdown, setShowDetailedBreakdown] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareMethod, setShareMethod] = useState('email');
+  const [quoteId] = useState(() => `TMO-${Date.now()}`);
+  const [isPublic, setIsPublic] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [comparisonData, setComparisonData] = useState(null);
+  const quoteRef = useRef(null);
+
   const planOptions = [
     { 
       id: 'essentials', 
       name: 'Experience Essentials', 
-      pricing: { 1: 50, 2: 80, 3: 90, 4: 100, 5: 120, 6: 135, additional: 35 }
+      pricing: { 1: 50, 2: 80, 3: 90, 4: 100, 5: 120, 6: 135, additional: 35 },
+      features: ['Unlimited talk, text & data', '5GB mobile hotspot', 'SD video streaming']
     },
     { 
       id: 'more', 
       name: 'Experience More', 
-      pricing: { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 }
+      pricing: { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 },
+      features: ['Unlimited talk, text & data', '15GB mobile hotspot', 'HD video streaming', 'Scam Shield']
     },
     { 
       id: 'beyond', 
       name: 'Experience Beyond', 
-      pricing: { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 }
-    },
-    { 
-      id: 'essentials-55', 
-      name: 'Essentials Choice 55', 
-      pricing: { 1: 45, 2: 60 }, 
-      senior: true, 
-      maxLines: 2 
-    },
-    { 
-      id: 'more-55', 
-      name: 'More w/55+ Savings', 
-      pricing: { 1: 70, 2: 100 }, 
-      senior: true, 
-      maxLines: 2 
-    },
-    { 
-      id: 'beyond-55', 
-      name: 'Beyond w/55+ Savings', 
-      pricing: { 1: 85, 2: 130 }, 
-      senior: true, 
-      maxLines: 2 
+      pricing: { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 },
+      features: ['Unlimited talk, text & data', '50GB mobile hotspot', '4K video streaming', 'Scam Shield Premium', 'Netflix on Us']
     }
   ];
 
   const deviceOptions = [
-    { id: 'iphone-air', name: 'iPhone Air', monthlyPrice: 42, price: 999, tier: 5 },
-    { id: 'iphone-17-pro-max', name: 'iPhone 17 Pro Max', monthlyPrice: 50, price: 1199, tier: 6 },
-    { id: 'iphone-17-pro', name: 'iPhone 17 Pro', monthlyPrice: 46, price: 1099, tier: 5 },
-    { id: 'iphone-17', name: 'iPhone 17', monthlyPrice: 33, price: 799, tier: 4 },
-    { id: 'iphone-16e', name: 'iPhone 16e', monthlyPrice: 25, price: 599, tier: 3 },
-    { id: 'iphone-16-pro-max', name: 'iPhone 16 Pro Max', monthlyPrice: 50, price: 1199, tier: 6 },
-    { id: 'iphone-16-pro', name: 'iPhone 16 Pro', monthlyPrice: 46, price: 1099, tier: 5 },
-    { id: 'iphone-16-plus', name: 'iPhone 16 Plus', monthlyPrice: 38, price: 899, tier: 4 },
-    { id: 'iphone-16', name: 'iPhone 16', monthlyPrice: 33, price: 799, tier: 4 },
-    { id: 'iphone-15', name: 'iPhone 15', monthlyPrice: 29, price: 699, tier: 4 },
-    { id: 'pixel-10-pro-xl', name: 'Pixel 10 Pro XL', monthlyPrice: 50, price: 1199, tier: 6 },
-    { id: 'pixel-10-pro', name: 'Pixel 10 Pro', monthlyPrice: 42, price: 999, tier: 5 },
-    { id: 'pixel-10', name: 'Pixel 10', monthlyPrice: 29, price: 699, tier: 4 },
-    { id: 'pixel-9a', name: 'Pixel 9A', monthlyPrice: 21, price: 499, tier: 3 },
-    { id: 'galaxy-s25-edge', name: 'Galaxy S25 Edge', monthlyPrice: 54, price: 1299, tier: 6 },
-    { id: 'galaxy-s25-ultra', name: 'Galaxy S25 Ultra', monthlyPrice: 54, price: 1299, tier: 6 },
-    { id: 'galaxy-s25-plus', name: 'Galaxy S25+', monthlyPrice: 42, price: 999, tier: 5 },
-    { id: 'galaxy-s25', name: 'Galaxy S25', monthlyPrice: 33, price: 799, tier: 4 },
-    { id: 'galaxy-s25-fe', name: 'Galaxy S25 FE', monthlyPrice: 25, price: 599, tier: 3 },
-    { id: 'galaxy-a36', name: 'Galaxy A36', monthlyPrice: 17, price: 399, tier: 2 },
-    { id: 'galaxy-z-fold-7', name: 'Galaxy Z Fold 7', monthlyPrice: 75, price: 1799, tier: 6 },
-    { id: 'galaxy-z-flip-7', name: 'Galaxy Z Flip 7', monthlyPrice: 42, price: 999, tier: 5 },
-    { id: 'razr-ultra', name: 'Razr Ultra', monthlyPrice: 42, price: 999, tier: 5 },
-    { id: 'razr-plus-2025', name: 'Razr+ 2025', monthlyPrice: 33, price: 799, tier: 4 },
-    { id: 'razr-2025', name: 'Razr 2025', monthlyPrice: 25, price: 599, tier: 3 },
-    { id: 'edge-2025', name: 'Edge 2025', monthlyPrice: 29, price: 699, tier: 4 },
-    { id: 'g-power-2025', name: 'G Power 2025', monthlyPrice: 13, price: 299, tier: 2 },
-    { id: 'g-2025', name: 'G 2025', monthlyPrice: 8, price: 199, tier: 1 },
-    { id: 'revvl-pro-8', name: 'Revvl Pro 8', monthlyPrice: 17, price: 399, tier: 2 },
-    { id: 'bring-your-own', name: 'Bring Your Own Device', monthlyPrice: 0, price: 0, tier: 5 }
+    { id: 'iphone-air', name: 'iPhone Air', monthlyPrice: 42, price: 999, tier: 5, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-17-pro-max', name: 'iPhone 17 Pro Max', monthlyPrice: 50, price: 1199, tier: 6, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-17-pro', name: 'iPhone 17 Pro', monthlyPrice: 46, price: 1099, tier: 5, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-17', name: 'iPhone 17', monthlyPrice: 33, price: 799, tier: 4, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-16e', name: 'iPhone 16e', monthlyPrice: 25, price: 599, tier: 3, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-16-pro-max', name: 'iPhone 16 Pro Max', monthlyPrice: 50, price: 1199, tier: 6, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-16-pro', name: 'iPhone 16 Pro', monthlyPrice: 46, price: 1099, tier: 5, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-16-plus', name: 'iPhone 16 Plus', monthlyPrice: 38, price: 899, tier: 4, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-16', name: 'iPhone 16', monthlyPrice: 33, price: 799, tier: 4, brand: 'Apple', category: 'smartphone' },
+    { id: 'iphone-15', name: 'iPhone 15', monthlyPrice: 29, price: 699, tier: 4, brand: 'Apple', category: 'smartphone' },
+    { id: 'pixel-10-pro-xl', name: 'Pixel 10 Pro XL', monthlyPrice: 50, price: 1199, tier: 6, brand: 'Google', category: 'smartphone' },
+    { id: 'pixel-10-pro', name: 'Pixel 10 Pro', monthlyPrice: 42, price: 999, tier: 5, brand: 'Google', category: 'smartphone' },
+    { id: 'pixel-10', name: 'Pixel 10', monthlyPrice: 29, price: 699, tier: 4, brand: 'Google', category: 'smartphone' },
+    { id: 'pixel-9a', name: 'Pixel 9A', monthlyPrice: 21, price: 499, tier: 3, brand: 'Google', category: 'smartphone' },
+    { id: 'galaxy-s25-edge', name: 'Galaxy S25 Edge', monthlyPrice: 54, price: 1299, tier: 6, brand: 'Samsung', category: 'smartphone' },
+    { id: 'galaxy-s25-ultra', name: 'Galaxy S25 Ultra', monthlyPrice: 54, price: 1299, tier: 6, brand: 'Samsung', category: 'smartphone' },
+    { id: 'galaxy-s25-plus', name: 'Galaxy S25+', monthlyPrice: 42, price: 999, tier: 5, brand: 'Samsung', category: 'smartphone' },
+    { id: 'galaxy-s25', name: 'Galaxy S25', monthlyPrice: 33, price: 799, tier: 4, brand: 'Samsung', category: 'smartphone' },
+    { id: 'galaxy-s25-fe', name: 'Galaxy S25 FE', monthlyPrice: 25, price: 599, tier: 3, brand: 'Samsung', category: 'smartphone' },
+    { id: 'galaxy-a36', name: 'Galaxy A36', monthlyPrice: 17, price: 399, tier: 2, brand: 'Samsung', category: 'smartphone' },
+    { id: 'galaxy-z-fold-7', name: 'Galaxy Z Fold 7', monthlyPrice: 75, price: 1799, tier: 6, brand: 'Samsung', category: 'foldable' },
+    { id: 'galaxy-z-flip-7', name: 'Galaxy Z Flip 7', monthlyPrice: 42, price: 999, tier: 5, brand: 'Samsung', category: 'foldable' },
+    { id: 'razr-ultra', name: 'Razr Ultra', monthlyPrice: 42, price: 999, tier: 5, brand: 'Motorola', category: 'foldable' },
+    { id: 'razr-plus-2025', name: 'Razr+ 2025', monthlyPrice: 33, price: 799, tier: 4, brand: 'Motorola', category: 'foldable' },
+    { id: 'razr-2025', name: 'Razr 2025', monthlyPrice: 25, price: 599, tier: 3, brand: 'Motorola', category: 'foldable' },
+    { id: 'edge-2025', name: 'Edge 2025', monthlyPrice: 29, price: 699, tier: 4, brand: 'Motorola', category: 'smartphone' },
+    { id: 'g-power-2025', name: 'G Power 2025', monthlyPrice: 13, price: 299, tier: 2, brand: 'Motorola', category: 'smartphone' },
+    { id: 'g-2025', name: 'G 2025', monthlyPrice: 8, price: 199, tier: 1, brand: 'Motorola', category: 'smartphone' },
+    { id: 'revvl-pro-8', name: 'Revvl Pro 8', monthlyPrice: 17, price: 399, tier: 2, brand: 'Revvl', category: 'smartphone' },
+    { id: 'bring-your-own', name: 'Bring Your Own Device', monthlyPrice: 0, price: 0, tier: 5, brand: 'BYOD', category: 'byod' }
   ];
 
   const protectionTiers = [
-    { tier: 1, price: 7 },
-    { tier: 2, price: 9 },
-    { tier: 3, price: 13 },
-    { tier: 4, price: 16 },
-    { tier: 5, price: 18 },
-    { tier: 6, price: 25 }
+    { tier: 1, price: 7, name: 'P360 Basic' },
+    { tier: 2, price: 9, name: 'P360 Standard' },
+    { tier: 3, price: 13, name: 'P360 Plus' },
+    { tier: 4, price: 16, name: 'P360 Premium' },
+    { tier: 5, price: 18, name: 'P360 Elite' },
+    { tier: 6, price: 25, name: 'P360 Ultimate' }
   ];
-
-  const calculatePlanPrice = (planId, lineCount) => {
-    const plan = planOptions.find(p => p.id === planId);
-    if (!plan) return 0;
-    
-    if (plan.senior && lineCount > 2) {
-      return 0; // Senior plans max 2 lines
-    }
-    
-    if (lineCount <= 6) {
-      return plan.pricing[lineCount] || 0;
-    } else {
-      // For 6+ lines, use 6-line pricing + additional lines
-      const basePrice = plan.pricing[6] || 0;
-      const additionalLines = lineCount - 6;
-      return basePrice + (additionalLines * plan.pricing.additional);
-    }
-  };
-
-  const calculatePlanTotal = () => {
-    // Calculate total based on the plan combination
-    const planCounts = {};
-    for (let i = 0; i < quoteData.lines; i++) {
-      const planId = quoteData.plans[i];
-      if (planId) {
-        planCounts[planId] = (planCounts[planId] || 0) + 1;
-      }
-    }
-    
-    let total = 0;
-    Object.entries(planCounts).forEach(([planId, count]) => {
-      total += calculatePlanPrice(planId, count);
-    });
-    
-    return total;
-  };
-
-  const calculateDeviceTotal = () => {
-    let total = 0;
-    for (let i = 0; i < quoteData.lines; i++) {
-      const deviceId = quoteData.devices[i];
-      const tradeInValue = parseFloat(quoteData.tradeIns[i]) || 0;
-      
-      if (deviceId) {
-        const device = deviceOptions.find(d => d.id === deviceId);
-        if (device) {
-          // Calculate net device price after trade-in
-          const netPrice = device.price - tradeInValue;
-          const monthlyPayment = Math.max(0, Math.ceil(netPrice / 24));
-          total += monthlyPayment;
-        }
-      }
-    }
-    return total;
-  };
-
-  const calculateDeviceCost = () => {
-    let total = 0;
-    for (let i = 0; i < quoteData.lines; i++) {
-      const deviceId = quoteData.devices[i];
-      if (deviceId) {
-        const device = deviceOptions.find(d => d.id === deviceId);
-        if (device) {
-          total += device.price;
-        }
-      }
-    }
-    return total;
-  };
-
-  const calculateTradeInTotal = () => {
-    let total = 0;
-    for (let i = 0; i < quoteData.lines; i++) {
-      const tradeInValue = quoteData.tradeIns[i] || 0;
-      total += parseFloat(tradeInValue) || 0;
-    }
-    return total;
-  };
-
-  const calculateECBalance = () => {
-    const deviceTotal = calculateDeviceCost();
-    const tradeInTotal = calculateTradeInTotal();
-    const ecAmount = parseFloat(quoteData.equipmentCredit) || 0;
-    
-    return Math.max(0, deviceTotal - tradeInTotal - ecAmount);
-  };
-
-  const calculateDownPaymentRequired = () => {
-    const ecBalance = calculateECBalance();
-    const downPaymentPercent = parseFloat(quoteData.downPayment) || 0;
-    
-    if (ecBalance <= 0) return 0;
-    
-    return Math.ceil(ecBalance * (downPaymentPercent / 100));
-  };
-
-  const calculateMonthlyFinancing = () => {
-    let financingTotal = 0;
-    
-    // Calculate financing for voice line devices
-    for (let i = 0; i < quoteData.lines; i++) {
-      const deviceId = quoteData.devices[i];
-      if (deviceId) {
-        const device = deviceOptions.find(d => d.id === deviceId);
-        if (device) {
-          // Check if this line has a promotion that makes the device free
-          const promotionData = quoteData.promotions?.[i];
-          const isDeviceFree = promotionData && promotionData.promotionId && 
-                              promotionData.promotionId.includes('on-us');
-          
-          if (!isDeviceFree) {
-            // Get equipment credit for this line
-            const equipmentCredit = parseFloat(quoteData.equipmentCredit) || 0;
-            const tradeInValue = parseFloat(quoteData.tradeIns?.[i]) || 0;
-            const downPayment = parseFloat(quoteData.downPayment) || 0;
-            
-            // Calculate amount to be financed
-            const devicePrice = device.price;
-            const ecCredit = equipmentCredit; // Total EC available
-            
-            // Amount financed = device price - EC credit - trade-in - down payment
-            const amountFinanced = Math.max(0, devicePrice - ecCredit - tradeInValue - downPayment);
-            
-            // Monthly payment = amount financed / 24 months
-            const monthlyPayment = Math.ceil(amountFinanced / 24);
-            
-            financingTotal += monthlyPayment;
-          }
-          // If device is free due to promotion, no financing needed
-        }
-      }
-    }
-    
-    return financingTotal;
-  };
-
-  const calculateDeviceTaxes = () => {
-    const deviceCost = calculateDeviceCost();
-    // Device taxes are typically around 8-10% depending on state
-    return Math.round(deviceCost * 0.09);
-  };
-
-  const calculateActivationFees = () => {
-    // $10 activation fee per line
-    return quoteData.lines * 10;
-  };
-
-  const calculateTotalDueToday = () => {
-    const deviceTaxes = calculateDeviceTaxes();
-    const activationFees = calculateActivationFees();
-    const downPayment = calculateDownPaymentRequired();
-    const tradeInCredit = calculateTradeInCredit();
-    
-    const subtotal = deviceTaxes + activationFees + downPayment;
-    
-    // If trade-in credit exceeds the subtotal, customer owes $0
-    return Math.max(0, subtotal - tradeInCredit);
-  };
-
-  const calculateInsiderSavings = () => {
-    if (!quoteData.discounts.tmobileInsider) return 0;
-    
-    // 20% discount on rate plans (More or Beyond only)
-    const planCounts = {};
-    for (let i = 0; i < quoteData.lines; i++) {
-      const planId = quoteData.plans[i];
-      if (planId) {
-        planCounts[planId] = (planCounts[planId] || 0) + 1;
-      }
-    }
-    
-    let savings = 0;
-    Object.entries(planCounts).forEach(([planId, count]) => {
-      // Only apply to More or Beyond plans (not Essentials or senior plans)
-      if (planId === 'more' || planId === 'beyond') {
-        const planPrice = calculatePlanPrice(planId, count);
-        savings += Math.round(planPrice * 0.20); // 20% discount
-      }
-    });
-    
-    return savings;
-  };
-
-  const calculateTradeInCredit = () => {
-    const deviceCost = calculateDeviceCost();
-    const tradeInTotal = calculateTradeInTotal();
-    
-    // If trade-in value exceeds device cost, return the excess as monthly credit
-    return Math.max(0, tradeInTotal - deviceCost);
-  };
-
-  const calculateProtectionTotal = () => {
-    let total = 0;
-    for (let i = 0; i < quoteData.lines; i++) {
-      if (quoteData.protection[i]) {
-        const deviceId = quoteData.devices[i];
-        if (deviceId) {
-          const device = deviceOptions.find(d => d.id === deviceId);
-          if (device) {
-            const tierInfo = protectionTiers.find(t => t.tier === device.tier);
-            if (tierInfo) {
-              total += tierInfo.price;
-            }
-          }
-        }
-      }
-    }
-    return total;
-  };
-
-  const calculateAutoPaySavings = () => {
-    if (!quoteData.discounts.autoPay) return 0;
-    // $5 per line up to 8 lines
-    return Math.min(quoteData.lines, 8) * 5;
-  };
-
-  const calculateSeniorSavings = () => {
-    if (!quoteData.discounts.senior55) return 0;
-    
-    // Calculate savings by comparing senior vs regular plans
-    const planCounts = {};
-    for (let i = 0; i < quoteData.lines; i++) {
-      const planId = quoteData.plans[i];
-      if (planId) {
-        planCounts[planId] = (planCounts[planId] || 0) + 1;
-      }
-    }
-    
-    let savings = 0;
-    Object.entries(planCounts).forEach(([planId, count]) => {
-      const plan = planOptions.find(p => p.id === planId);
-      if (plan && plan.senior) {
-        // Calculate what the regular plan would cost
-        let regularPlanId = planId.replace('-55', '');
-        if (regularPlanId === 'essentials') regularPlanId = 'essentials';
-        if (regularPlanId === 'more') regularPlanId = 'more';
-        if (regularPlanId === 'beyond') regularPlanId = 'beyond';
-        
-        const regularPlan = planOptions.find(p => p.id === regularPlanId);
-        if (regularPlan) {
-          const regularPrice = calculatePlanPrice(regularPlanId, count);
-          const seniorPrice = calculatePlanPrice(planId, count);
-          savings += (regularPrice - seniorPrice);
-        }
-      }
-    });
-    
-    return savings;
-  };
 
   const getPlanName = (planId) => {
     const plan = planOptions.find(p => p.id === planId);
@@ -353,913 +97,1001 @@ const QuoteSummary = ({
   };
 
   const getDevicePrice = (deviceId) => {
-    const device = deviceOptions.find(d => d.id === deviceId);
+        const device = deviceOptions.find(d => d.id === deviceId);
     return device ? device.monthlyPrice : 0;
   };
 
   const getProtectionPrice = (deviceId) => {
-    const device = deviceOptions.find(d => d.id === deviceId);
+        const device = deviceOptions.find(d => d.id === deviceId);
     if (!device) return 0;
-    const tierInfo = protectionTiers.find(t => t.tier === device.tier);
-    return tierInfo ? tierInfo.price : 0;
+    
+    const protection = protectionTiers.find(p => p.tier === device.tier);
+    return protection ? protection.price : 0;
   };
 
-  // Tablet/Wearable helper functions
-  const getTabletWearableDeviceName = (deviceId) => {
-    const tabletWearableDevices = [
-      // Tablets
-      { id: 'ipad-10', name: 'Apple iPad 10 (A16)', monthlyPrice: 25 },
-      { id: 'ipad-mini-7', name: 'Apple iPad Mini 7th Gen', monthlyPrice: 30 },
-      { id: 'ipad-pro-11', name: 'Apple iPad Pro 11"', monthlyPrice: 45 },
-      { id: 'ipad-pro-13', name: 'Apple iPad Pro 13"', monthlyPrice: 55 },
-      { id: 'galaxy-tab-a9', name: 'Samsung Galaxy Tab A9', monthlyPrice: 20 },
-      { id: 'galaxy-tab-s10-plus', name: 'Samsung Galaxy Tab S10+ 5G', monthlyPrice: 40 },
-      { id: 'revvl-tab-5g', name: 'Revvl Tab 5G', monthlyPrice: 15 },
-      // Wearables
-      { id: 'apple-watch-se-3-40mm', name: 'Apple Watch SE 3rd Gen 40mm', monthlyPrice: 15 },
-      { id: 'apple-watch-se-3-44mm', name: 'Apple Watch SE 3rd Gen 44mm', monthlyPrice: 18 },
-      { id: 'apple-watch-11-42mm', name: 'Apple Watch 11th Gen 42mm', monthlyPrice: 25 },
-      { id: 'apple-watch-11-45mm', name: 'Apple Watch 11th Gen 45mm', monthlyPrice: 28 },
-      { id: 'apple-watch-ultra-3', name: 'Apple Watch Ultra 3rd Gen', monthlyPrice: 35 },
-      { id: 'galaxy-watch-8-40mm', name: 'Samsung Galaxy Watch 8 40mm', monthlyPrice: 20 },
-      { id: 'galaxy-watch-8-44mm', name: 'Samsung Galaxy Watch 8 44mm', monthlyPrice: 23 },
-      { id: 'galaxy-watch-8-classic-46mm', name: 'Samsung Galaxy Watch 8 Classic 46mm', monthlyPrice: 30 },
-      { id: 'galaxy-watch-ultra', name: 'Samsung Galaxy Watch Ultra', monthlyPrice: 35 },
-      { id: 'pixel-watch-3', name: 'Google Pixel Watch 3', monthlyPrice: 22 },
-      { id: 'pixel-watch-4', name: 'Google Pixel Watch 4', monthlyPrice: 25 }
-    ];
-    const device = tabletWearableDevices.find(d => d.id === deviceId);
-    return device || { name: 'Unknown Device', monthlyPrice: 0 };
-  };
-
-  const getTabletWearablePlanName = (planId) => {
-    const tabletWearablePlans = [
-      { id: 'tablet-unlimited', name: 'Tablet Unlimited', price: 20 },
-      { id: 'tablet-2gb', name: 'Tablet 2GB', price: 10 },
-      { id: 'tablet-6gb', name: 'Tablet 6GB', price: 15 },
-      { id: 'wearable-unlimited', name: 'Wearable Unlimited', price: 5 },
-      { id: 'wearable-500mb', name: 'Wearable 500MB', price: 5 }
-    ];
-    const plan = tabletWearablePlans.find(p => p.id === planId);
-    return plan || { name: 'Unknown Plan', price: 0 };
-  };
-
-  const getTabletWearableProtectionPrice = (deviceId) => {
-    // Tablet/Wearable protection pricing (simplified)
-    const protectionPrices = {
-      'ipad-10': 7, 'ipad-mini-7': 7, 'ipad-pro-11': 13, 'ipad-pro-13': 16,
-      'galaxy-tab-a9': 7, 'galaxy-tab-s10-plus': 13, 'revvl-tab-5g': 7,
-      'apple-watch-se-3-40mm': 7, 'apple-watch-se-3-44mm': 7,
-      'apple-watch-11-42mm': 9, 'apple-watch-11-45mm': 9,
-      'apple-watch-ultra-3': 13, 'galaxy-watch-8-40mm': 7,
-      'galaxy-watch-8-44mm': 7, 'galaxy-watch-8-classic-46mm': 9,
-      'galaxy-watch-ultra': 13, 'pixel-watch-3': 7, 'pixel-watch-4': 7
-    };
-    return protectionPrices[deviceId] || 7;
-  };
-
-  // Mobile Internet helper functions
-  const getMobileInternetDeviceName = (deviceId) => {
-    const mobileInternetDevices = [
-      { id: 'tcl-linkport-ik511', name: 'TCL Linkport IK511', price: 0 },
-      { id: 'lenovo-100e-chromebook-gen4', name: 'Lenovo 100e Chromebook Gen 4', price: 0 },
-      { id: 'tcl-syncup-tracker-2', name: 'TCL SyncUP Tracker 2', price: 0 },
-      { id: 'tmobile-syncup-drive', name: 'T-Mobile SyncUP Drive', price: 0 },
-      { id: 'inseego-mifi-x-pro-5g', name: 'Inseego MiFi X Pro 5G', price: 0 },
-      { id: 'jextream-rg2100-5g-hotspot', name: 'JEXtream RG2100 5G Mobile Hotspot', price: 0 },
-      { id: 'franklin-t10-mobile-hotspot', name: 'Franklin T10 Mobile Hotspot', price: 0 }
-    ];
-    const device = mobileInternetDevices.find(d => d.id === deviceId);
-    return device || { name: 'Unknown Device', price: 0 };
-  };
-
-  const getMobileInternetPlanName = (planId) => {
-    const mobileInternetPlans = [
-      { id: '15gb-data-plan', name: '15GB Data Plan', price: 20 },
-      { id: '25gb-data-plan', name: '25GB Data Plan', price: 25 },
-      { id: '100gb-data-plan', name: '100GB Data Plan', price: 50 }
-    ];
-    const plan = mobileInternetPlans.find(p => p.id === planId);
-    return plan || { name: 'Unknown Plan', price: 0 };
-  };
-
-  // Home Internet helper functions
-  const getHomeInternetDeviceName = (deviceId) => {
-    const homeInternetDevices = [
-      { id: 'tmobile-home-internet-gateway', name: 'T-Mobile Home Internet Gateway', price: 0 }
-    ];
-    const device = homeInternetDevices.find(d => d.id === deviceId);
-    return device || { name: 'Unknown Device', price: 0 };
-  };
-
-  const getHomeInternetPlanName = (planId) => {
-    const homeInternetPlans = [
-      { id: 'rely-home-internet', name: 'Rely Home Internet', price: 50 },
-      { id: 'amplified-home-internet', name: 'Amplified Home Internet', price: 60 },
-      { id: 'all-in-home-internet', name: 'All-In Home Internet', price: 70 },
-      { id: 'home-internet-backup', name: 'Home Internet Backup', price: 20 },
-      { id: 'tmobile-away-unlimited-plan', name: 'T-Mobile Away Unlimited Plan', price: 160 },
-      { id: 'tmobile-away-200gb-plan', name: 'T-Mobile Away 200GB Plan', price: 110 }
-    ];
-    const plan = homeInternetPlans.find(p => p.id === planId);
-    return plan || { name: 'Unknown Plan', price: 0 };
-  };
-
-  const calculateTaxesAndFees = () => {
-    const subtotal = calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateTabletWearableTotal() + calculateMobileInternetTotal() + calculateHomeInternetTotal();
-    return Math.round(subtotal * 0.15); // Approximate 15% for taxes and fees
-  };
-
-  const calculateTabletWearableTotal = () => {
-    if (!tabletWearableData || !tabletWearableData.lines) return 0;
+  const calculateVoiceTotal = () => {
+    if (!voiceLinesData || !voiceLinesData.plans) return 0;
     
     let total = 0;
-    for (let i = 0; i < tabletWearableData.lines; i++) {
-      const deviceId = tabletWearableData.devices[i];
-      const planId = tabletWearableData.plans[i];
-      const device = getTabletWearableDeviceName(deviceId);
-      const plan = getTabletWearablePlanName(planId);
-      
-      total += device.monthlyPrice + plan.price;
-      
-      // Add protection if selected
-      if (tabletWearableData.protection && tabletWearableData.protection[i]) {
-        total += getTabletWearableProtectionPrice(deviceId);
+    
+    // Calculate plan costs - family plans have shared pricing, not per-line pricing
+    if (Object.keys(voiceLinesData.plans).length > 0) {
+      // Get the first plan (assuming all lines are on the same plan for family plans)
+      const firstPlanId = Object.values(voiceLinesData.plans)[0];
+      const plan = planOptions.find(p => p.id === firstPlanId);
+      if (plan) {
+        const lines = voiceLinesData.quantity || 1;
+        if (lines <= 6) {
+          total += plan.pricing[lines] || 0;
+        } else {
+          total += plan.pricing[6] + (lines - 6) * plan.pricing.additional;
+        }
       }
     }
+    
+    // Add device costs - these are per-line
+    if (voiceLinesData.devices) {
+      Object.values(voiceLinesData.devices).forEach(deviceId => {
+        total += getDevicePrice(deviceId);
+      });
+    }
+    
+    // Add protection costs - these are per-line
+    if (voiceLinesData.protection) {
+      Object.values(voiceLinesData.protection).forEach(protectionId => {
+        const protectionPrices = {
+          'p360-tier1': 7, 'p360-tier2': 9, 'p360-tier3': 13,
+          'p360-tier4': 16, 'p360-tier5': 18, 'p360-tier6': 25
+        };
+        total += protectionPrices[protectionId] || 0;
+      });
+    }
+    
     return total;
   };
 
-  const calculateMobileInternetTotal = () => {
-    if (!mobileInternetData || !mobileInternetData.device || !mobileInternetData.plan) return 0;
-    
-    const device = getMobileInternetDeviceName(mobileInternetData.device);
-    const plan = getMobileInternetPlanName(mobileInternetData.plan);
-    
-    // Mobile Internet devices are free, only plan cost
-    return plan.price;
+  const calculateDataTotal = () => {
+    return dataLinesData?.totalMonthly || 0;
+  };
+
+  const calculateIoTTotal = () => {
+    return iotLinesData?.totalMonthly || 0;
   };
 
   const calculateHomeInternetTotal = () => {
-    if (!homeInternetData || !homeInternetData.device || !homeInternetData.plan) return 0;
-    
-    const device = getHomeInternetDeviceName(homeInternetData.device);
-    const plan = getHomeInternetPlanName(homeInternetData.plan);
-    
-    // Home Internet gateway is free, only plan cost
-    return plan.price;
+    return homeInternetData?.totalMonthly || 0;
   };
 
-  const getTotalMonthly = () => {
-    const subtotal = calculatePlanTotal() + calculateProtectionTotal() + calculateMonthlyFinancing() + calculateTabletWearableTotal() + calculateMobileInternetTotal() + calculateHomeInternetTotal();
-    const discounts = calculateAutoPaySavings() + calculateSeniorSavings() + calculateInsiderSavings();
-    const taxesAndFees = calculateTaxesAndFees();
-    return subtotal - discounts + taxesAndFees;
+  const calculateDiscounts = () => {
+    let totalDiscounts = 0;
+    
+    if (discountsData?.autoPay) {
+      // $5 per line up to 8 lines
+      const totalLines = (voiceLinesData?.quantity || 0) + 
+                        (dataLinesData?.quantity || 0) + 
+                        (iotLinesData?.quantity || 0);
+      totalDiscounts += Math.min(totalLines, 8) * 5;
+    }
+    
+    if (discountsData?.senior55) {
+      // 20% off voice plans only (not devices/protection)
+      if (voiceLinesData && voiceLinesData.plans && Object.keys(voiceLinesData.plans).length > 0) {
+        const firstPlanId = Object.values(voiceLinesData.plans)[0];
+        const plan = planOptions.find(p => p.id === firstPlanId);
+        if (plan) {
+          const lines = voiceLinesData.quantity || 1;
+          let planCost = 0;
+          if (lines <= 6) {
+            planCost = plan.pricing[lines] || 0;
+          } else {
+            planCost = plan.pricing[6] + (lines - 6) * plan.pricing.additional;
+          }
+          totalDiscounts += planCost * 0.2;
+        }
+      }
+    }
+    
+    if (discountsData?.tmobileInsider) {
+      // 15% off all services
+      const allServicesTotal = calculateVoiceTotal() + calculateDataTotal() + 
+                              calculateIoTTotal() + calculateHomeInternetTotal();
+      totalDiscounts += allServicesTotal * 0.15;
+    }
+    
+    return totalDiscounts;
   };
 
-  const handleDownloadQuote = () => {
+  const calculateTotal = () => {
+    const servicesTotal = calculateVoiceTotal() + calculateDataTotal() + 
+                         calculateIoTTotal() + calculateHomeInternetTotal();
+    const discounts = calculateDiscounts();
+    const equipmentFinancing = equipmentCreditData?.monthlyFinancing || 0;
+    
+    return servicesTotal - discounts + equipmentFinancing;
+  };
+
+  const getPlanPrice = (planId, lines) => {
+      const plan = planOptions.find(p => p.id === planId);
+    if (!plan) return 0;
+    
+    if (lines <= 6) {
+      return plan.pricing[lines] || 0;
+    } else {
+      return plan.pricing[6] + (lines - 6) * plan.pricing.additional;
+    }
+  };
+
+  const generateShareUrl = () => {
+    const baseUrl = window.location.origin;
+    const quoteData = {
+      customerData,
+      voiceLinesData,
+      dataLinesData,
+      iotLinesData,
+      homeInternetData,
+      equipmentCreditData,
+      discountsData,
+      timestamp: new Date().toISOString(),
+      quoteId
+    };
+    
+    // In a real app, this would be stored on a server and return a short URL
+    const encodedData = btoa(JSON.stringify(quoteData));
+    const url = `${baseUrl}/quote/${quoteId}?data=${encodedData}`;
+    setShareUrl(url);
+    return url;
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // Show success message
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  const generatePDF = () => {
     const doc = new jsPDF();
     
-    // Set up the PDF
+    // Header with T-Mobile branding
+    doc.setFillColor(226, 0, 116);
+    doc.rect(0, 0, 210, 30, 'F');
+    doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
-    doc.setTextColor(226, 0, 116); // T-Mobile magenta
-    doc.text('T-Mobile Quote Summary', 20, 30);
+    doc.text('T-Mobile Quote Summary', 20, 20);
     
+    // Quote ID and date
+    doc.setFontSize(10);
+    doc.text(`Quote ID: ${quoteId}`, 20, 35);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 40);
+    
+    // Customer Info
+    if (customerData) {
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 45);
+      doc.text(`Customer: ${customerData.firstName} ${customerData.lastName}`, 20, 55);
+      doc.text(`Email: ${customerData.email}`, 20, 65);
+      doc.text(`Phone: ${customerData.phone}`, 20, 75);
+    }
     
-    let yPosition = 60;
+    let yPosition = 90;
     
-    // Customer Information
+    // Voice Lines
+    if (voiceLinesData && voiceLinesData.quantity > 0) {
     doc.setFontSize(14);
     doc.setTextColor(226, 0, 116);
-    doc.text('Customer Information:', 20, yPosition);
+      doc.text('Voice Lines', 20, yPosition);
     yPosition += 10;
     
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.text(`Name: ${customerData ? `${customerData.firstName} ${customerData.lastName}` : 'Not provided'}`, 20, yPosition);
+      doc.text(`Lines: ${voiceLinesData.quantity}`, 20, yPosition);
     yPosition += 7;
-    doc.text(`Email: ${customerData ? customerData.email : 'Not provided'}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Phone: ${customerData ? customerData.phone : 'Not provided'}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Expected EC: ${customerData ? customerData.expectedEC : 'Not provided'}`, 20, yPosition);
-    yPosition += 15;
-    
-    // Quote Details
-    doc.setFontSize(14);
-    doc.setTextColor(226, 0, 116);
-    doc.text('Quote Details:', 20, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Lines: ${quoteData.lines}`, 20, yPosition);
-    yPosition += 10;
-    
-    // Plan Details
-    doc.setFontSize(12);
-    doc.setTextColor(226, 0, 116);
-    doc.text('Plan Details:', 20, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    Array.from({ length: quoteData.lines }, (_, i) => {
-      const planId = quoteData.plans[i];
-      const deviceId = quoteData.devices[i];
-      const plan = planOptions.find(p => p.id === planId);
-      const device = deviceOptions.find(d => d.id === deviceId);
       
-      doc.text(`Line ${i + 1}: ${getPlanName(planId)} - $${plan?.price || 0}/mo`, 20, yPosition);
-      yPosition += 7;
-      doc.text(`         ${getDeviceName(deviceId)} - $${getDevicePrice(deviceId)}/mo`, 20, yPosition);
-      yPosition += 7;
-      
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
+      if (voiceLinesData.plans) {
+        Object.values(voiceLinesData.plans).forEach((planId, i) => {
+          doc.text(`Line ${i + 1}: ${getPlanName(planId)} - $${getPlanPrice(planId, voiceLinesData.quantity)}/mo`, 20, yPosition);
+    yPosition += 7;
+        });
       }
-    });
+      
+      yPosition += 10;
+    }
     
-    yPosition += 10;
-    
-    // Monthly Totals
-    doc.setFontSize(12);
+    // Data Lines
+    if (dataLinesData && dataLinesData.quantity > 0) {
+    doc.setFontSize(14);
     doc.setTextColor(226, 0, 116);
-    doc.text('Monthly Totals:', 20, yPosition);
-    yPosition += 10;
-    
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Plan Total: $${calculatePlanTotal()}/mo`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Device Payments: $${calculateDeviceTotal()}/mo`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Protection Plans: $${calculateProtectionTotal()}/mo`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Monthly Financing: $${calculateMonthlyFinancing()}/mo`, 20, yPosition);
-    yPosition += 7;
-    if (calculateTabletWearableTotal() > 0) {
-      doc.text(`Data Lines: $${calculateTabletWearableTotal()}/mo`, 20, yPosition);
-      yPosition += 7;
-    }
-    if (calculateMobileInternetTotal() > 0) {
-      doc.text(`Mobile Internet: $${calculateMobileInternetTotal()}/mo`, 20, yPosition);
-      yPosition += 7;
-    }
-    if (calculateHomeInternetTotal() > 0) {
-      doc.text(`Home Internet: $${calculateHomeInternetTotal()}/mo`, 20, yPosition);
-      yPosition += 7;
-    }
-    
-    if (calculateAutoPaySavings() > 0) {
-      doc.text(`Auto Pay Discount: -$${calculateAutoPaySavings()}/mo`, 20, yPosition);
-      yPosition += 7;
-    }
-    if (calculateSeniorSavings() > 0) {
-      doc.text(`Senior 55+ Discount: -$${calculateSeniorSavings()}/mo`, 20, yPosition);
-      yPosition += 7;
-    }
-    if (calculateInsiderSavings() > 0) {
-      doc.text(`T-Mobile Insider Discount: -$${calculateInsiderSavings()}/mo`, 20, yPosition);
-      yPosition += 7;
-    }
-    if (calculateTradeInCredit() > 0) {
-      doc.text(`Trade-In Credit (Instant): -$${calculateTradeInCredit()}`, 20, yPosition);
-      yPosition += 7;
-    }
-    
-    doc.text(`Taxes & Fees: $${calculateTaxesAndFees()}/mo`, 20, yPosition);
-    yPosition += 7;
-    doc.setFontSize(12);
-    doc.setTextColor(226, 0, 116);
-    doc.text(`Total Monthly: $${getTotalMonthly()}/mo`, 20, yPosition);
-    yPosition += 15;
-    
-    // Equipment Credit Summary
-    doc.setFontSize(12);
-    doc.setTextColor(226, 0, 116);
-    doc.text('Equipment Credit Summary:', 20, yPosition);
+      doc.text('Data Lines', 20, yPosition);
     yPosition += 10;
     
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.text(`Total Device Cost: $${calculateDeviceCost()}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Total Trade-In Value: $${calculateTradeInTotal()}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Equipment Credit: $${parseFloat(quoteData.equipmentCredit) || 0}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Remaining Balance: $${calculateECBalance()}`, 20, yPosition);
-    yPosition += 7;
-    
-    if (calculateECBalance() > 0) {
-      doc.text(`Down Payment Required: $${calculateDownPaymentRequired()}`, 20, yPosition);
+      doc.text(`Category: ${dataLinesData.category}`, 20, yPosition);
       yPosition += 7;
-      doc.text(`Monthly Financing: $${calculateMonthlyFinancing()}/mo`, 20, yPosition);
+      doc.text(`Lines: ${dataLinesData.quantity}`, 20, yPosition);
       yPosition += 7;
+      doc.text(`Monthly Cost: $${dataLinesData.totalMonthly}`, 20, yPosition);
+      yPosition += 15;
     }
     
-    // Due Today
-    doc.setFontSize(12);
+    // IoT Lines
+    if (iotLinesData && iotLinesData.quantity > 0) {
+      doc.setFontSize(14);
     doc.setTextColor(226, 0, 116);
-    doc.text('Due Today:', 20, yPosition);
+      doc.text('IoT Lines', 20, yPosition);
     yPosition += 10;
     
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.text(`Device Taxes: $${calculateDeviceTaxes()}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Activation Fees: $${calculateActivationFees()}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Down Payment: $${calculateDownPaymentRequired()}`, 20, yPosition);
-    yPosition += 7;
-    doc.setFontSize(12);
+      doc.text(`Lines: ${iotLinesData.quantity}`, 20, yPosition);
+      yPosition += 7;
+      doc.text(`Monthly Cost: $${iotLinesData.totalMonthly}`, 20, yPosition);
+      yPosition += 15;
+    }
+    
+    // Home Internet
+    if (homeInternetData && homeInternetData.device) {
+      doc.setFontSize(14);
     doc.setTextColor(226, 0, 116);
-    doc.text(`Total Due Today: $${calculateTotalDueToday()}`, 20, yPosition);
+      doc.text('Home Internet', 20, yPosition);
+    yPosition += 10;
     
-    // Add T-Mobile branding
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text('T-Mobile Quick Quote Tool', 20, 280);
-    doc.text('Visit t-mobile.com for more information', 20, 287);
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+      doc.text(`Monthly Cost: $${homeInternetData.totalMonthly}`, 20, yPosition);
+      yPosition += 15;
+    }
     
-    // Save the PDF
-    const fileName = `t-mobile-quote-${customerData ? customerData.lastName.toLowerCase() : 'customer'}.pdf`;
-    doc.save(fileName);
+    // Equipment Credit
+    if (equipmentCreditData) {
+      doc.setFontSize(14);
+    doc.setTextColor(226, 0, 116);
+      doc.text('Equipment Credit & Financing', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+      doc.text(`EC Amount: $${equipmentCreditData.amount || 0}`, 20, yPosition);
+    yPosition += 7;
+      doc.text(`Down Payment: $${equipmentCreditData.downPayment || 0}`, 20, yPosition);
+    yPosition += 7;
+      doc.text(`Monthly Financing: $${equipmentCreditData.monthlyFinancing || 0}`, 20, yPosition);
+      yPosition += 15;
+    }
+    
+    // Discounts
+    if (discountsData) {
+      doc.setFontSize(14);
+    doc.setTextColor(226, 0, 116);
+      doc.text('Discounts', 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+      if (discountsData.autoPay) doc.text('Auto Pay: $5 per line', 20, yPosition);
+      if (discountsData.senior55) doc.text('Senior 55+: 20% off', 20, yPosition);
+      if (discountsData.tmobileInsider) doc.text('T-Mobile Insider: 15% off', 20, yPosition);
+      yPosition += 15;
+    }
+    
+    // Total
+    doc.setFontSize(16);
+    doc.setTextColor(226, 0, 116);
+    doc.text(`Total Monthly Cost: $${calculateTotal().toFixed(2)}`, 20, yPosition);
+    
+    doc.save(`tmobile-quote-${quoteId}.pdf`);
   };
 
-  const handleShareQuote = () => {
-    const shareText = `Check out my T-Mobile quote: ${quoteData.lines} lines for $${getTotalMonthly()}/month!`;
+  const generateComparisonData = () => {
+    const currentTotal = calculateTotal();
+    const savings = calculateDiscounts();
     
-    if (navigator.share) {
-      navigator.share({
-        title: 'T-Mobile Quote',
-        text: shareText,
-        url: window.location.href
-      });
-    } else {
-      navigator.clipboard.writeText(shareText);
-      alert('Quote copied to clipboard!');
-    }
+    // Generate alternative scenarios
+    const scenarios = [
+      {
+        name: 'Current Quote',
+        total: currentTotal,
+        savings: savings,
+        features: ['All selected services', 'Applied discounts', 'Equipment financing']
+      },
+      {
+        name: 'No Discounts',
+        total: currentTotal + savings,
+        savings: 0,
+        features: ['All selected services', 'No discounts applied', 'Equipment financing']
+      },
+      {
+        name: 'Budget Option',
+        total: currentTotal * 0.7, // 30% less
+        savings: savings * 0.5,
+        features: ['Essential services only', 'Basic devices', 'Minimal financing']
+      }
+    ];
+    
+    setComparisonData(scenarios);
+    setShowComparison(true);
+  };
+
+  const getSavingsPercentage = () => {
+    const totalBeforeDiscounts = calculateTotal() + calculateDiscounts();
+    const discounts = calculateDiscounts();
+    return totalBeforeDiscounts > 0 ? (discounts / totalBeforeDiscounts) * 100 : 0;
+  };
+
+  const getTotalLines = () => {
+    return (voiceLinesData?.quantity || 0) + 
+           (dataLinesData?.quantity || 0) + 
+           (iotLinesData?.quantity || 0);
   };
 
   return (
-    <div className="form-section">
-      <h2 className="section-title">Your T-Mobile Quote</h2>
+    <div style={{
+      maxWidth: '100%',
+      margin: '0 auto',
+      padding: '15px 10px',
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      height: 'calc(100vh - 120px)',
+      overflowY: 'auto'
+    }} ref={quoteRef}>
+      <div style={{
+        textAlign: 'center',
+        marginBottom: '20px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+          marginBottom: '8px'
+        }}>
+          <Phone size={24} color="#E20074" />
+          <h2 style={{
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#E20074',
+            margin: 0
+          }}>
+            Quote Summary
+          </h2>
+        </div>
+      </div>
+      
+      {/* Quote Header */}
+      <div style={{
+        background: 'linear-gradient(135deg, #E20074, #1E88E5)',
+        color: 'white',
+        padding: '20px',
+        borderRadius: '12px',
+        marginBottom: '30px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '5px' }}>
+            Your T-Mobile Quote
+          </h2>
+          <p style={{ fontSize: '14px', opacity: 0.9, margin: 0 }}>
+            Quote ID: {quoteId} • Generated: {new Date().toLocaleDateString()}
+          </p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: '28px', fontWeight: '700', marginBottom: '5px' }}>
+            ${calculateTotal().toFixed(2)}/mo
+          </div>
+          <div style={{ fontSize: '12px', opacity: 0.9 }}>
+            {getTotalLines()} lines • {getSavingsPercentage().toFixed(1)}% savings
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+        gap: '10px',
+        marginBottom: '30px'
+      }}>
+        <button
+          onClick={() => setShowDetailedBreakdown(!showDetailedBreakdown)}
+          style={{
+            padding: '12px',
+            border: '2px solid #E20074',
+            borderRadius: '8px',
+            background: showDetailedBreakdown ? '#E20074' : 'white',
+            color: showDetailedBreakdown ? 'white' : '#E20074',
+            fontSize: '14px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
+          }}
+        >
+          {showDetailedBreakdown ? <EyeOff size={16} /> : <Eye size={16} />}
+          {showDetailedBreakdown ? 'Hide' : 'Show'} Details
+        </button>
+        
+        <button
+          onClick={generateComparisonData}
+          style={{
+            padding: '12px',
+            border: '2px solid #4CAF50',
+            borderRadius: '8px',
+            background: 'white',
+            color: '#4CAF50',
+            fontSize: '14px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
+          }}
+        >
+          <BarChart3 size={16} />
+          Compare
+        </button>
+        
+        <button
+          onClick={() => setShareModalOpen(true)}
+          style={{
+            padding: '12px',
+            border: '2px solid #2196F3',
+            borderRadius: '8px',
+            background: 'white',
+            color: '#2196F3',
+            fontSize: '14px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
+          }}
+        >
+          <Share2 size={16} />
+          Share
+        </button>
+        
+        <button 
+          onClick={generatePDF}
+          style={{
+            padding: '12px',
+            border: '2px solid #FF9800',
+            borderRadius: '8px',
+            background: 'white',
+            color: '#FF9800',
+            fontSize: '14px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
+          }}
+        >
+          <Download size={16} />
+          PDF
+        </button>
+      </div>
       
       {/* Customer Information */}
       {customerData && (
         <div style={{
-          background: '#E20074',
-          color: 'white',
+          background: '#f8f9fa',
           padding: '20px',
           borderRadius: '12px',
-          marginBottom: '30px'
+          marginBottom: '30px',
+          border: '1px solid #e0e0e0'
         }}>
-          <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '15px' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px', color: '#E20074' }}>
             Customer Information
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-            <div>
-              <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Name</div>
-              <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                {customerData.firstName} {customerData.lastName}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Email</div>
-              <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                {customerData.email}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Phone</div>
-              <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                {customerData.phone}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '4px' }}>Expected EC</div>
-              <div style={{ fontSize: '16px', fontWeight: '600' }}>
-                {customerData.expectedEC}
-              </div>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            <div><strong>Name:</strong> {customerData.firstName} {customerData.lastName}</div>
+            <div><strong>Email:</strong> {customerData.email}</div>
+            <div><strong>Phone:</strong> {customerData.phone}</div>
           </div>
         </div>
       )}
       
-      <div className="summary">
-        <div className="summary-title">Quote Summary</div>
+      {/* Services Summary */}
+      <div style={{ marginBottom: '30px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: '#E20074' }}>
+          Services Summary
+        </h3>
         
-        {/* Two Column Layout */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '20px',
-          marginTop: '20px'
-        }}>
-          
-          {/* Expected Monthly Balance Column */}
+        {/* Voice Lines */}
+        {voiceLinesData && voiceLinesData.quantity > 0 && (
           <div style={{
             background: 'white',
-            border: '2px solid #e0e0e0',
-            borderRadius: '12px',
-            padding: '20px'
-          }}>
-            <div style={{
-              background: '#E20074',
-              color: '#FFFFFF',
-              padding: '15px',
+            border: '1px solid #e0e0e0',
               borderRadius: '8px',
-              marginBottom: '20px',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>
-                Expected Monthly Balance
-              </h3>
-            </div>
-            
-            <div className="summary-item">
-              <span className="summary-label">Plan Total</span>
-              <span className="summary-value">${calculatePlanTotal()}/mo</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Device Payments</span>
-              <span className="summary-value">${calculateDeviceTotal()}/mo</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Protection Plans</span>
-              <span className="summary-value">${calculateProtectionTotal()}/mo</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Monthly Financing</span>
-              <span className="summary-value">${calculateMonthlyFinancing()}/mo</span>
-            </div>
-            {calculateTabletWearableTotal() > 0 && (
-              <div className="summary-item">
-                <span className="summary-label">Data Lines</span>
-                <span className="summary-value">${calculateTabletWearableTotal()}/mo</span>
-              </div>
-            )}
-            {calculateMobileInternetTotal() > 0 && (
-              <div className="summary-item">
-                <span className="summary-label">Mobile Internet</span>
-                <span className="summary-value">${calculateMobileInternetTotal()}/mo</span>
-              </div>
-            )}
-            {calculateHomeInternetTotal() > 0 && (
-              <div className="summary-item">
-                <span className="summary-label">Home Internet</span>
-                <span className="summary-value">${calculateHomeInternetTotal()}/mo</span>
-              </div>
-            )}
-            <div className="summary-item">
-              <span className="summary-label">Subtotal</span>
-              <span className="summary-value">
-                ${calculatePlanTotal() + calculateDeviceTotal() + calculateProtectionTotal() + calculateMonthlyFinancing() + calculateTabletWearableTotal() + calculateMobileInternetTotal() + calculateHomeInternetTotal()}/mo
-              </span>
-            </div>
-            {calculateAutoPaySavings() > 0 && (
-              <div className="summary-item" style={{ color: '#4CAF50' }}>
-                <span className="summary-label">Auto Pay Discount</span>
-                <span className="summary-value">-${calculateAutoPaySavings()}/mo</span>
-              </div>
-            )}
-            {calculateSeniorSavings() > 0 && (
-              <div className="summary-item" style={{ color: '#4CAF50' }}>
-                <span className="summary-label">Senior 55+ Discount</span>
-                <span className="summary-value">-${calculateSeniorSavings()}/mo</span>
-              </div>
-            )}
-            {calculateInsiderSavings() > 0 && (
-              <div className="summary-item" style={{ color: '#4CAF50' }}>
-                <span className="summary-label">T-Mobile Insider Discount</span>
-                <span className="summary-value">-${calculateInsiderSavings()}/mo</span>
-              </div>
-            )}
-            {calculateTradeInCredit() > 0 && (
-              <div className="summary-item" style={{ color: '#4CAF50' }}>
-                <span className="summary-label">Trade-In Credit (Instant)</span>
-                <span className="summary-value">-${calculateTradeInCredit()}</span>
-              </div>
-            )}
-            <div className="summary-item">
-              <span className="summary-label">Taxes & Fees</span>
-              <span className="summary-value">${calculateTaxesAndFees()}/mo</span>
-            </div>
-            
-            <div style={{
-              borderTop: '2px solid #e0e0e0',
-              paddingTop: '15px',
-              marginTop: '15px'
-            }}>
-              <div className="summary-item" style={{ 
-                fontSize: '20px', 
-                fontWeight: '700', 
-                color: '#E20074' 
-              }}>
-                <span className="summary-label">Total Monthly</span>
-                <span className="summary-value">${getTotalMonthly()}/mo</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Due Today Column */}
-          <div style={{
-            background: 'white',
-            border: '2px solid #e0e0e0',
-            borderRadius: '12px',
-            padding: '20px'
-          }}>
-            <div style={{
-              background: '#E20074',
-              color: '#FFFFFF',
-              padding: '15px',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}>
-                Due Today
-              </h3>
-            </div>
-            
-            <div className="summary-item">
-              <span className="summary-label">Device Taxes</span>
-              <span className="summary-value">${calculateDeviceTaxes()}</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Activation Fees</span>
-              <span className="summary-value">${calculateActivationFees()}</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Down Payment</span>
-              <span className="summary-value">${calculateDownPaymentRequired()}</span>
-            </div>
-            
-            <div style={{
-              borderTop: '2px solid #e0e0e0',
-              paddingTop: '15px',
-              marginTop: '15px'
-            }}>
-              <div className="summary-item" style={{ 
-                fontSize: '20px', 
-                fontWeight: '700', 
-                color: '#E20074' 
-              }}>
-                <span className="summary-label">Total Due Today</span>
-                <span className="summary-value">${calculateTotalDueToday()}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Line Details */}
-        <div style={{
-          background: '#f8f9fa',
-          padding: '20px',
-          borderRadius: '12px',
-          marginTop: '20px',
-          border: '1px solid #e0e0e0'
-        }}>
-          <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
-            Line Details
-          </h3>
-          {Array.from({ length: quoteData.lines }, (_, i) => {
-            const planId = quoteData.plans[i];
-            const deviceId = quoteData.devices[i];
-            const plan = planOptions.find(p => p.id === planId);
-            const device = deviceOptions.find(d => d.id === deviceId);
-            
-            return (
-              <div key={i} style={{ 
-                marginBottom: '15px', 
-                padding: '15px', 
-                background: 'white', 
-                borderRadius: '8px',
-                border: '1px solid #e0e0e0'
-              }}>
-                <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074' }}>Line {i + 1}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ color: '#666' }}>Plan:</span>
-                  <span>{getPlanName(planId)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ color: '#666' }}>Device:</span>
-                  <span>{getDeviceName(deviceId)} - ${getDevicePrice(deviceId)}/mo</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ color: '#666' }}>Protection:</span>
-                  <span>
-                    {quoteData.protection[i] 
-                      ? `P360 - $${getProtectionPrice(deviceId)}/mo` 
-                      : 'No Protection'
-                    }
-                  </span>
-                </div>
-                {quoteData.tradeIns && quoteData.tradeIns[i] && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#666' }}>Trade-In Value:</span>
-                    <span style={{ color: '#4CAF50' }}>${quoteData.tradeIns[i]}</span>
-                  </div>
-                )}
-                {portInData && portInData[i] && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#666' }}>Number:</span>
-                    <span>
-                      {portInData[i].type === 'new' ? 'New Number (Auto)' : 
-                       portInData[i].type === 'port-in' ? `Port-In: ${portInData[i].mdn} (${portInData[i].carrier})` : 
-                       'Not specified'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Data Lines (Tablet/Wearable) */}
-        {tabletWearableData && tabletWearableData.lines > 0 && (
-          <div style={{
-            background: '#f8f9fa',
             padding: '20px',
-            borderRadius: '12px',
-            marginTop: '20px',
-            border: '1px solid #e0e0e0'
-          }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
-              Data Lines
-            </h3>
-            {Array.from({ length: tabletWearableData.lines }, (_, i) => {
-              const deviceId = tabletWearableData.devices[i];
-              const planId = tabletWearableData.plans[i];
-              const device = getTabletWearableDeviceName(deviceId);
-              const plan = getTabletWearablePlanName(planId);
-              
-              return (
-                <div key={i} style={{ 
-                  marginBottom: '15px', 
-                  padding: '15px', 
-                  background: 'white', 
-                  borderRadius: '8px',
-                  border: '1px solid #e0e0e0'
-                }}>
-                  <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074' }}>
-                    Data Line {i + 1}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ color: '#666' }}>Device:</span>
-                    <span>{device.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ color: '#666' }}>Plan:</span>
-                    <span>{plan.name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <span style={{ color: '#666' }}>Monthly Cost:</span>
-                    <span>${device.monthlyPrice + plan.price}/mo</span>
-                  </div>
-                  {tabletWearableData.protection && tabletWearableData.protection[i] && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#666' }}>Protection:</span>
-                      <span>P360 - ${getTabletWearableProtectionPrice(deviceId)}/mo</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Mobile Internet */}
-        {mobileInternetData && mobileInternetData.device && mobileInternetData.plan && (
-          <div style={{
-            background: '#f8f9fa',
-            padding: '20px',
-            borderRadius: '12px',
-            marginTop: '20px',
-            border: '1px solid #e0e0e0'
-          }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
-              Mobile Internet
-            </h3>
-            <div style={{ 
-              padding: '15px', 
-              background: 'white', 
-              borderRadius: '8px',
-              border: '1px solid #e0e0e0'
-            }}>
-              <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074' }}>
-                Mobile Internet Line
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ color: '#666' }}>Device:</span>
-                <span>{getMobileInternetDeviceName(mobileInternetData.device).name}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ color: '#666' }}>Plan:</span>
-                <span>{getMobileInternetPlanName(mobileInternetData.plan).name}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ color: '#666' }}>Monthly Cost:</span>
-                <span>${getMobileInternetPlanName(mobileInternetData.plan).price}/mo</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#666' }}>Device Cost:</span>
-                <span style={{ color: '#4CAF50' }}>Free</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Home Internet */}
-        {homeInternetData && homeInternetData.device && homeInternetData.plan && (
-          <div style={{
-            background: '#f8f9fa',
-            padding: '20px',
-            borderRadius: '12px',
-            marginTop: '20px',
-            border: '1px solid #e0e0e0'
-          }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
-              Home Internet
-            </h3>
-            <div style={{ 
-              padding: '15px', 
-              background: 'white', 
-              borderRadius: '8px',
-              border: '1px solid #e0e0e0'
-            }}>
-              <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074' }}>
-                Home Internet Line
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ color: '#666' }}>Device:</span>
-                <span>{getHomeInternetDeviceName(homeInternetData.device).name}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ color: '#666' }}>Plan:</span>
-                <span>{getHomeInternetPlanName(homeInternetData.plan).name}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ color: '#666' }}>Monthly Cost:</span>
-                <span>${getHomeInternetPlanName(homeInternetData.plan).price}/mo</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#666' }}>Gateway Cost:</span>
-                <span style={{ color: '#4CAF50' }}>Free</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Customer Information Update */}
-      {customerData && customerData.firstName === 'T-Mobile' && customerData.lastName === 'Guest' && (
-        <div style={{
-          background: '#f8f9fa',
-          padding: '20px',
-          borderRadius: '12px',
-          marginTop: '20px',
-          border: '1px solid #e0e0e0'
-        }}>
-          <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', marginBottom: '15px' }}>
-            Add Your Information
-          </h3>
-          <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
-            You're currently viewing as a guest. Add your information to personalize your quote and make it easier to contact you.
-          </p>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '15px',
             marginBottom: '15px'
           }}>
-            <input
-              type="text"
-              placeholder="First Name"
-              style={{
-                padding: '10px',
-                border: '1px solid #e0e0e0',
-                borderRadius: '6px',
-                fontSize: '14px'
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              style={{
-                padding: '10px',
-                border: '1px solid #e0e0e0',
-                borderRadius: '6px',
-                fontSize: '14px'
-              }}
-            />
-            <input
-              type="email"
-              placeholder="Email Address"
-              style={{
-                padding: '10px',
-                border: '1px solid #e0e0e0',
-                borderRadius: '6px',
-                fontSize: '14px'
-              }}
-            />
-            <input
-              type="tel"
-              placeholder="Phone Number"
-              style={{
-                padding: '10px',
-                border: '1px solid #e0e0e0',
-                borderRadius: '6px',
-                fontSize: '14px'
-              }}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+              <Smartphone size={20} color="#E20074" />
+              <h4 style={{ fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                Voice Lines ({voiceLinesData.quantity})
+              </h4>
+            </div>
+            
+            {showDetailedBreakdown && voiceLinesData.plans && (
+              <div style={{ marginBottom: '15px' }}>
+                {Object.values(voiceLinesData.plans).map((planId, i) => (
+                  <div key={i} style={{ 
+                    marginBottom: '8px', 
+                    fontSize: '14px',
+                    padding: '8px',
+                    background: '#f8f9fa',
+                    borderRadius: '6px'
+                  }}>
+                    <div style={{ fontWeight: '600' }}>Line {i + 1}: {getPlanName(planId)}</div>
+                    <div style={{ color: '#666' }}>${getPlanPrice(planId, voiceLinesData.quantity)}/mo</div>
+            </div>
+                ))}
+              </div>
+            )}
+            
+            <div style={{ fontWeight: '600', marginTop: '10px', fontSize: '16px' }}>
+              Voice Total: ${calculateVoiceTotal()}/mo
+              </div>
+              </div>
+            )}
+
+        {/* Data Lines */}
+        {dataLinesData && dataLinesData.quantity > 0 && (
+            <div style={{
+            background: 'white',
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            padding: '20px',
+            marginBottom: '15px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+              <Wifi size={20} color="#E20074" />
+              <h4 style={{ fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                Data Lines ({dataLinesData.quantity}) - {dataLinesData.category}
+              </h4>
+              </div>
+            <div style={{ fontSize: '14px', marginBottom: '10px' }}>
+              Monthly Cost: ${dataLinesData.totalMonthly}/mo
+            </div>
           </div>
-          <button style={{
+        )}
+
+        {/* IoT Lines */}
+        {iotLinesData && iotLinesData.quantity > 0 && (
+          <div style={{
+            background: 'white',
+            border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+            padding: '20px',
+            marginBottom: '15px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+              <Watch size={20} color="#E20074" />
+              <h4 style={{ fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                IoT Lines ({iotLinesData.quantity})
+              </h4>
+            </div>
+            <div style={{ fontSize: '14px', marginBottom: '10px' }}>
+              Monthly Cost: ${iotLinesData.totalMonthly}/mo
+            </div>
+            </div>
+        )}
+            
+        {/* Home Internet */}
+        {homeInternetData && homeInternetData.device && (
+            <div style={{
+            background: 'white',
+            border: '1px solid #e0e0e0',
+            borderRadius: '8px',
+            padding: '20px',
+            marginBottom: '15px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+              <Home size={20} color="#E20074" />
+              <h4 style={{ fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                Home Internet
+              </h4>
+              </div>
+            <div style={{ fontSize: '14px', marginBottom: '10px' }}>
+              Monthly Cost: ${homeInternetData.totalMonthly}/mo
+            </div>
+          </div>
+        )}
+        </div>
+        
+      {/* Equipment Credit & Financing */}
+      {equipmentCreditData && (
+        <div style={{
+          background: '#f8f9fa',
+          padding: '20px',
+          borderRadius: '12px',
+          marginBottom: '30px',
+          border: '1px solid #e0e0e0'
+        }}>
+          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px', color: '#E20074' }}>
+            Equipment Credit & Financing
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            <div><strong>EC Amount:</strong> ${equipmentCreditData.amount || 0}</div>
+            <div><strong>Down Payment:</strong> ${equipmentCreditData.downPayment || 0}</div>
+            <div><strong>Monthly Financing:</strong> ${equipmentCreditData.monthlyFinancing || 0}</div>
+                </div>
+                  </div>
+                )}
+
+      {/* Discounts */}
+      {discountsData && (
+          <div style={{
+          background: '#e8f5e8',
+            padding: '20px',
+            borderRadius: '12px',
+          marginBottom: '30px',
+          border: '1px solid #4CAF50'
+          }}>
+          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px', color: '#2E7D32' }}>
+            Applied Discounts
+            </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            {discountsData.autoPay && <div><strong>Auto Pay:</strong> $5 per line</div>}
+            {discountsData.senior55 && <div><strong>Senior 55+:</strong> 20% off</div>}
+            {discountsData.tmobileInsider && <div><strong>T-Mobile Insider:</strong> 15% off</div>}
+                  </div>
+          <div style={{ fontWeight: '600', marginTop: '10px', fontSize: '16px' }}>
+            Total Discounts: ${calculateDiscounts().toFixed(2)}/mo
+                  </div>
+          </div>
+        )}
+
+      {/* Total Summary */}
+          <div style={{
+        background: 'linear-gradient(135deg, #E20074, #1E88E5)',
+        color: 'white',
+        padding: '30px',
+        borderRadius: '16px',
+        marginBottom: '30px',
+        textAlign: 'center'
+      }}>
+        <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '10px' }}>
+          Total Monthly Cost
+        </h2>
+        <div style={{ fontSize: '36px', fontWeight: '700' }}>
+          ${calculateTotal().toFixed(2)}/mo
+              </div>
+        <p style={{ fontSize: '14px', opacity: 0.9, marginTop: '10px' }}>
+          Includes all services, equipment financing, and applied discounts
+        </p>
+              </div>
+
+      {/* Action Buttons */}
+      <div className="button-group">
+        <button
+          className="button-secondary"
+          onClick={onPrev}
+          style={{ flex: 1 }}
+        >
+          <ArrowLeft size={16} style={{ marginRight: '8px' }} />
+          Back to Discounts
+        </button>
+        <button
+          className="button-secondary"
+          onClick={onRestart}
+          style={{ flex: 1 }}
+        >
+          <RotateCcw size={16} style={{ marginRight: '8px' }} />
+          Start New Quote
+        </button>
+        <button
+          className="button"
+          onClick={() => window.print()}
+          style={{ flex: 1 }}
+        >
+          <Share2 size={16} style={{ marginRight: '8px' }} />
+          Print Quote
+        </button>
+              </div>
+
+      {/* Comparison Modal */}
+      {showComparison && comparisonData && (
+          <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+            <div style={{ 
+              background: 'white', 
+            borderRadius: '12px',
+            padding: '20px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowComparison(false)}
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666'
+              }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: '600' }}>
+              Quote Comparison
+            </h3>
+
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${comparisonData.length}, 1fr)`, gap: '20px' }}>
+              {comparisonData.map((scenario, index) => (
+                <div key={index} style={{
+                  border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+                  padding: '15px',
+                  background: index === 0 ? '#f8f9fa' : 'white'
+                }}>
+                  <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>{scenario.name}</div>
+                    <div style={{ fontSize: '24px', fontWeight: '700', color: '#E20074' }}>
+                      ${scenario.total.toFixed(2)}/mo
+              </div>
+                    <div style={{ fontSize: '12px', color: '#666' }}>
+                      Savings: ${scenario.savings.toFixed(2)}/mo
+              </div>
+              </div>
+
+                  <div style={{ fontSize: '12px' }}>
+                    <div style={{ fontWeight: '600', marginBottom: '8px' }}>Features:</div>
+                    {scenario.features.map((feature, i) => (
+                      <div key={i} style={{ marginBottom: '4px', color: '#666' }}>
+                        • {feature}
+              </div>
+                    ))}
+              </div>
+            </div>
+              ))}
+          </div>
+      </div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {shareModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            maxWidth: '500px',
+            width: '100%',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShareModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666'
+              }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ marginBottom: '20px', fontSize: '20px', fontWeight: '600' }}>
+              Share Your Quote
+            </h3>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                Share Method
+              </label>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                <button
+                  onClick={() => setShareMethod('email')}
+                  style={{
+                    padding: '10px 15px',
+                    border: `2px solid ${shareMethod === 'email' ? '#E20074' : '#e0e0e0'}`,
+                borderRadius: '6px',
+                    background: shareMethod === 'email' ? '#E20074' : 'white',
+                    color: shareMethod === 'email' ? 'white' : '#666',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Mail size={16} />
+                  Email
+                </button>
+                <button
+                  onClick={() => setShareMethod('link')}
+              style={{
+                    padding: '10px 15px',
+                    border: `2px solid ${shareMethod === 'link' ? '#E20074' : '#e0e0e0'}`,
+                borderRadius: '6px',
+                    background: shareMethod === 'link' ? '#E20074' : 'white',
+                    color: shareMethod === 'link' ? 'white' : '#666',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Copy size={16} />
+                  Link
+                </button>
+                <button
+                  onClick={() => setShareMethod('qr')}
+              style={{
+                    padding: '10px 15px',
+                    border: `2px solid ${shareMethod === 'qr' ? '#E20074' : '#e0e0e0'}`,
+                borderRadius: '6px',
+                    background: shareMethod === 'qr' ? '#E20074' : 'white',
+                    color: shareMethod === 'qr' ? 'white' : '#666',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <QrCode size={16} />
+                  QR Code
+                </button>
+              </div>
+            </div>
+
+            {shareMethod === 'email' && (
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                  Email Address
+                </label>
+            <input
+                  type="email"
+                  placeholder="Enter email address"
+              style={{
+                    width: '100%',
+                padding: '10px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '6px',
+                    fontSize: '14px',
+                    marginBottom: '15px'
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    // Send email logic
+                    setShareModalOpen(false);
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
             background: '#E20074',
             color: 'white',
             border: 'none',
-            padding: '10px 20px',
             borderRadius: '6px',
-            fontSize: '14px',
-            fontWeight: '600',
+                    fontSize: '16px',
             cursor: 'pointer'
-          }}>
-            Save Information
+                  }}
+                >
+                  Send Quote via Email
           </button>
         </div>
       )}
 
-      <div style={{ 
-        background: '#E20074',
-        color: 'white', 
-        padding: '20px', 
-        borderRadius: '12px', 
-        marginBottom: '20px',
-        textAlign: 'center'
-      }}>
-        <h3 style={{ marginBottom: '10px' }}>Ready to Get Started?</h3>
-        <p style={{ marginBottom: '15px' }}>
-          Contact T-Mobile to activate your service and get your devices!
-        </p>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <a 
-            href="tel:1-800-937-8997" 
+            {shareMethod === 'link' && (
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                  Shareable Link
+                </label>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                  <input
+                    type="text"
+                    value={shareUrl || generateShareUrl()}
+                    readOnly
             style={{
-              background: 'white',
-              color: '#e20074',
-              padding: '10px 20px',
+                      flex: 1,
+                      padding: '10px',
+                      border: '1px solid #e0e0e0',
               borderRadius: '6px',
-              textDecoration: 'none',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <Phone size={16} />
-            Call Now
-          </a>
-          <a 
-            href="https://www.t-mobile.com/stores" 
-            target="_blank" 
-            rel="noopener noreferrer"
+                      fontSize: '14px'
+                    }}
+                  />
+                  <button
+                    onClick={() => copyToClipboard(shareUrl || generateShareUrl())}
             style={{
-              background: 'rgba(255,255,255,0.2)',
+                      padding: '10px 15px',
+                      background: '#4CAF50',
               color: 'white',
-              padding: '10px 20px',
+                      border: 'none',
               borderRadius: '6px',
-              textDecoration: 'none',
-              fontWeight: '600',
-              border: '1px solid white'
+                      cursor: 'pointer'
             }}
           >
-            Find Store
-          </a>
+                    <Copy size={16} />
+                  </button>
         </div>
+                <div style={{ fontSize: '12px', color: '#666', marginBottom: '15px' }}>
+                  This link will allow others to view your quote. It expires in 30 days.
       </div>
+              </div>
+            )}
 
-      <div className="button-group">
-        <button className="button button-secondary" onClick={onPrev}>
-          Back to Devices
-        </button>
-        <button className="button button-secondary" onClick={handleDownloadQuote}>
-          <Download size={16} style={{ marginRight: '8px' }} />
-          Download Quote
-        </button>
-        <button className="button button-secondary" onClick={handleShareQuote}>
-          <Share2 size={16} style={{ marginRight: '8px' }} />
-          Share Quote
-        </button>
-        <button className="button" onClick={onRestart}>
-          Start New Quote
-        </button>
-      </div>
+            {shareMethod === 'qr' && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: '200px',
+                  height: '200px',
+                  background: '#f0f0f0',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 15px',
+                  fontSize: '12px',
+                  color: '#666'
+                }}>
+                  QR Code Placeholder
+                </div>
+                <div style={{ fontSize: '12px', color: '#666' }}>
+                  Scan this QR code to view the quote on mobile
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Guest Message */}
+      {!customerData && (
+        <div style={{
+          background: '#fff3cd',
+          border: '1px solid #ffeaa7',
+          borderRadius: '8px',
+          padding: '15px',
+          marginTop: '30px',
+          textAlign: 'center'
+        }}>
+          <p style={{ fontSize: '14px', color: '#856404', margin: 0 }}>
+            You&apos;re currently viewing as a guest. Add your information to personalize your quote and make it easier to contact you.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

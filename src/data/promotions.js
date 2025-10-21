@@ -800,3 +800,112 @@ export const checkStackability = (selectedPromotions) => {
   
   return errors;
 };
+
+// Additional utility functions for enhanced promotion engine
+export const getPromotionById = (promoId) => {
+  return promotions.find(p => p.id === promoId);
+};
+
+export const getPromotionsByCategory = (category) => {
+  return promotions.filter(promo => {
+    const promoCategory = getPromotionCategory(promo.id);
+    return promoCategory === category;
+  });
+};
+
+export const getPromotionCategory = (promoId) => {
+  const promo = promotions.find(p => p.id === promoId);
+  if (!promo) return 'Unknown';
+  
+  if (promo.name.includes('iPhone')) return 'iPhone';
+  if (promo.name.includes('Galaxy') || promo.name.includes('Samsung')) return 'Samsung';
+  if (promo.name.includes('Pixel') || promo.name.includes('Google')) return 'Google';
+  if (promo.name.includes('Motorola') || promo.name.includes('Razr')) return 'Motorola';
+  if (promo.name.includes('Android')) return 'Android';
+  return 'General';
+};
+
+export const getActivePromotions = () => {
+  return promotions.filter(promo => promo.status === 'active');
+};
+
+export const getPromotionsByStatus = (status) => {
+  return promotions.filter(promo => promo.status === status);
+};
+
+export const calculatePromotionSavings = (promoId, devicePrice, tradeInValue = 0) => {
+  const promo = promotions.find(p => p.id === promoId);
+  if (!promo) return 0;
+
+  if (promo.name.includes('On Us')) {
+    return Math.min(devicePrice, promo.maxPayout);
+  } else if (promo.name.includes('Off')) {
+    const discountAmount = parseFloat(promo.name.match(/\$(\d+)/)?.[1] || '0');
+    return Math.min(discountAmount, promo.maxPayout);
+  } else if (promo.name.includes('% Off')) {
+    const discountPercent = parseFloat(promo.name.match(/(\d+)%/)?.[1] || '0');
+    return Math.min((devicePrice * discountPercent / 100), promo.maxPayout);
+  }
+  
+  return Math.min(tradeInValue, promo.maxPayout);
+};
+
+export const getBestPromotionForDevice = (deviceId, lineType = 'new') => {
+  const eligiblePromotions = getPromotionsForDevice(deviceId);
+  const filteredPromotions = eligiblePromotions.filter(promo => {
+    if (lineType === 'new') return promo.aal === 'Y' || promo.aal === 'Y+P';
+    if (lineType === 'upgrade') return promo.aal === 'N';
+    return true;
+  });
+  
+  return filteredPromotions.sort((a, b) => b.maxPayout - a.maxPayout)[0];
+};
+
+export const validatePromotionEligibility = (promoId, deviceId, planId, lineType, hasPortIn = false) => {
+  const promo = promotions.find(p => p.id === promoId);
+  if (!promo) return { eligible: false, reason: 'Promotion not found' };
+
+  // Check device eligibility
+  if (!promo.eligibleDevices.includes(deviceId) && !promo.eligibleDevices.includes('check-c2-list')) {
+    return { eligible: false, reason: 'Device not eligible for this promotion' };
+  }
+
+  // Check line type eligibility
+  if (lineType === 'new' && promo.aal === 'N') {
+    return { eligible: false, reason: 'Promotion requires upgrade, not new line' };
+  }
+  if (lineType === 'upgrade' && (promo.aal === 'Y' || promo.aal === 'Y+P')) {
+    return { eligible: false, reason: 'Promotion requires new line, not upgrade' };
+  }
+
+  // Check port-in requirement
+  if (promo.aal === 'Y+P' && !hasPortIn) {
+    return { eligible: false, reason: 'Promotion requires port-in from another carrier' };
+  }
+
+  // Check rate plan eligibility
+  if (!isRatePlanEligible(promoId, planId)) {
+    return { eligible: false, reason: 'Rate plan not eligible for this promotion' };
+  }
+
+  return { eligible: true, reason: 'Eligible' };
+};
+
+export const getPromotionSummary = (promoId) => {
+  const promo = promotions.find(p => p.id === promoId);
+  if (!promo) return null;
+
+  return {
+    id: promo.id,
+    name: promo.name,
+    internalId: promo.internalId,
+    status: promo.status,
+    maxPayout: promo.maxPayout,
+    limit: promo.limit,
+    category: getPromotionCategory(promoId),
+    requirement: promo.aal === 'Y' ? 'New Line' : 
+                 promo.aal === 'Y+P' ? 'New Line + Port' : 'Upgrade',
+    ratePlan: promo.redemption.ratePlan,
+    notStackable: promo.notStackableOnSameLine
+  };
+};
