@@ -912,19 +912,19 @@ export const isRatePlanEligible = (promotionId, planId) => {
   
   // Check if plan is eligible based on promotion requirements
   if (ratePlan.includes('experience beyond')) {
-    return ['experience-beyond'].includes(planId);
+    return ['experience-beyond', 'experience-beyond-55', 'experience-beyond-military', 'experience-beyond-first-responder'].includes(planId);
   }
   
-  if (ratePlan.includes('experience plus')) {
-    return ['experience-plus'].includes(planId);
+  if (ratePlan.includes('experience more')) {
+    return ['experience-more', 'experience-more-55'].includes(planId);
   }
   
   if (ratePlan.includes('experience')) {
-    return ['experience', 'experience-plus', 'experience-beyond'].includes(planId);
+    return ['experience-more', 'experience-beyond', 'experience-more-55', 'experience-beyond-55', 'experience-beyond-military', 'experience-beyond-first-responder'].includes(planId);
   }
   
   if (ratePlan.includes('55+') || ratePlan.includes('military') || ratePlan.includes('fr')) {
-    return ['experience-plus-55', 'experience-plus-military', 'experience-plus-first-responder'].includes(planId);
+    return ['essentials-choice-55', 'experience-more-55', 'experience-beyond-55', 'experience-beyond-military', 'experience-beyond-first-responder'].includes(planId);
   }
   
   if (ratePlan.includes('all voice plans')) {

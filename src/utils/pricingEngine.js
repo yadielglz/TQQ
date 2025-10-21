@@ -5,10 +5,17 @@ export class PricingEngine {
   constructor() {
     this.basePricing = {
       plans: {
-        'essentials-saver': { 1: 50, 2: 80, 3: 90, 4: 100, 5: 120, 6: 135, additional: 35 },
-        'experience': { 1: 70, 2: 120, 3: 120, 4: 150, 5: 180, 6: 210, additional: 35 },
-        'experience-plus': { 1: 80, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 },
-        'experience-beyond': { 1: 95, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 }
+        'experience-essentials-saver': { 1: 50, 2: 80, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
+        'experience-essentials': { 1: 60, 2: 90, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
+        'experience-more': { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 },
+        'experience-beyond': { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 },
+        // 55+ Plans
+        'essentials-choice-55': { 1: 45, 2: 60, 3: 75, 4: 90, 5: 105, 6: 120, additional: 35 },
+        'experience-more-55': { 1: 70, 2: 100, 3: 130, 4: 160, 5: 190, 6: 220, additional: 35 },
+        'experience-beyond-55': { 1: 85, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
+        // Military/First Responder Plans
+        'experience-beyond-military': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
+        'experience-beyond-first-responder': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 }
       },
       devices: {
         // iPhone Series

@@ -232,63 +232,136 @@ const VoiceLinesFlow = ({
               }}>
                 Rate Plans
               </h3>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '15px'
-              }}>
-                {[
-                  { id: 'experience-beyond', name: 'Experience Beyond', price: 95, features: ['Unlimited', 'Premium Data', 'Netflix', 'Apple TV+', 'T-Mobile Tuesdays'] },
-                  { id: 'experience-plus', name: 'Experience Plus', price: 80, features: ['Unlimited', 'Premium Data', 'Netflix', 'T-Mobile Tuesdays'] },
-                  { id: 'experience', name: 'Experience', price: 70, features: ['Unlimited', 'Premium Data', 'T-Mobile Tuesdays'] },
-                  { id: 'essentials-saver', name: 'Essentials Saver', price: 60, features: ['Unlimited', 'Basic Data'] }
-                ].map(plan => (
-                  <div
-                    key={plan.id}
-                    onClick={() => {
-                      const newPlans = {};
-                      for (let i = 0; i < lines; i++) {
-                        newPlans[i] = plan.id;
-                      }
-                      setPlans(newPlans);
-                    }}
-                    style={{
-                      padding: '15px',
-                      border: `2px solid ${Object.values(plans).includes(plan.id) ? '#E20074' : '#e0e0e0'}`,
-                      borderRadius: '8px',
-                      background: Object.values(plans).includes(plan.id) ? '#fdf2f8' : 'white',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
-                    <h4 style={{
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      marginBottom: '8px',
-                      color: '#333'
-                    }}>
-                      {plan.name}
-                    </h4>
-                    <div style={{
-                      fontSize: '20px',
-                      fontWeight: '700',
-                      color: '#E20074',
-                      marginBottom: '8px'
-                    }}>
-                      ${plan.price}/line
+              
+              {/* Standard Plans */}
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#666', marginBottom: '10px' }}>
+                  Standard Plans
+                </h4>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '15px'
+                }}>
+                  {[
+                    { id: 'experience-beyond', name: 'Experience Beyond', price: 100, features: ['Unlimited', 'Premium Data', 'Netflix', 'Apple TV+', 'T-Mobile Tuesdays'] },
+                    { id: 'experience-more', name: 'Experience More', price: 85, features: ['Unlimited', 'Premium Data', 'Netflix', 'T-Mobile Tuesdays'] },
+                    { id: 'experience-essentials', name: 'Experience Essentials', price: 60, features: ['Unlimited', 'Basic Data'] },
+                    { id: 'experience-essentials-saver', name: 'Experience Essentials Saver', price: 50, features: ['Unlimited', 'Basic Data'] }
+                  ].map(plan => (
+                    <div
+                      key={plan.id}
+                      onClick={() => {
+                        const newPlans = {};
+                        for (let i = 0; i < lines; i++) {
+                          newPlans[i] = plan.id;
+                        }
+                        setPlans(newPlans);
+                      }}
+                      style={{
+                        padding: '15px',
+                        border: `2px solid ${Object.values(plans).includes(plan.id) ? '#E20074' : '#e0e0e0'}`,
+                        borderRadius: '8px',
+                        background: Object.values(plans).includes(plan.id) ? '#fdf2f8' : 'white',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <h4 style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        marginBottom: '8px',
+                        color: '#333'
+                      }}>
+                        {plan.name}
+                      </h4>
+                      <div style={{
+                        fontSize: '20px',
+                        fontWeight: '700',
+                        color: '#E20074',
+                        marginBottom: '8px'
+                      }}>
+                        ${plan.price}/line
+                      </div>
+                      <ul style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        margin: 0,
+                        paddingLeft: '15px'
+                      }}>
+                        {plan.features.map(feature => (
+                          <li key={feature}>{feature}</li>
+                        ))}
+                      </ul>
                     </div>
-                    <ul style={{
-                      fontSize: '12px',
-                      color: '#666',
-                      margin: 0,
-                      paddingLeft: '15px'
-                    }}>
-                      {plan.features.map(feature => (
-                        <li key={feature}>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+
+              {/* Special Plans */}
+              <div>
+                <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#666', marginBottom: '10px' }}>
+                  Special Plans (55+, Military, First Responder)
+                </h4>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '15px'
+                }}>
+                  {[
+                    { id: 'experience-beyond-55', name: 'Experience Beyond 55+', price: 85, features: ['Unlimited', 'Premium Data', 'Netflix', 'Apple TV+', 'T-Mobile Tuesdays', '55+ Savings'] },
+                    { id: 'experience-more-55', name: 'Experience More 55+', price: 70, features: ['Unlimited', 'Premium Data', 'Netflix', 'T-Mobile Tuesdays', '55+ Savings'] },
+                    { id: 'essentials-choice-55', name: 'Essentials Choice 55+', price: 45, features: ['Unlimited', 'Basic Data', '55+ Savings'] },
+                    { id: 'experience-beyond-military', name: 'Experience Beyond Military', price: 90, features: ['Unlimited', 'Premium Data', 'Netflix', 'Apple TV+', 'T-Mobile Tuesdays', 'Military Savings'] },
+                    { id: 'experience-beyond-first-responder', name: 'Experience Beyond First Responder', price: 90, features: ['Unlimited', 'Premium Data', 'Netflix', 'Apple TV+', 'T-Mobile Tuesdays', 'First Responder Savings'] }
+                  ].map(plan => (
+                    <div
+                      key={plan.id}
+                      onClick={() => {
+                        const newPlans = {};
+                        for (let i = 0; i < lines; i++) {
+                          newPlans[i] = plan.id;
+                        }
+                        setPlans(newPlans);
+                      }}
+                      style={{
+                        padding: '15px',
+                        border: `2px solid ${Object.values(plans).includes(plan.id) ? '#E20074' : '#e0e0e0'}`,
+                        borderRadius: '8px',
+                        background: Object.values(plans).includes(plan.id) ? '#fdf2f8' : 'white',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <h4 style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        marginBottom: '8px',
+                        color: '#333'
+                      }}>
+                        {plan.name}
+                      </h4>
+                      <div style={{
+                        fontSize: '20px',
+                        fontWeight: '700',
+                        color: '#E20074',
+                        marginBottom: '8px'
+                      }}>
+                        ${plan.price}/line
+                      </div>
+                      <ul style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        margin: 0,
+                        paddingLeft: '15px'
+                      }}>
+                        {plan.features.map(feature => (
+                          <li key={feature}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
