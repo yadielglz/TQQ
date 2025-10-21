@@ -1,314 +1,146 @@
 // T-Mobile Promotions Data - October 15, 2025
-// Current active promotions as of October 15, 2025
+// Updated with corrected promotion information
 
 export const promotions = [
   // IPHONE PROMOTIONS
   {
     id: 'iphone-17-pro-on-us',
     name: 'iPhone 17 Pro On Us',
-    internalId: 'ID250083',
+    internalId: 'IPH17PRO_ONUS',
+    category: 'iPhone',
     status: 'active',
-    statusDate: '9/12',
-    eligibleDevices: ['iphone-17-pro', 'iphone-17-pro-max'],
-    aal: 'Y', // New Line
+    startDate: '2025-09-12',
+    endDate: null,
+    eligibleDevices: ['iphone-17-pro'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 1100,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 830,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          },
-          {
-            value: 550,
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'galaxy-s10', 'galaxy-s10e', 'galaxy-s10-plus', 'galaxy-s10-5g',
-              'galaxy-note9', 'galaxy-note10', 'galaxy-note10-plus', 'galaxy-note20', 'galaxy-note20-ultra',
-              'pixel-4', 'pixel-4-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Experience Beyond & Go5G Next Plans'
+      tradeTiers: ['Any Condition'],
+      tradeValues: [1100, 830, 550],
+      ratePlan: 'Experience Beyond & Go5G Next',
+      tradeRequired: true
     },
     maxPayout: 1100,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'iphone-17-pro-900-off',
     name: '$900 Off iPhone 17 Pro',
-    internalId: 'ID250082',
+    internalId: 'IPH17PRO_900OFF',
+    category: 'iPhone',
     status: 'active',
-    statusDate: '9/12',
-    eligibleDevices: ['iphone-17-pro', 'iphone-17-pro-max'],
-    aal: 'Y', // New Line
+    startDate: '2025-09-12',
+    endDate: null,
+    eligibleDevices: ['iphone-17-pro'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 900,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 630,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          },
-          {
-            value: 315,
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'galaxy-s10', 'galaxy-s10e', 'galaxy-s10-plus', 'galaxy-s10-5g',
-              'galaxy-note9', 'galaxy-note10', 'galaxy-note10-plus', 'galaxy-note20', 'galaxy-note20-ultra',
-              'pixel-4', 'pixel-4-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: '55+, Military, First Responder'
+      tradeTiers: ['Any Condition'],
+      tradeValues: [900, 630, 315],
+      ratePlan: '55+, Military, FR',
+      tradeRequired: true
     },
     maxPayout: 900,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'iphone-17-on-us',
     name: 'iPhone 17 On Us',
-    internalId: 'ID250081',
+    internalId: 'IPH17_ONUS',
+    category: 'iPhone',
     status: 'active',
-    statusDate: '9/12',
-    eligibleDevices: ['iphone-17', 'iphone-17-plus'],
-    aal: 'Y', // New Line
+    startDate: '2025-09-12',
+    endDate: null,
+    eligibleDevices: ['iphone-17'],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 830,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 415,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Most Voice Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [830, 415],
+      ratePlan: 'Most Voice Plans',
+      tradeRequired: false
     },
     maxPayout: 830,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'iphone-17-630-off',
     name: '$630 Off iPhone 17',
-    internalId: 'ID250080',
+    internalId: 'IPH17_630OFF',
+    category: 'iPhone',
     status: 'active',
-    statusDate: '9/12',
-    eligibleDevices: ['iphone-17', 'iphone-17-plus'],
-    aal: 'Y', // New Line
+    startDate: '2025-09-12',
+    endDate: null,
+    eligibleDevices: ['iphone-17'],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 630,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 315,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          }
-        ]
-      },
-      ratePlan: '55+, Military, First Responder'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [630, 315],
+      ratePlan: '55+, Military, FR',
+      tradeRequired: false
     },
     maxPayout: 630,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'iphone-17-300-off',
     name: '$300 Off iPhone 17',
-    internalId: 'ID250079',
+    internalId: 'IPH17_300OFF',
+    category: 'iPhone',
     status: 'active',
-    statusDate: '9/12',
-    eligibleDevices: ['iphone-17', 'iphone-17-plus'],
-    aal: 'Y', // New Line
+    startDate: '2025-09-12',
+    endDate: null,
+    eligibleDevices: ['iphone-17'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 300,
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'iphone-11', 'iphone-se-2nd', 'iphone-se-3rd',
-              'galaxy-s9', 'galaxy-s9-plus', 'galaxy-s8', 'galaxy-s8-plus', 'galaxy-s8-active', 'galaxy-note8',
-              'galaxy-a-series', 'galaxy-z-fold', 'galaxy-z-fold-2', 'galaxy-z-flip', 'galaxy-z-flip-5g',
-              'pixel-4', 'pixel-4-xl', 'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a',
-              'lg-v60-thinq', 'razr-5g', 'razr-40', 'edge-5g-2022'
-            ]
-          },
-          {
-            value: 150,
-            devices: [
-              'iphone-6', 'iphone-6-plus', 'iphone-6s', 'iphone-6s-plus', 'iphone-7', 'iphone-7-plus',
-              'galaxy-s7', 'galaxy-s7-edge', 'galaxy-note5', 'galaxy-note7',
-              'pixel-3', 'pixel-3-xl', 'pixel-3a', 'pixel-3a-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [300, 150],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: true
     },
     maxPayout: 300,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'iphone-16e-on-us',
     name: 'iPhone 16e On Us',
-    internalId: 'ID250078',
+    internalId: 'IPH16E_ONUS',
+    category: 'iPhone',
     status: 'active',
-    statusDate: '9/12',
+    startDate: '2025-09-12',
+    endDate: null,
     eligibleDevices: ['iphone-16e'],
-    aal: 'Y+P', // New Line + Port In Required
+    aal: 'Y+P', // New Line + Port-In Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 630,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Any Condition'],
+      tradeValues: [630],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: false
     },
     maxPayout: 630,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'iphone-15-50-off',
     name: '50% Off iPhone 15',
-    internalId: 'ID250077',
+    internalId: 'IPH15_50OFF',
+    category: 'iPhone',
     status: 'active',
-    statusDate: '9/12',
-    eligibleDevices: ['iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max'],
-    aal: 'Y', // New Line
+    startDate: '2025-09-12',
+    endDate: null,
+    eligibleDevices: ['iphone-15'],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 315,
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'iphone-11', 'iphone-se-2nd', 'iphone-se-3rd',
-              'galaxy-s9', 'galaxy-s9-plus', 'galaxy-s8', 'galaxy-s8-plus', 'galaxy-s8-active', 'galaxy-note8',
-              'galaxy-a-series', 'galaxy-z-fold', 'galaxy-z-fold-2', 'galaxy-z-flip', 'galaxy-z-flip-5g',
-              'pixel-4', 'pixel-4-xl', 'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a',
-              'lg-v60-thinq', 'razr-5g', 'razr-40', 'edge-5g-2022'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Any Condition'],
+      tradeValues: [315],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: false
     },
     maxPayout: 315,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
 
@@ -316,533 +148,283 @@ export const promotions = [
   {
     id: 'galaxy-s25-plus-on-us',
     name: 'Samsung Galaxy S25+ On Us',
-    internalId: 'ID250297',
+    internalId: 'S25PLUS_ONUS',
+    category: 'Samsung',
     status: 'active',
-    statusDate: '10/2',
+    startDate: '2025-10-02',
+    endDate: null,
     eligibleDevices: ['galaxy-s25-plus'],
-    aal: 'Y', // New Line
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 1000,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 500,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Experience Beyond & Go5G Next Plans'
+      tradeTiers: ['Any Condition'],
+      tradeValues: [1000, 500],
+      ratePlan: 'Exp. Beyond & Go5G Next',
+      tradeRequired: true
     },
     maxPayout: 1000,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'galaxy-s25-edge-on-us',
     name: 'Samsung Galaxy S25 Edge On Us',
-    internalId: 'ID250296',
+    internalId: 'S25EDGE_ONUS',
+    category: 'Samsung',
     status: 'active',
-    statusDate: '10/2',
-    endDate: '10/15',
+    startDate: '2025-10-02',
+    endDate: '2025-10-15',
     eligibleDevices: ['galaxy-s25-edge'],
-    aal: 'Y', // New Line
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 1100,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 550,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Experience Beyond & Go5G Next Plans'
+      tradeTiers: ['Any Condition'],
+      tradeValues: [1100, 550],
+      ratePlan: 'Exp. Beyond & Go5G Next',
+      tradeRequired: true
     },
     maxPayout: 1100,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'galaxy-s25-on-us',
     name: 'Samsung Galaxy S25 On Us',
-    internalId: 'ID250295',
+    internalId: 'S25_ONUS',
+    category: 'Samsung',
     status: 'active',
-    statusDate: '10/2',
+    startDate: '2025-10-02',
+    endDate: null,
     eligibleDevices: ['galaxy-s25'],
-    aal: 'Y', // New Line
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 800,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 400,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Experience Beyond & Go5G Next Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [800, 400],
+      ratePlan: 'Exp. Beyond & Go5G Next',
+      tradeRequired: true
     },
     maxPayout: 800,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'samsung-650-off',
     name: '$650 Off Select Samsungs',
-    internalId: 'ID250294',
+    internalId: 'SAMSUNG_650OFF',
+    category: 'Samsung',
     status: 'active',
-    statusDate: '10/2',
-    eligibleDevices: ['galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge', 'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-02',
+    endDate: null,
+    eligibleDevices: ['galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 650,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [650],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: true
     },
     maxPayout: 650,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'samsung-300-off',
     name: '$300 Off Select Samsungs',
-    internalId: 'ID250293',
+    internalId: 'SAMSUNG_300OFF',
+    category: 'Samsung',
     status: 'active',
-    statusDate: '10/2',
-    eligibleDevices: ['galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge', 'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-02',
+    endDate: null,
+    eligibleDevices: ['galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-fe'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 300,
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'iphone-11', 'iphone-se-2nd', 'iphone-se-3rd',
-              'galaxy-s9', 'galaxy-s9-plus', 'galaxy-s8', 'galaxy-s8-plus', 'galaxy-s8-active', 'galaxy-note8',
-              'galaxy-a-series', 'galaxy-z-fold', 'galaxy-z-fold-2', 'galaxy-z-flip', 'galaxy-z-flip-5g',
-              'pixel-4', 'pixel-4-xl', 'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a',
-              'lg-v60-thinq', 'razr-5g', 'razr-40', 'edge-5g-2022'
-            ]
-          },
-          {
-            value: 150,
-            devices: [
-              'iphone-6', 'iphone-6-plus', 'iphone-6s', 'iphone-6s-plus', 'iphone-7', 'iphone-7-plus',
-              'galaxy-s7', 'galaxy-s7-edge', 'galaxy-note5', 'galaxy-note7',
-              'pixel-3', 'pixel-3-xl', 'pixel-3a', 'pixel-3a-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [300, 150],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: true
     },
     maxPayout: 300,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'android-600-off',
     name: '$600 Off Android Smartphones',
-    internalId: 'ID250292',
+    internalId: 'ANDROID_600OFF',
+    category: 'Android',
     status: 'active',
-    statusDate: '10/2',
-    eligibleDevices: ['galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge', 'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra', 'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-02',
+    endDate: null,
+    eligibleDevices: ['pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl', 'galaxy-s25', 'galaxy-s25-plus'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 600,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [600],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: true
     },
     maxPayout: 600,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'android-300-99-off',
     name: '$300.99 Off Android Smartphones',
-    internalId: 'ID250291',
+    internalId: 'ANDROID_30099OFF',
+    category: 'Android',
     status: 'active',
-    statusDate: '3/20',
-    eligibleDevices: ['galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge', 'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra', 'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl'],
-    aal: 'Y', // New Line
+    startDate: '2025-03-20',
+    endDate: null,
+    eligibleDevices: ['pixel-9', 'pixel-9-pro', 'galaxy-s24', 'galaxy-s24-plus'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 300.99,
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'iphone-11', 'iphone-se-2nd', 'iphone-se-3rd',
-              'galaxy-s9', 'galaxy-s9-plus', 'galaxy-s8', 'galaxy-s8-plus', 'galaxy-s8-active', 'galaxy-note8',
-              'galaxy-a-series', 'galaxy-z-fold', 'galaxy-z-fold-2', 'galaxy-z-flip', 'galaxy-z-flip-5g',
-              'pixel-4', 'pixel-4-xl', 'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a',
-              'lg-v60-thinq', 'razr-5g', 'razr-40', 'edge-5g-2022'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [300.99],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: true
     },
     maxPayout: 300.99,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'android-500-off',
     name: '$500 Off Select Androids',
-    internalId: 'ID250290',
+    internalId: 'ANDROID_500OFF',
+    category: 'Android',
     status: 'active',
-    statusDate: '10/2',
-    eligibleDevices: ['galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge', 'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra', 'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-02',
+    endDate: null,
+    eligibleDevices: ['pixel-10', 'pixel-10-pro', 'galaxy-s25-fe'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 500,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 250,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Good Condition'],
+      tradeValues: [500, 250],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: true
     },
     maxPayout: 500,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
-    id: 'moto-razr-plus-on-us',
+    id: 'razr-plus-on-us',
     name: 'Moto razr+ On Us',
-    internalId: 'ID250289',
+    internalId: 'RAZRPLUS_ONUS',
+    category: 'Android',
     status: 'active',
-    statusDate: '10/2',
+    startDate: '2025-10-02',
+    endDate: null,
     eligibleDevices: ['razr-plus-2025'],
-    aal: 'Y', // New Line
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 1000,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Experience Beyond & Go5G Next Plans'
+      tradeTiers: ['Any Condition'],
+      tradeValues: [1000],
+      ratePlan: 'Exp. Beyond & Go5G Next',
+      tradeRequired: true
     },
     maxPayout: 1000,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'pixel-10-on-us',
     name: 'Google Pixel 10 On Us',
-    internalId: 'ID250288',
+    internalId: 'PIXEL10_ONUS',
+    category: 'Pixel',
     status: 'active',
-    statusDate: '10/2',
-    eligibleDevices: ['pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-02',
+    endDate: null,
+    eligibleDevices: ['pixel-10'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 1000,
-            devices: [
-              'iphone-12', 'iphone-12-mini', 'iphone-12-pro', 'iphone-12-pro-max',
-              'iphone-13', 'iphone-13-mini', 'iphone-13-pro', 'iphone-13-pro-max',
-              'iphone-14', 'iphone-14-plus', 'iphone-14-pro', 'iphone-14-pro-max',
-              'iphone-15', 'iphone-15-plus', 'iphone-15-pro', 'iphone-15-pro-max',
-              'iphone-16', 'iphone-16-plus', 'iphone-16-pro', 'iphone-16-pro-max',
-              'galaxy-s21', 'galaxy-s21-plus', 'galaxy-s21-ultra',
-              'galaxy-s22', 'galaxy-s22-plus', 'galaxy-s22-ultra',
-              'galaxy-s23', 'galaxy-s23-plus', 'galaxy-s23-ultra',
-              'galaxy-s24', 'galaxy-s24-plus', 'galaxy-s24-ultra',
-              'galaxy-s25', 'galaxy-s25-plus', 'galaxy-s25-ultra', 'galaxy-s25-edge',
-              'pixel-6', 'pixel-6-pro', 'pixel-7', 'pixel-7-pro',
-              'pixel-8', 'pixel-8-pro', 'pixel-9', 'pixel-9-pro', 'pixel-9-xl',
-              'pixel-10', 'pixel-10-pro', 'pixel-10-pro-xl'
-            ]
-          },
-          {
-            value: 500,
-            devices: [
-              'iphone-11', 'iphone-11-pro', 'iphone-11-pro-max',
-              'galaxy-s20', 'galaxy-s20-plus', 'galaxy-s20-ultra',
-              'galaxy-z-fold-3', 'galaxy-z-fold-4', 'galaxy-z-fold-5',
-              'galaxy-z-flip-3', 'galaxy-z-flip-4', 'galaxy-z-flip-5',
-              'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Experience Beyond & Go5G Next Plans'
+      tradeTiers: ['Condition-Based'],
+      tradeValues: [1000, 500],
+      ratePlan: 'Exp. Beyond & Go5G Next',
+      tradeRequired: true
     },
     maxPayout: 1000,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
 
   // TABLET PROMOTIONS
   {
-    id: 'ipad-250-off',
+    id: 'ipad-a16-250-off',
     name: '$250 Off iPad (A16)',
-    internalId: 'ID250287',
+    internalId: 'IPADA16_250OFF',
+    category: 'Tablet',
     status: 'active',
-    statusDate: '10/2',
+    startDate: '2025-10-02',
+    endDate: null,
     eligibleDevices: ['ipad-a16'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 250,
-            devices: [
-              'ipad-9th', 'ipad-10th', 'ipad-air-4th', 'ipad-air-5th',
-              'ipad-pro-11-3rd', 'ipad-pro-11-4th', 'ipad-pro-11-5th',
-              'ipad-pro-12-9-5th', 'ipad-pro-12-9-6th', 'ipad-pro-12-9-7th',
-              'galaxy-tab-s8', 'galaxy-tab-s8-plus', 'galaxy-tab-s8-ultra',
-              'galaxy-tab-s9', 'galaxy-tab-s9-plus', 'galaxy-tab-s9-ultra',
-              'galaxy-tab-s10-fe', 'galaxy-tab-s10-fe-5g'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'iPad A16'
+      tradeTiers: [],
+      tradeValues: [250],
+      ratePlan: 'iPad A16',
+      tradeRequired: false
     },
     maxPayout: 250,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
-    id: 'samsung-tab-a9-plus-on-us',
+    id: 'tab-a9-plus-on-us',
     name: 'Samsung Tab A9+ On Us',
-    internalId: 'ID250286',
+    internalId: 'TABA9PLUS_ONUS',
+    category: 'Tablet',
     status: 'active',
-    statusDate: '8/21',
+    startDate: '2025-08-21',
+    endDate: null,
     eligibleDevices: ['galaxy-tab-a9-plus'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free device
-            devices: [
-              'ipad-9th', 'ipad-10th', 'ipad-air-4th', 'ipad-air-5th',
-              'galaxy-tab-s8', 'galaxy-tab-s8-plus', 'galaxy-tab-s8-ultra',
-              'galaxy-tab-s9', 'galaxy-tab-s9-plus', 'galaxy-tab-s9-ultra',
-              'galaxy-tab-s10-fe', 'galaxy-tab-s10-fe-5g'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Tab A9+'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'Tab A9+',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
-    id: 'samsung-tab-s10-fe-300-off',
+    id: 'tab-s10-fe-300-off',
     name: '$300 Off Samsung Tab S10 FE 5G',
-    internalId: 'ID250285',
+    internalId: 'TABS10FE_300OFF',
+    category: 'Tablet',
     status: 'active',
-    statusDate: '6/18',
+    startDate: '2025-06-18',
+    endDate: null,
     eligibleDevices: ['galaxy-tab-s10-fe-5g'],
-    aal: 'Y', // New Line
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 300,
-            devices: [
-              'ipad-9th', 'ipad-10th', 'ipad-air-4th', 'ipad-air-5th',
-              'ipad-pro-11-3rd', 'ipad-pro-11-4th', 'ipad-pro-11-5th',
-              'ipad-pro-12-9-5th', 'ipad-pro-12-9-6th', 'ipad-pro-12-9-7th',
-              'galaxy-tab-s8', 'galaxy-tab-s8-plus', 'galaxy-tab-s8-ultra',
-              'galaxy-tab-s9', 'galaxy-tab-s9-plus', 'galaxy-tab-s9-ultra'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Tab S10 FE 5G'
+      tradeTiers: [],
+      tradeValues: [300],
+      ratePlan: 'Tab S10 FE 5G',
+      tradeRequired: false
     },
     maxPayout: 300,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'revvl-tab-2-on-us',
     name: 'Revvl Tab 2 On Us',
-    internalId: 'ID250284',
+    internalId: 'REVVL_TAB2_ONUS',
+    category: 'Tablet',
     status: 'active',
-    statusDate: '6/26',
+    startDate: '2025-06-26',
+    endDate: null,
     eligibleDevices: ['revvl-tab-2'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free device
-            devices: [
-              'ipad-9th', 'ipad-10th', 'ipad-air-4th', 'ipad-air-5th',
-              'galaxy-tab-s8', 'galaxy-tab-s8-plus', 'galaxy-tab-s8-ultra',
-              'galaxy-tab-s9', 'galaxy-tab-s9-plus', 'galaxy-tab-s9-ultra',
-              'galaxy-tab-s10-fe', 'galaxy-tab-s10-fe-5g'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Revvl Tab 2'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'Revvl Tab 2',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
 
@@ -850,893 +432,618 @@ export const promotions = [
   {
     id: 'apple-watch-200-99-off',
     name: '$200.99 Off Apple Watch',
-    internalId: 'ID250283',
+    internalId: 'APPLEWATCH_20099OFF',
+    category: 'Wearable',
     status: 'active',
-    statusDate: '10/9',
-    eligibleDevices: ['apple-watch-series-9', 'apple-watch-series-10', 'apple-watch-se-3rd'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-09',
+    endDate: null,
+    eligibleDevices: ['apple-watch-series-10', 'apple-watch-series-9', 'apple-watch-se-3rd'],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 200.99,
-            devices: [
-              'apple-watch-series-7', 'apple-watch-series-8', 'apple-watch-series-9',
-              'apple-watch-se-2nd', 'apple-watch-se-3rd',
-              'galaxy-watch-4', 'galaxy-watch-5', 'galaxy-watch-6',
-              'galaxy-watch-7', 'galaxy-watch-classic-4', 'galaxy-watch-classic-5',
-              'galaxy-watch-classic-6', 'galaxy-watch-classic-7',
-              'pixel-watch', 'pixel-watch-2'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Apple Watch'
+      tradeTiers: [],
+      tradeValues: [200.99],
+      ratePlan: '36-Month EIP',
+      tradeRequired: false
     },
     maxPayout: 200.99,
-    limit: 4,
-    notStackableOnSameLine: [],
-    eipTerm: 36
+    limit: 'Per line',
+    notStackableOnSameLine: []
   },
   {
     id: 'samsung-watch-400-off',
     name: '$400 Off Samsung Watches',
-    internalId: 'ID250282',
+    internalId: 'SAMSUNGWATCH_400OFF',
+    category: 'Wearable',
     status: 'active',
-    statusDate: '10/9',
+    startDate: '2025-10-09',
+    endDate: null,
     eligibleDevices: ['galaxy-watch-7', 'galaxy-watch-classic-7', 'galaxy-watch-pro-7'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 400,
-            devices: [
-              'apple-watch-series-7', 'apple-watch-series-8', 'apple-watch-series-9',
-              'apple-watch-se-2nd', 'apple-watch-se-3rd',
-              'galaxy-watch-4', 'galaxy-watch-5', 'galaxy-watch-6',
-              'galaxy-watch-7', 'galaxy-watch-classic-4', 'galaxy-watch-classic-5',
-              'galaxy-watch-classic-6', 'galaxy-watch-classic-7',
-              'pixel-watch', 'pixel-watch-2'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Samsung Watch'
+      tradeTiers: [],
+      tradeValues: [400],
+      ratePlan: '36-Month EIP',
+      tradeRequired: false
     },
     maxPayout: 400,
-    limit: 4,
-    notStackableOnSameLine: [],
-    eipTerm: 36
+    limit: 'Per line',
+    notStackableOnSameLine: []
   },
   {
     id: 'pixel-watch-449-99-off',
     name: '$449.99 Off Google Pixel Watch',
-    internalId: 'ID250281',
+    internalId: 'PIXELWATCH_44999OFF',
+    category: 'Wearable',
     status: 'active',
-    statusDate: '10/9',
+    startDate: '2025-10-09',
+    endDate: null,
     eligibleDevices: ['pixel-watch-2'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 449.99,
-            devices: [
-              'apple-watch-series-7', 'apple-watch-series-8', 'apple-watch-series-9',
-              'apple-watch-se-2nd', 'apple-watch-se-3rd',
-              'galaxy-watch-4', 'galaxy-watch-5', 'galaxy-watch-6',
-              'galaxy-watch-7', 'galaxy-watch-classic-4', 'galaxy-watch-classic-5',
-              'galaxy-watch-classic-6', 'galaxy-watch-classic-7',
-              'pixel-watch', 'pixel-watch-2'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Pixel Watch'
+      tradeTiers: [],
+      tradeValues: [449.99],
+      ratePlan: '36-Month EIP',
+      tradeRequired: false
     },
     maxPayout: 449.99,
-    limit: 4,
-    notStackableOnSameLine: [],
-    eipTerm: 36
+    limit: 'Per line',
+    notStackableOnSameLine: []
   },
   {
     id: 'apple-watch-bogo',
     name: 'Apple Watch BOGO',
-    internalId: 'ID250280',
+    internalId: 'APPLEWATCH_BOGO',
+    category: 'Wearable',
     status: 'active',
-    statusDate: '10/9',
-    eligibleDevices: ['apple-watch-series-9', 'apple-watch-series-10', 'apple-watch-se-3rd'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-09',
+    endDate: null,
+    eligibleDevices: ['apple-watch-series-10', 'apple-watch-series-9', 'apple-watch-se-3rd'],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 300,
-            devices: [
-              'apple-watch-series-7', 'apple-watch-series-8', 'apple-watch-series-9',
-              'apple-watch-se-2nd', 'apple-watch-se-3rd',
-              'galaxy-watch-4', 'galaxy-watch-5', 'galaxy-watch-6',
-              'galaxy-watch-7', 'galaxy-watch-classic-4', 'galaxy-watch-classic-5',
-              'galaxy-watch-classic-6', 'galaxy-watch-classic-7',
-              'pixel-watch', 'pixel-watch-2'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'Apple Watch'
+      tradeTiers: [],
+      tradeValues: [300],
+      ratePlan: 'Buy One, Get One',
+      tradeRequired: false
     },
     maxPayout: 300,
-    limit: 2,
-    notStackableOnSameLine: [],
-    bogo: true
+    limit: 'Per line',
+    notStackableOnSameLine: []
   },
 
   // HOME INTERNET & FIBER PROMOTIONS
   {
     id: 'hsi-200-rebate',
     name: 'Up to $200 Rebate with HSI Line',
-    internalId: 'ID250279',
+    internalId: 'HSI_200REBATE',
+    category: 'Home Internet',
     status: 'active',
-    statusDate: '10/9',
+    startDate: '2025-10-09',
+    endDate: null,
     eligibleDevices: ['tmobile-home-internet', 'tmobile-home-internet-plus'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 200,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Requires Active HSI'
+      tradeTiers: [],
+      tradeValues: [200],
+      ratePlan: 'Requires Active HSI',
+      tradeRequired: false
     },
     maxPayout: 200,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'hsi-5-off-bundle',
     name: '$5 Off HSI with Any Voice Line',
-    internalId: 'ID250278',
+    internalId: 'HSI_5OFF_BUNDLE',
+    category: 'Home Internet',
     status: 'active',
-    statusDate: '9/9',
+    startDate: '2025-09-09',
+    endDate: null,
     eligibleDevices: ['tmobile-home-internet', 'tmobile-home-internet-plus'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 5,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Bundle Offer'
+      tradeTiers: [],
+      tradeValues: [5],
+      ratePlan: 'Bundle Offer',
+      tradeRequired: false
     },
     maxPayout: 5,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'metronet-one-month-free',
     name: 'Metronet One Month Free',
-    internalId: 'ID250277',
+    internalId: 'METRONET_FREE',
+    category: 'Home Internet',
     status: 'active',
-    statusDate: '10/16',
+    startDate: '2025-10-16',
+    endDate: null,
     eligibleDevices: ['metronet-fiber'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free month
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Fiber Internet'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'Fiber Internet',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'fiber-100-300-rebate',
     name: '$100/$300 Rebate with Fiber',
-    internalId: 'ID250276',
+    internalId: 'FIBER_100_300REBATE',
+    category: 'Home Internet',
     status: 'active',
-    statusDate: '10/7',
+    startDate: '2025-10-07',
+    endDate: null,
     eligibleDevices: ['metronet-fiber'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 100,
-            devices: []
-          },
-          {
-            value: 300,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Fiber Line'
+      tradeTiers: [],
+      tradeValues: [100, 300],
+      ratePlan: 'Fiber Line',
+      tradeRequired: false
     },
     maxPayout: 300,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'fiber-voice-200-400-rebate',
     name: '$200/$400 Rebate with Fiber & Voice Line',
-    internalId: 'ID250275',
+    internalId: 'FIBER_VOICE_200_400REBATE',
+    category: 'Home Internet',
     status: 'active',
-    statusDate: '9/10',
+    startDate: '2025-09-10',
+    endDate: null,
     eligibleDevices: ['metronet-fiber'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 200,
-            devices: []
-          },
-          {
-            value: 400,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Fiber + Voice'
+      tradeTiers: [],
+      tradeValues: [200, 400],
+      ratePlan: 'Fiber + Voice',
+      tradeRequired: false
     },
     maxPayout: 400,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
 
   // HOTSPOT / IOT / PREPAID PROMOTIONS
   {
-    id: 'tcl-linkport-ik511-on-us',
+    id: 'tcl-linkport-on-us',
     name: 'TCL LINKPORT IK511 On Us',
-    internalId: 'ID250274',
+    internalId: 'TCL_LINKPORT_ONUS',
+    category: 'Hotspot',
     status: 'active',
-    statusDate: '6/18',
+    startDate: '2025-06-18',
+    endDate: null,
     eligibleDevices: ['tcl-linkport-ik511'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free device
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Hotspot Device'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'Hotspot Device',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'syncup-tracker-free',
     name: 'Free SyncUP Tracker',
-    internalId: 'ID250273',
+    internalId: 'SYNCUP_TRACKER_FREE',
+    category: 'IoT',
     status: 'active',
-    statusDate: '1/26',
+    startDate: '2025-01-26',
+    endDate: null,
     eligibleDevices: ['syncup-tracker'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free device
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'IoT'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'IoT Device',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'watch-tablet-laptop-5-off',
     name: '$5 Watch/Tablet/Laptop Line',
-    internalId: 'ID250272',
+    internalId: 'WATCH_TABLET_LAPTOP_5OFF',
+    category: 'IoT',
     status: 'active',
-    statusDate: '10/17',
-    eligibleDevices: ['apple-watch-series-9', 'apple-watch-series-10', 'apple-watch-se-3rd', 'galaxy-watch-7', 'galaxy-watch-classic-7', 'pixel-watch-2', 'ipad-a16', 'galaxy-tab-s10-fe-5g', 'revvl-tab-2', 'macbook-air-m3', 'galaxy-book4'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-17',
+    endDate: null,
+    eligibleDevices: ['apple-watch-series-10', 'apple-watch-series-9', 'galaxy-watch-7', 'ipad-a16', 'galaxy-tab-a9-plus'],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 5,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'BTS Promo'
+      tradeTiers: [],
+      tradeValues: [5],
+      ratePlan: 'BTS Offer',
+      tradeRequired: false
     },
     maxPayout: 5,
-    limit: 4,
-    notStackableOnSameLine: []
-  },
-  {
-    id: 'prepaid-samsung-a15-on-us',
-    name: 'Prepaid Samsung A15 On Us',
-    internalId: 'ID250271',
-    status: 'active',
-    statusDate: '5/8',
-    eligibleDevices: ['galaxy-a15'],
-    aal: 'Y', // New Line
-    redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free with $100 service
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Free with $100 Service'
-    },
-    maxPayout: 0,
-    limit: 4,
-    notStackableOnSameLine: []
-  },
-  {
-    id: 'prepaid-samsung-a16-on-us',
-    name: 'Prepaid Samsung A16 On Us',
-    internalId: 'ID250270',
-    status: 'active',
-    statusDate: '3/26',
-    eligibleDevices: ['galaxy-a16'],
-    aal: 'Y', // New Line
-    redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free with $150 service
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Free with $150 Service'
-    },
-    maxPayout: 0,
-    limit: 4,
-    notStackableOnSameLine: []
-  },
-  {
-    id: 'prepaid-network-retirement-5g-on-us',
-    name: 'Prepaid Network Retirement 5G Device On Us',
-    internalId: 'ID250269',
-    status: 'active',
-    statusDate: '1/31',
-    eligibleDevices: ['galaxy-a15', 'galaxy-a16', 'revvl-6x', 'revvl-6x-pro'],
-    aal: 'Y', // New Line
-    redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free device
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Free'
-    },
-    maxPayout: 0,
-    limit: 4,
-    notStackableOnSameLine: []
-  },
-  {
-    id: 'prepaid-device-on-us-100-service',
-    name: 'Prepaid Device On Us with $100 Service',
-    internalId: 'ID250268',
-    status: 'active',
-    statusDate: '1/16',
-    eligibleDevices: ['galaxy-a15', 'galaxy-a16', 'revvl-6x', 'revvl-6x-pro'],
-    aal: 'Y', // New Line
-    redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free with $100 service
-            devices: []
-          }
-        ]
-      },
-      ratePlan: '$100 Service Required'
-    },
-    maxPayout: 0,
-    limit: 4,
-    notStackableOnSameLine: []
-  },
-  {
-    id: 'prepaid-iphone-se-100-off',
-    name: 'Prepaid $100 Off iPhone SE (3rd Gen) on Unlimited Plus',
-    internalId: 'ID250267',
-    status: 'active',
-    statusDate: '1/16',
-    eligibleDevices: ['iphone-se-3rd'],
-    aal: 'Y', // New Line
-    redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 100,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Unlimited Plus'
-    },
-    maxPayout: 100,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
 
   // PLAN-BASED DISCOUNTS
   {
-    id: 'bogo-discount-aal-existing',
+    id: 'bogo-discount-aal',
     name: 'BOGO Discount AAL (Existing BANs)',
-    internalId: 'ID250266',
+    internalId: 'BOGO_DISCOUNT_AAL',
+    category: 'Plan',
     status: 'active',
-    statusDate: '10/16',
-    endDate: '10/15',
-    eligibleDevices: ['any'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-16',
+    endDate: '2025-10-15',
+    eligibleDevices: [],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free GO Line
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Free GO Line'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'Free GO Line',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: [],
-    stackable: true,
-    stackableWith: ['BYOD', 'Device Offers']
+    stackable: true
   },
   {
-    id: '3rd-line-discount-new',
+    id: 'third-line-discount',
     name: '3rd Line Discount (New BANs)',
-    internalId: 'ID250265',
+    internalId: 'THIRD_LINE_DISCOUNT',
+    category: 'Plan',
     status: 'active',
-    statusDate: '10/16',
-    endDate: '10/15',
-    eligibleDevices: ['any'],
-    aal: 'Y', // New Line
+    startDate: '2025-10-16',
+    endDate: '2025-10-15',
+    eligibleDevices: [],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free 3rd Line
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Free 3rd Line'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'Free 3rd Line',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 1,
-    notStackableOnSameLine: [],
-    minimumLines: 3
+    limit: '3-Line Minimum',
+    notStackableOnSameLine: []
   },
   {
     id: 'keep-and-switch',
     name: 'Keep and Switch',
-    internalId: 'ID250264',
+    internalId: 'KEEP_AND_SWITCH',
+    category: 'Plan',
     status: 'active',
-    statusDate: '9/5',
-    eligibleDevices: ['any'],
-    aal: 'Y', // New Line
+    startDate: '2025-09-05',
+    endDate: null,
+    eligibleDevices: [],
+    aal: 'Y+P', // New Line + Port-In Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 800,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'BYOD Eligible'
+      tradeTiers: [],
+      tradeValues: [800],
+      ratePlan: 'BYOD Eligible',
+      tradeRequired: false
     },
     maxPayout: 800,
-    limit: 4,
-    notStackableOnSameLine: []
+    limit: 'Per line',
+    notStackableOnSameLine: [],
+    stackable: true
   },
   {
     id: 'family-freedom',
     name: 'Family Freedom',
-    internalId: 'ID250263',
+    internalId: 'FAMILY_FREEDOM',
+    category: 'Plan',
     status: 'active',
-    statusDate: '4/3',
-    eligibleDevices: ['any'],
-    aal: 'Y', // New Line
+    startDate: '2025-04-03',
+    endDate: null,
+    eligibleDevices: [],
+    aal: 'Y+P', // New Line + Port-In Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 800,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Stackable with Device Offers'
+      tradeTiers: [],
+      tradeValues: [800],
+      ratePlan: 'Stackable',
+      tradeRequired: true
     },
     maxPayout: 800,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: [],
-    stackable: true,
-    stackableWith: ['Device Offers']
+    stackable: true
   },
   {
     id: 'tmobile-work-perks',
     name: 'T-Mobile Work Perks',
-    internalId: 'ID250262',
+    internalId: 'TMOBILE_WORK_PERKS',
+    category: 'Plan',
     status: 'active',
-    statusDate: '11/18',
-    eligibleDevices: ['any'],
-    aal: 'Y', // New Line
+    startDate: '2025-11-18',
+    endDate: null,
+    eligibleDevices: [],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Ongoing discount
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Stackable with Financing and Device Offers'
+      tradeTiers: [],
+      tradeValues: [0],
+      ratePlan: 'Ongoing',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: [],
-    stackable: true,
-    stackableWith: ['Financing', 'Device Offers']
+    stackable: true
   },
 
-  // ADDITIONAL OFFERS AND REBATES
+  // ADDITIONAL OFFERS
   {
     id: 'affordables-300-99-off',
     name: 'Up to $300.99 Off Affordables',
-    internalId: 'ID250261',
+    internalId: 'AFFORDABLES_30099OFF',
+    category: 'Other',
     status: 'active',
-    statusDate: '3/20',
-    eligibleDevices: ['galaxy-a15', 'galaxy-a16', 'revvl-6x', 'revvl-6x-pro', 'iphone-se-3rd'],
-    aal: 'Y', // New Line
+    startDate: '2025-03-20',
+    endDate: null,
+    eligibleDevices: ['galaxy-a16', 'galaxy-a15', 'revvl-6x', 'revvl-6x-pro'],
+    aal: 'N', // Upgrade Only
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 300.99,
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'iphone-11', 'iphone-se-2nd', 'iphone-se-3rd',
-              'galaxy-s9', 'galaxy-s9-plus', 'galaxy-s8', 'galaxy-s8-plus', 'galaxy-s8-active', 'galaxy-note8',
-              'galaxy-a-series', 'galaxy-z-fold', 'galaxy-z-fold-2', 'galaxy-z-flip', 'galaxy-z-flip-5g',
-              'pixel-4', 'pixel-4-xl', 'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a',
-              'lg-v60-thinq', 'razr-5g', 'razr-40', 'edge-5g-2022'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Any Phone, Good Condition'],
+      tradeValues: [300.99],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: true
     },
     maxPayout: 300.99,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'samsung-a16-on-us',
     name: 'Samsung A16 On Us',
-    internalId: 'ID250260',
+    internalId: 'SAMSUNG_A16_ONUS',
+    category: 'Samsung',
     status: 'active',
-    statusDate: '10/2',
+    startDate: '2025-10-02',
+    endDate: null,
     eligibleDevices: ['galaxy-a16'],
-    aal: 'Y', // New Line
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free device
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'iphone-11', 'iphone-se-2nd', 'iphone-se-3rd',
-              'galaxy-s9', 'galaxy-s9-plus', 'galaxy-s8', 'galaxy-s8-plus', 'galaxy-s8-active', 'galaxy-note8',
-              'galaxy-a-series', 'galaxy-z-fold', 'galaxy-z-fold-2', 'galaxy-z-flip', 'galaxy-z-flip-5g',
-              'pixel-4', 'pixel-4-xl', 'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a',
-              'lg-v60-thinq', 'razr-5g', 'razr-40', 'edge-5g-2022'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Any Phone, Any Condition'],
+      tradeValues: [0],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
     id: 'assorted-5g-devices-on-us',
     name: 'Assorted 5G Devices On Us',
-    internalId: 'ID250259',
+    internalId: 'ASSORTED_5G_ONUS',
+    category: 'Other',
     status: 'active',
-    statusDate: '8/21',
-    eligibleDevices: ['galaxy-a15', 'galaxy-a16', 'revvl-6x', 'revvl-6x-pro', 'iphone-se-3rd'],
-    aal: 'Y', // New Line
+    startDate: '2025-08-21',
+    endDate: null,
+    eligibleDevices: ['galaxy-a15', 'revvl-6x', 'revvl-6x-pro'],
+    aal: 'Y', // New Line Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 0, // Free device
-            devices: [
-              'iphone-8', 'iphone-8-plus', 'iphone-x', 'iphone-xs', 'iphone-xs-max', 'iphone-xr',
-              'iphone-11', 'iphone-se-2nd', 'iphone-se-3rd',
-              'galaxy-s9', 'galaxy-s9-plus', 'galaxy-s8', 'galaxy-s8-plus', 'galaxy-s8-active', 'galaxy-note8',
-              'galaxy-a-series', 'galaxy-z-fold', 'galaxy-z-fold-2', 'galaxy-z-flip', 'galaxy-z-flip-5g',
-              'pixel-4', 'pixel-4-xl', 'pixel-5', 'pixel-6a', 'pixel-7a', 'pixel-8a',
-              'lg-v60-thinq', 'razr-5g', 'razr-40', 'edge-5g-2022'
-            ]
-          }
-        ]
-      },
-      ratePlan: 'All Voice Plans'
+      tradeTiers: ['Any Phone, Any Condition'],
+      tradeValues: [0],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: false
     },
     maxPayout: 0,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   },
   {
-    id: 'bts-100-port-in-rebate',
+    id: 'bts-100-port-rebate',
     name: 'BTS $100 Port-in Rebate',
-    internalId: 'ID250258',
+    internalId: 'BTS_100_PORT_REBATE',
+    category: 'Other',
     status: 'active',
-    statusDate: '6/18',
-    eligibleDevices: ['any'],
-    aal: 'Y+P', // New Line + Port In Required
+    startDate: '2025-06-18',
+    endDate: null,
+    eligibleDevices: [],
+    aal: 'Y+P', // New Line + Port-In Required
     redemption: {
-      trade: {
-        tiers: [
-          {
-            value: 100,
-            devices: []
-          }
-        ]
-      },
-      ratePlan: 'Port-in Required'
+      tradeTiers: [],
+      tradeValues: [100],
+      ratePlan: 'All Voice Plans',
+      tradeRequired: false
     },
     maxPayout: 100,
-    limit: 4,
+    limit: 'Per line',
     notStackableOnSameLine: []
   }
 ];
 
-// Helper functions for promotion logic
+// Helper functions for promotion management
 export const getPromotionsForDevice = (deviceId) => {
   return promotions.filter(promo => 
-    promo.eligibleDevices.includes(deviceId) || 
-    promo.eligibleDevices.includes('any') ||
-    promo.eligibleDevices.includes('check-c2-list')
+    promo.eligibleDevices.includes(deviceId)
   );
 };
 
-export const getPromotionsForLineType = (lineType) => {
-  return promotions.filter(promo => {
-    if (lineType === 'new') return promo.aal === 'Y' || promo.aal === 'Y+P';
-    if (lineType === 'upgrade') return promo.aal === 'N';
-    return false;
-  });
+export const getTradeInValueForPromotion = (promotionId, tradeInDeviceId) => {
+  const promotion = promotions.find(p => p.id === promotionId);
+  if (!promotion) return 0;
+
+  // This would typically come from a trade-in device database
+  const tradeInValues = {
+    'iphone-12': 830,
+    'iphone-12-pro': 830,
+    'iphone-13': 830,
+    'iphone-13-pro': 830,
+    'iphone-14': 830,
+    'iphone-14-pro': 830,
+    'iphone-15': 830,
+    'iphone-15-pro': 830,
+    'galaxy-s21': 800,
+    'galaxy-s22': 800,
+    'galaxy-s23': 800,
+    'galaxy-s24': 800,
+    'pixel-6': 800,
+    'pixel-7': 800,
+    'pixel-8': 800,
+    'pixel-9': 800
+  };
+
+  const baseValue = tradeInValues[tradeInDeviceId] || 0;
+  
+  // Apply promotion-specific trade-in values
+  if (promotion.redemption.tradeValues && promotion.redemption.tradeValues.length > 0) {
+    return Math.min(baseValue, promotion.redemption.tradeValues[0]);
+  }
+  
+  return baseValue;
 };
 
-export const getTradeInValueForPromotion = (promoId, tradeInDeviceId) => {
-  const promo = promotions.find(p => p.id === promoId);
-  if (!promo) return 0;
-  
-  for (const tier of promo.redemption.trade.tiers) {
-    if (tier.devices.includes(tradeInDeviceId)) {
-      return tier.value;
-    }
-  }
-  return 0;
-};
+export const isRatePlanEligible = (promotionId, planId) => {
+  const promotion = promotions.find(p => p.id === promotionId);
+  if (!promotion) return false;
 
-export const isRatePlanEligible = (promoId, planId) => {
-  const promo = promotions.find(p => p.id === promoId);
-  if (!promo) return false;
+  const ratePlan = promotion.redemption.ratePlan.toLowerCase();
   
-  const ratePlanRequirement = promo.redemption.ratePlan;
-  
-  // Handle different rate plan requirements
-  if (ratePlanRequirement === 'Most Voice Plans') {
-    return !['select-choice', 'value-essentials', 'essentials-savings'].includes(planId);
+  // Check if plan is eligible based on promotion requirements
+  if (ratePlan.includes('experience beyond') || ratePlan.includes('go5g next')) {
+    return ['go5g-next', 'experience-beyond'].includes(planId);
   }
   
-  if (ratePlanRequirement === '55+, Military, First Responder') {
-    return ['essentials-55', 'more-55', 'beyond-55'].includes(planId);
+  if (ratePlan.includes('55+') || ratePlan.includes('military') || ratePlan.includes('fr')) {
+    return ['go5g-plus-55', 'go5g-plus-military', 'go5g-plus-first-responder'].includes(planId);
   }
   
-  if (ratePlanRequirement === 'All Voice Plans') {
-    return !['select-choice', 'value-essentials', 'essentials-savings'].includes(planId);
+  if (ratePlan.includes('all voice plans')) {
+    return true; // Most plans are eligible
   }
   
-  if (ratePlanRequirement === 'Experience Beyond & Go5G Next Plans') {
-    return ['beyond', 'go5g-next'].includes(planId);
+  if (ratePlan.includes('most voice plans')) {
+    return !['essentials-saver', 'choice', 'value'].includes(planId);
   }
   
-  return true;
+  return true; // Default to eligible
 };
 
 export const checkPromotionLimits = (selectedPromotions) => {
-  const limits = {};
   const errors = [];
+  const promotionCounts = {};
   
-  selectedPromotions.forEach(selectedPromo => {
-    const promoId = selectedPromo.promotionId;
-    const promo = promotions.find(p => p.id === promoId);
-    if (!promo) return;
-    
-    limits[promoId] = (limits[promoId] || 0) + 1;
-    
-    if (limits[promoId] > promo.limit) {
-      errors.push(`${promo.name} can only be applied ${promo.limit} time(s)`);
+  selectedPromotions.forEach(promo => {
+    const promotion = promotions.find(p => p.id === promo.promotionId);
+    if (promotion) {
+      promotionCounts[promotion.id] = (promotionCounts[promotion.id] || 0) + 1;
+      
+      // Check per-line limits
+      if (promotion.limit === 'Per line' && promotionCounts[promotion.id] > 1) {
+        errors.push(`${promotion.name} can only be applied once per line`);
+      }
+      
+      // Check account-level limits
+      if (promotion.limit === '3-Line Minimum' && selectedPromotions.length < 3) {
+        errors.push(`${promotion.name} requires a minimum of 3 lines`);
+      }
     }
   });
   
-  return { limits, errors };
+  return { valid: errors.length === 0, errors };
 };
 
 export const checkStackability = (selectedPromotions) => {
   const errors = [];
+  const stackablePromotions = selectedPromotions.filter(promo => {
+    const promotion = promotions.find(p => p.id === promo.promotionId);
+    return promotion?.stackable === true;
+  });
   
+  // Check for non-stackable promotions on the same line
   selectedPromotions.forEach(promo => {
-    const promoData = promotions.find(p => p.id === promo.promotionId);
-    if (!promoData) return;
-    
-    const notStackable = promoData.notStackableOnSameLine;
-    if (notStackable.length === 0) return;
-    
-    selectedPromotions.forEach(otherPromo => {
-      if (promo.lineIndex === otherPromo.lineIndex && promo.promotionId !== otherPromo.promotionId) {
-        const otherPromoData = promotions.find(p => p.id === otherPromo.promotionId);
-        if (otherPromoData && notStackable.includes(otherPromoData.name)) {
-          errors.push(`${promoData.name} cannot be combined with ${otherPromoData.name} on the same line`);
-        }
+    const promotion = promotions.find(p => p.id === promo.promotionId);
+    if (promotion && !promotion.stackable) {
+      const conflictingPromos = selectedPromotions.filter(otherPromo => 
+        otherPromo.lineIndex === promo.lineIndex && 
+        otherPromo.promotionId !== promo.promotionId
+      );
+      
+      if (conflictingPromos.length > 0) {
+        errors.push(`${promotion.name} cannot be stacked with other promotions on the same line`);
       }
-    });
+    }
   });
   
   return errors;
 };
 
-// Additional utility functions for enhanced promotion engine
-export const getPromotionById = (promoId) => {
-  return promotions.find(p => p.id === promoId);
-};
-
-export const getPromotionsByCategory = (category) => {
-  return promotions.filter(promo => {
-    const promoCategory = getPromotionCategory(promo.id);
-    return promoCategory === category;
-  });
-};
-
-export const getPromotionCategory = (promoId) => {
-  const promo = promotions.find(p => p.id === promoId);
-  if (!promo) return 'Unknown';
-  
-  if (promo.name.includes('iPhone')) return 'iPhone';
-  if (promo.name.includes('Galaxy') || promo.name.includes('Samsung')) return 'Samsung';
-  if (promo.name.includes('Pixel') || promo.name.includes('Google')) return 'Google';
-  if (promo.name.includes('Motorola') || promo.name.includes('Razr')) return 'Motorola';
-  if (promo.name.includes('Android')) return 'Android';
-  if (promo.name.includes('iPad') || promo.name.includes('Tab')) return 'Tablet';
-  if (promo.name.includes('Watch')) return 'Wearable';
-  if (promo.name.includes('HSI') || promo.name.includes('Fiber') || promo.name.includes('Internet')) return 'Home Internet';
-  if (promo.name.includes('Hotspot') || promo.name.includes('IoT') || promo.name.includes('Prepaid')) return 'IoT/Prepaid';
-  if (promo.name.includes('BOGO') || promo.name.includes('Line') || promo.name.includes('Switch')) return 'Plan-Based';
-  return 'General';
-};
-
-export const getActivePromotions = () => {
-  return promotions.filter(promo => promo.status === 'active');
-};
-
-export const getPromotionsByStatus = (status) => {
-  return promotions.filter(promo => promo.status === status);
-};
-
-export const calculatePromotionSavings = (promoId, devicePrice, tradeInValue = 0) => {
-  const promo = promotions.find(p => p.id === promoId);
-  if (!promo) return 0;
-
-  if (promo.name.includes('On Us')) {
-    return Math.min(devicePrice, promo.maxPayout);
-  } else if (promo.name.includes('Off')) {
-    const discountAmount = parseFloat(promo.name.match(/\$(\d+(?:\.\d+)?)/)?.[1] || '0');
-    return Math.min(discountAmount, promo.maxPayout);
-  } else if (promo.name.includes('% Off')) {
-    const discountPercent = parseFloat(promo.name.match(/(\d+)%/)?.[1] || '0');
-    return Math.min((devicePrice * discountPercent / 100), promo.maxPayout);
-  }
-  
-  return Math.min(tradeInValue, promo.maxPayout);
-};
-
-export const getBestPromotionForDevice = (deviceId, lineType = 'new') => {
-  const eligiblePromotions = getPromotionsForDevice(deviceId);
-  const filteredPromotions = eligiblePromotions.filter(promo => {
-    if (lineType === 'new') return promo.aal === 'Y' || promo.aal === 'Y+P';
-    if (lineType === 'upgrade') return promo.aal === 'N';
-    return true;
-  });
-  
-  return filteredPromotions.sort((a, b) => b.maxPayout - a.maxPayout)[0];
-};
-
-export const validatePromotionEligibility = (promoId, deviceId, planId, lineType, hasPortIn = false) => {
-  const promo = promotions.find(p => p.id === promoId);
-  if (!promo) return { eligible: false, reason: 'Promotion not found' };
+export const validatePromotionEligibility = (promotionId, deviceId, planId, lineType, hasPortIn) => {
+  const promotion = promotions.find(p => p.id === promotionId);
+  if (!promotion) return { eligible: false, reason: 'Promotion not found' };
 
   // Check device eligibility
-  if (!promo.eligibleDevices.includes(deviceId) && !promo.eligibleDevices.includes('any') && !promo.eligibleDevices.includes('check-c2-list')) {
+  if (!promotion.eligibleDevices.includes(deviceId)) {
     return { eligible: false, reason: 'Device not eligible for this promotion' };
   }
 
-  // Check line type eligibility
-  if (lineType === 'new' && promo.aal === 'N') {
-    return { eligible: false, reason: 'Promotion requires upgrade, not new line' };
+  // Check AAL requirements
+  if (promotion.aal === 'Y' && lineType !== 'new') {
+    return { eligible: false, reason: 'This promotion requires a new line' };
   }
-  if (lineType === 'upgrade' && (promo.aal === 'Y' || promo.aal === 'Y+P')) {
-    return { eligible: false, reason: 'Promotion requires new line, not upgrade' };
+  
+  if (promotion.aal === 'N' && lineType !== 'upgrade') {
+    return { eligible: false, reason: 'This promotion is for upgrades only' };
   }
-
-  // Check port-in requirement
-  if (promo.aal === 'Y+P' && !hasPortIn) {
-    return { eligible: false, reason: 'Promotion requires port-in from another carrier' };
+  
+  if (promotion.aal === 'Y+P' && (!hasPortIn || lineType !== 'new')) {
+    return { eligible: false, reason: 'This promotion requires a new line with port-in' };
   }
 
   // Check rate plan eligibility
-  if (!isRatePlanEligible(promoId, planId)) {
+  if (!isRatePlanEligible(promotionId, planId)) {
     return { eligible: false, reason: 'Rate plan not eligible for this promotion' };
   }
 
-  return { eligible: true, reason: 'Eligible' };
+  // Check if promotion is active
+  const now = new Date();
+  const startDate = new Date(promotion.startDate);
+  const endDate = promotion.endDate ? new Date(promotion.endDate) : null;
+  
+  if (now < startDate) {
+    return { eligible: false, reason: 'Promotion has not started yet' };
+  }
+  
+  if (endDate && now > endDate) {
+    return { eligible: false, reason: 'Promotion has expired' };
+  }
+
+  return { eligible: true };
 };
 
-export const getPromotionSummary = (promoId) => {
-  const promo = promotions.find(p => p.id === promoId);
-  if (!promo) return null;
+export const getPromotionSummary = (promotionId) => {
+  const promotion = promotions.find(p => p.id === promotionId);
+  if (!promotion) return null;
 
   return {
-    id: promo.id,
-    name: promo.name,
-    internalId: promo.internalId,
-    status: promo.status,
-    maxPayout: promo.maxPayout,
-    limit: promo.limit,
-    category: getPromotionCategory(promoId),
-    requirement: promo.aal === 'Y' ? 'New Line' : 
-                 promo.aal === 'Y+P' ? 'New Line + Port' : 'Upgrade',
-    ratePlan: promo.redemption.ratePlan,
-    notStackable: promo.notStackableOnSameLine,
-    stackable: promo.stackable || false,
-    stackableWith: promo.stackableWith || [],
-    eipTerm: promo.eipTerm || 24,
-    bogo: promo.bogo || false,
-    minimumLines: promo.minimumLines || 1
+    id: promotion.id,
+    name: promotion.name,
+    internalId: promotion.internalId,
+    category: promotion.category,
+    status: promotion.status,
+    maxPayout: promotion.maxPayout,
+    aal: promotion.aal,
+    ratePlan: promotion.redemption.ratePlan,
+    tradeRequired: promotion.redemption.tradeRequired,
+    limit: promotion.limit,
+    stackable: promotion.stackable || false
   };
 };
+
+export const getPromotionCategory = (promotionId) => {
+  const promotion = promotions.find(p => p.id === promotionId);
+  return promotion?.category || 'Other';
+};
+
+export default promotions;

@@ -169,109 +169,17 @@ const VoiceLinesFlow = ({
       
       case 'promotions':
         return (
-          <div style={{
-            maxWidth: '100%',
-            margin: '0 auto',
-            padding: '15px 10px',
-            background: 'white',
-            borderRadius: '10px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            height: 'calc(100vh - 120px)',
-            overflowY: 'auto'
-          }}>
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '20px'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                marginBottom: '8px'
-              }}>
-                <Phone size={24} color="#E20074" />
-                <h2 style={{
-                  fontSize: '24px',
-                  fontWeight: '700',
-                  color: '#E20074',
-                  margin: 0
-                }}>
-                  Voice Line Promotions
-                </h2>
-              </div>
-              <p style={{ 
-                color: '#666', 
-                fontSize: '14px',
-                margin: 0,
-                lineHeight: '1.4'
-              }}>
-                Select promotions for your voice lines. This step is optional.
-              </p>
-            </div>
-            
-            {/* Simple promotion selection for now */}
-            <div style={{
-              background: '#f8f9fa',
-              padding: '15px',
-              borderRadius: '6px',
-              marginBottom: '20px',
-              border: '1px solid #e0e0e0'
-            }}>
-              <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>
-                Available Promotions
-              </div>
-              <div style={{ color: '#666', fontSize: '12px' }}>
-                Promotion selection will be implemented in the next phase.
-                For now, you can proceed without promotions.
-              </div>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'center'
-            }}>
-              <button
-                onClick={prevStep}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  background: '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s ease'
-                }}
-                onMouseOver={(e) => e.target.style.background = '#5a6268'}
-                onMouseOut={(e) => e.target.style.background = '#6c757d'}
-              >
-                Back
-              </button>
-              <button
-                onClick={nextStep}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  background: '#E20074',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s ease'
-                }}
-                onMouseOver={(e) => e.target.style.background = '#C1005F'}
-                onMouseOut={(e) => e.target.style.background = '#E20074'}
-              >
-                Continue
-              </button>
-            </div>
-          </div>
+          <PromotionsSelection
+            lines={lines}
+            quoteData={{
+              devices: Object.values(devices),
+              plans: Object.values(plans)
+            }}
+            portInData={ports}
+            onPromotionsChange={setPromotions}
+            onNext={nextStep}
+            onPrev={prevStep}
+          />
         );
       
       case 'ports':
