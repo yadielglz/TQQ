@@ -60,6 +60,12 @@ export class PerLinePromotionManager {
 
     // Get device-specific promotions
     let availablePromotions = getPromotionsForDevice(deviceId);
+    
+    // Also include promotions that are available for all devices (empty eligibleDevices array)
+    const allDevicePromotions = promotions.filter(promo => 
+      promo.eligibleDevices.length === 0
+    );
+    availablePromotions = [...availablePromotions, ...allDevicePromotions];
 
     // Filter by line type (new vs upgrade)
     availablePromotions = availablePromotions.filter(promo => {

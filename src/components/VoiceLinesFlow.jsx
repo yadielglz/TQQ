@@ -90,26 +90,54 @@ const VoiceLinesFlow = ({
 
   const calculateTotal = () => {
     let total = 0;
-    const planOptions = [
-      { id: 'essentials', pricing: { 1: 50, 2: 80, 3: 90, 4: 100, 5: 120, 6: 135, additional: 35 }},
-      { id: 'more', pricing: { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 }},
-      { id: 'beyond', pricing: { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 }}
-    ];
+    
+    // Updated plan pricing with correct Experience plan IDs
+    const planPricing = {
+      'experience-essentials-saver': { 1: 50, 2: 80, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
+      'experience-essentials': { 1: 60, 2: 90, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
+      'experience-more': { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 },
+      'experience-beyond': { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 },
+      // 55+ Plans
+      'essentials-choice-55': { 1: 45, 2: 60, 3: 75, 4: 90, 5: 105, 6: 120, additional: 35 },
+      'experience-more-55': { 1: 70, 2: 100, 3: 130, 4: 160, 5: 190, 6: 220, additional: 35 },
+      'experience-beyond-55': { 1: 85, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
+      // Military/First Responder Plans
+      'experience-beyond-military': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
+      'experience-beyond-first-responder': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 }
+    };
 
-    // Calculate plan total - only calculate once for the total number of lines
-    // Family plans have shared pricing, not per-line pricing
+    // Calculate plan total - family plans have shared pricing
     if (Object.keys(plans).length > 0) {
-      // Get the first plan (assuming all lines are on the same plan for family plans)
       const firstPlanId = Object.values(plans)[0];
-      const plan = planOptions.find(p => p.id === firstPlanId);
+      const plan = planPricing[firstPlanId];
       if (plan) {
         if (lines <= 6) {
-          total += plan.pricing[lines] || 0;
+          total += plan[lines] || 0;
         } else {
-          total += plan.pricing[6] + (lines - 6) * plan.pricing.additional;
+          total += plan[6] + (lines - 6) * plan.additional;
         }
       }
     }
+
+    // Add device financing costs (monthly device payments)
+    Object.values(devices).forEach(deviceId => {
+      if (deviceId && deviceId !== 'bring-your-own') {
+        const devicePrices = {
+          'iphone-17-pro-max': 1199, 'iphone-17-pro': 1099, 'iphone-17-plus': 899, 'iphone-17': 799,
+          'iphone-16e': 599, 'iphone-16-pro-max': 1199, 'iphone-16-pro': 1099, 'iphone-16-plus': 899, 'iphone-16': 799,
+          'iphone-15-pro-max': 1099, 'iphone-15-pro': 999, 'iphone-15-plus': 899, 'iphone-15': 699, 'iphone-se-3rd': 429,
+          'pixel-10-pro-xl': 1199, 'pixel-10-pro': 999, 'pixel-10': 699, 'pixel-9-pro': 999, 'pixel-9-xl': 899, 'pixel-9': 699, 'pixel-9a': 499,
+          'galaxy-s25-edge': 1299, 'galaxy-s25-ultra': 1299, 'galaxy-s25-plus': 999, 'galaxy-s25': 799, 'galaxy-s25-fe': 599,
+          'galaxy-s24-ultra': 1299, 'galaxy-s24-plus': 999, 'galaxy-s24': 799, 'galaxy-a36': 399, 'galaxy-a16': 299, 'galaxy-a15': 199,
+          'galaxy-z-fold-7': 1799, 'galaxy-z-flip-7': 999, 'razr-ultra': 999, 'razr-plus-2025': 799, 'razr-2025': 599,
+          'edge-2025': 699, 'g-power-2025': 299, 'g-2025': 199, 'revvl-pro-8': 399, 'revvl-6x-pro': 299, 'revvl-6x': 199
+        };
+        const devicePrice = devicePrices[deviceId] || 0;
+        // Calculate monthly payment (assuming 24-month financing)
+        const monthlyPayment = Math.round(devicePrice / 24);
+        total += monthlyPayment;
+      }
+    });
 
     // Add protection costs - these are per-line
     Object.values(protection).forEach(protectionId => {
@@ -120,7 +148,12 @@ const VoiceLinesFlow = ({
       total += protectionPrices[protectionId] || 0;
     });
 
-    return total;
+    // Subtract promotion savings
+    if (promotions && promotions.totalSavings) {
+      total -= promotions.totalSavings;
+    }
+
+    return Math.max(0, total); // Ensure total is never negative
   };
 
   const renderStepContent = () => {

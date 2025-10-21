@@ -65,20 +65,22 @@ const PromotionsSelection = ({
 
   // Initialize promotion manager with line data
   useEffect(() => {
-    if (lines && quoteData && !hasInitialized.current) {
+    if (lines && quoteData) {
+      // Re-initialize when data changes (not just on first load)
+      hasInitialized.current = true;
+      
       // Initialize each line with its data
       for (let i = 0; i < lines; i++) {
         const lineData = {
           deviceId: quoteData.devices?.[i] || null,
           planId: quoteData.plans?.[i] || null,
           lineType: 'new', // Default to new line
-          hasPortIn: portInData?.[i]?.hasPortIn || false,
+          hasPortIn: portInData?.[i]?.type === 'port-in',
           isNewLine: true
         };
         initializeLine(i, lineData);
       }
       
-      hasInitialized.current = true;
       updatePromotionStats();
     }
   }, [lines, quoteData, portInData]);
