@@ -10,35 +10,85 @@ export class PricingEngine {
         beyond: { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 }
       },
       devices: {
+        // iPhone Series
         'iphone-air': 999,
         'iphone-17-pro-max': 1199,
         'iphone-17-pro': 1099,
+        'iphone-17-plus': 899,
         'iphone-17': 799,
         'iphone-16e': 599,
         'iphone-16-pro-max': 1199,
         'iphone-16-pro': 1099,
         'iphone-16-plus': 899,
         'iphone-16': 799,
+        'iphone-15-pro-max': 1099,
+        'iphone-15-pro': 999,
+        'iphone-15-plus': 899,
         'iphone-15': 699,
+        'iphone-se-3rd': 429,
+        
+        // Google Pixel Series
         'pixel-10-pro-xl': 1199,
         'pixel-10-pro': 999,
         'pixel-10': 699,
+        'pixel-9-pro': 999,
+        'pixel-9-xl': 899,
+        'pixel-9': 699,
         'pixel-9a': 499,
+        
+        // Samsung Galaxy Series
         'galaxy-s25-edge': 1299,
         'galaxy-s25-ultra': 1299,
         'galaxy-s25-plus': 999,
         'galaxy-s25': 799,
         'galaxy-s25-fe': 599,
+        'galaxy-s24-ultra': 1299,
+        'galaxy-s24-plus': 999,
+        'galaxy-s24': 799,
         'galaxy-a36': 399,
+        'galaxy-a16': 299,
+        'galaxy-a15': 199,
         'galaxy-z-fold-7': 1799,
         'galaxy-z-flip-7': 999,
+        
+        // Motorola Series
         'razr-ultra': 999,
         'razr-plus-2025': 799,
         'razr-2025': 599,
         'edge-2025': 699,
         'g-power-2025': 299,
         'g-2025': 199,
+        
+        // T-Mobile Revvl Series
         'revvl-pro-8': 399,
+        'revvl-6x-pro': 299,
+        'revvl-6x': 199,
+        
+        // Tablets
+        'ipad-a16': 449,
+        'galaxy-tab-a9-plus': 199,
+        'galaxy-tab-s10-fe-5g': 399,
+        'revvl-tab-2': 149,
+        
+        // Wearables
+        'apple-watch-series-10': 399,
+        'apple-watch-series-9': 399,
+        'apple-watch-se-3rd': 249,
+        'galaxy-watch-7': 299,
+        'galaxy-watch-classic-7': 449,
+        'galaxy-watch-pro-7': 649,
+        'pixel-watch-2': 349,
+        
+        // Home Internet
+        'tmobile-home-internet': 50,
+        'tmobile-home-internet-plus': 70,
+        'metronet-fiber': 60,
+        
+        // IoT Devices
+        'tcl-linkport-ik511': 199,
+        'syncup-tracker': 25,
+        
+        // Other
         'bring-your-own': 0
       },
       protection: {
