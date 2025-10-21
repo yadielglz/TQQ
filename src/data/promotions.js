@@ -172,7 +172,7 @@ export const promotions = [
     category: 'Samsung',
     status: 'active',
     startDate: '2025-10-02',
-    endDate: '2025-10-15',
+    endDate: '2025-10-16',
     eligibleDevices: ['galaxy-s25-edge'],
     aal: 'N', // Upgrade Only
     redemption: {
@@ -682,7 +682,7 @@ export const promotions = [
     category: 'Plan',
     status: 'active',
     startDate: '2025-10-16',
-    endDate: '2025-10-15',
+    endDate: '2025-10-17',
     eligibleDevices: [],
     aal: 'Y', // New Line Required
     redemption: {
@@ -703,7 +703,7 @@ export const promotions = [
     category: 'Plan',
     status: 'active',
     startDate: '2025-10-16',
-    endDate: '2025-10-15',
+    endDate: '2025-10-17',
     eligibleDevices: [],
     aal: 'Y', // New Line Required
     redemption: {
@@ -939,10 +939,8 @@ export const checkPromotionLimits = (selectedPromotions) => {
     if (promotion) {
       promotionCounts[promotion.id] = (promotionCounts[promotion.id] || 0) + 1;
       
-      // Check per-line limits
-      if (promotion.limit === 'Per line' && promotionCounts[promotion.id] > 1) {
-        errors.push(`${promotion.name} can only be applied once per line`);
-      }
+      // Check per-line limits (Per line means it can be applied to multiple lines)
+      // No validation needed for "Per line" as it's allowed on multiple lines
       
       // Check account-level limits
       if (promotion.limit === '3-Line Minimum' && selectedPromotions.length < 3) {
