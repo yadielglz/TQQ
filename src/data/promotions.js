@@ -16,7 +16,7 @@ export const promotions = [
     redemption: {
       tradeTiers: ['Any Condition'],
       tradeValues: [1100, 830, 550],
-      ratePlan: 'Experience Beyond & Go5G Next',
+      ratePlan: 'Experience Beyond',
       tradeRequired: true
     },
     maxPayout: 1100,
@@ -158,7 +158,7 @@ export const promotions = [
     redemption: {
       tradeTiers: ['Any Condition'],
       tradeValues: [1000, 500],
-      ratePlan: 'Exp. Beyond & Go5G Next',
+      ratePlan: 'Experience Beyond',
       tradeRequired: true
     },
     maxPayout: 1000,
@@ -178,7 +178,7 @@ export const promotions = [
     redemption: {
       tradeTiers: ['Any Condition'],
       tradeValues: [1100, 550],
-      ratePlan: 'Exp. Beyond & Go5G Next',
+      ratePlan: 'Experience Beyond',
       tradeRequired: true
     },
     maxPayout: 1100,
@@ -198,7 +198,7 @@ export const promotions = [
     redemption: {
       tradeTiers: ['Good Condition'],
       tradeValues: [800, 400],
-      ratePlan: 'Exp. Beyond & Go5G Next',
+      ratePlan: 'Experience Beyond',
       tradeRequired: true
     },
     maxPayout: 800,
@@ -318,7 +318,7 @@ export const promotions = [
     redemption: {
       tradeTiers: ['Any Condition'],
       tradeValues: [1000],
-      ratePlan: 'Exp. Beyond & Go5G Next',
+      ratePlan: 'Experience Beyond',
       tradeRequired: true
     },
     maxPayout: 1000,
@@ -338,7 +338,7 @@ export const promotions = [
     redemption: {
       tradeTiers: ['Condition-Based'],
       tradeValues: [1000, 500],
-      ratePlan: 'Exp. Beyond & Go5G Next',
+      ratePlan: 'Experience Beyond',
       tradeRequired: true
     },
     maxPayout: 1000,
@@ -911,12 +911,20 @@ export const isRatePlanEligible = (promotionId, planId) => {
   const ratePlan = promotion.redemption.ratePlan.toLowerCase();
   
   // Check if plan is eligible based on promotion requirements
-  if (ratePlan.includes('experience beyond') || ratePlan.includes('go5g next')) {
-    return ['go5g-next', 'experience-beyond'].includes(planId);
+  if (ratePlan.includes('experience beyond')) {
+    return ['experience-beyond'].includes(planId);
+  }
+  
+  if (ratePlan.includes('experience plus')) {
+    return ['experience-plus'].includes(planId);
+  }
+  
+  if (ratePlan.includes('experience')) {
+    return ['experience', 'experience-plus', 'experience-beyond'].includes(planId);
   }
   
   if (ratePlan.includes('55+') || ratePlan.includes('military') || ratePlan.includes('fr')) {
-    return ['go5g-plus-55', 'go5g-plus-military', 'go5g-plus-first-responder'].includes(planId);
+    return ['experience-plus-55', 'experience-plus-military', 'experience-plus-first-responder'].includes(planId);
   }
   
   if (ratePlan.includes('all voice plans')) {

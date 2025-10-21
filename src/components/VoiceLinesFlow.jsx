@@ -238,10 +238,10 @@ const VoiceLinesFlow = ({
                 gap: '15px'
               }}>
                 {[
-                  { id: 'go5g-next', name: 'Go5G Next', price: 95, features: ['Unlimited', 'Premium Data', 'Netflix'] },
-                  { id: 'go5g-plus', name: 'Go5G Plus', price: 80, features: ['Unlimited', 'Premium Data', 'Netflix'] },
-                  { id: 'go5g', name: 'Go5G', price: 70, features: ['Unlimited', 'Premium Data'] },
-                  { id: 'essentials', name: 'Essentials', price: 60, features: ['Unlimited', 'Basic Data'] }
+                  { id: 'experience-beyond', name: 'Experience Beyond', price: 95, features: ['Unlimited', 'Premium Data', 'Netflix', 'Apple TV+', 'T-Mobile Tuesdays'] },
+                  { id: 'experience-plus', name: 'Experience Plus', price: 80, features: ['Unlimited', 'Premium Data', 'Netflix', 'T-Mobile Tuesdays'] },
+                  { id: 'experience', name: 'Experience', price: 70, features: ['Unlimited', 'Premium Data', 'T-Mobile Tuesdays'] },
+                  { id: 'essentials-saver', name: 'Essentials Saver', price: 60, features: ['Unlimited', 'Basic Data'] }
                 ].map(plan => (
                   <div
                     key={plan.id}
