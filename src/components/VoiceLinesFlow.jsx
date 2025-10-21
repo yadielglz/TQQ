@@ -5,6 +5,7 @@ import PlanSelection from './PlanSelection';
 import DeviceSelection from './DeviceSelection';
 import ProtectionSelection from './ProtectionSelection';
 import PromotionsSelection from './PromotionsSelection';
+import PortInSelection from './PortInSelection';
 
 const VoiceLinesFlow = ({ 
   data, 
