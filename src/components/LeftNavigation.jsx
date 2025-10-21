@@ -17,9 +17,18 @@ const LeftNavigation = ({
   completedSteps, 
   selectedServices, 
   onStepClick, 
-  isMobile 
+  isMobile,
+  isCollapsed: externalCollapsed,
+  onCollapseChange
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  
+  // Use external collapse state if provided, otherwise use internal state
+  const isCollapsed = externalCollapsed !== undefined ? externalCollapsed : internalCollapsed;
+  const setIsCollapsed = onCollapseChange || setInternalCollapsed;
+  
+  // State for expanded sub-steps
+  const [expandedSteps, setExpandedSteps] = useState({});
 
   const getStepIcon = (step) => {
     const Icon = step.icon;
@@ -90,7 +99,7 @@ const LeftNavigation = ({
     const status = getStepStatus(step.id);
     const isSelected = isServiceSelected(step.id);
     const subSteps = getServiceSubSteps(step.id);
-    const [isExpanded, setIsExpanded] = useState(false);
+    const isExpanded = expandedSteps[step.id] || false;
 
     return (
       <div key={step.id} style={{ marginBottom: '8px' }}>
@@ -100,7 +109,10 @@ const LeftNavigation = ({
               onStepClick(step.id);
             }
             if (subSteps.length > 0) {
-              setIsExpanded(!isExpanded);
+              setExpandedSteps(prev => ({
+                ...prev,
+                [step.id]: !isExpanded
+              }));
             }
           }}
           style={{
@@ -133,7 +145,10 @@ const LeftNavigation = ({
               {subSteps.length > 0 && (
                 <div onClick={(e) => {
                   e.stopPropagation();
-                  setIsExpanded(!isExpanded);
+                  setExpandedSteps(prev => ({
+                    ...prev,
+                    [step.id]: !isExpanded
+                  }));
                 }}>
                   {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                 </div>
@@ -227,39 +242,91 @@ const LeftNavigation = ({
     </div>
   );
 
-  const renderDesktopView = () => (
-    <div style={{
-      position: 'fixed',
-      left: 0,
-      top: '80px', // Start below the StatusBar (approximately 80px height)
-      width: '280px',
-      height: 'calc(100vh - 80px)', // Adjust height to account for StatusBar
-      background: 'white',
-      borderRight: '1px solid #e0e0e0',
-      overflowY: 'auto',
-      zIndex: 100
-    }}>
-      {/* Desktop Header */}
+  const renderDesktopView = () => {
+    if (isCollapsed) {
+      return (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          left: '20px',
+          zIndex: 1000
+        }}>
+          <button
+            onClick={() => setIsCollapsed(false)}
+            style={{
+              background: '#E20074',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50px',
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 16px rgba(226, 0, 116, 0.3)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+          >
+            <Menu size={18} />
+            <span>Steps</span>
+            <ChevronUp size={16} />
+          </button>
+        </div>
+      );
+    }
+
+    return (
       <div style={{
-        background: '#E20074',
-        color: 'white',
-        padding: '20px',
-        textAlign: 'center'
+        position: 'fixed',
+        left: 0,
+        top: '80px', // Start below the StatusBar (approximately 80px height)
+        width: '280px',
+        height: 'calc(100vh - 80px)', // Adjust height to account for StatusBar
+        background: 'white',
+        borderRight: '1px solid #e0e0e0',
+        overflowY: 'auto',
+        zIndex: 100
       }}>
-        <div style={{ fontSize: '18px', fontWeight: '600' }}>
-          Quote Steps
+        {/* Desktop Header */}
+        <div style={{
+          background: '#E20074',
+          color: 'white',
+          padding: '20px',
+          textAlign: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div>
+            <div style={{ fontSize: '18px', fontWeight: '600' }}>
+              Quote Steps
+            </div>
+            <div style={{ fontSize: '12px', opacity: 0.9, marginTop: '4px' }}>
+              {completedSteps.length} of {steps.length} complete
+            </div>
+          </div>
+          <button
+            onClick={() => setIsCollapsed(true)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+              padding: '4px'
+            }}
+          >
+            <X size={20} />
+          </button>
         </div>
-        <div style={{ fontSize: '12px', opacity: 0.9, marginTop: '4px' }}>
-          {completedSteps.length} of {steps.length} complete
+        
+        {/* Desktop Content */}
+        <div style={{ padding: '20px' }}>
+          {steps.map(renderStepItem)}
         </div>
       </div>
-      
-      {/* Desktop Content */}
-      <div style={{ padding: '20px' }}>
-        {steps.map(renderStepItem)}
-      </div>
-    </div>
-  );
+    );
+  };
 
   // Mobile collapsed view
   if (isMobile && isCollapsed) {

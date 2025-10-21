@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Phone, Tablet, Watch, Wifi, Home, CreditCard, Percent, FileText, Settings, Activity } from 'lucide-react';
 import { LoadingOverlay, FadeIn, ToastProvider, useToast } from './Animations';
-import { saveQuoteToGoogleSheet, testGoogleSheetsIntegration } from '../utils/googleSheets';
 
 // Lazy load components for better performance
 const WelcomeScreen = lazy(() => import('./WelcomeScreen'));
@@ -14,7 +13,6 @@ const EquipmentCreditSelection = lazy(() => import('./EquipmentCreditSelection')
 const DiscountSelection = lazy(() => import('./DiscountSelection'));
 const QuoteSummary = lazy(() => import('./QuoteSummary'));
 const LeftNavigation = lazy(() => import('./LeftNavigation'));
-const GoogleSheetsConfig = lazy(() => import('./GoogleSheetsConfig'));
 const PerformanceMonitor = lazy(() => import('./PerformanceMonitor'));
 
 const MasterFlowContent = () => {
@@ -24,8 +22,8 @@ const MasterFlowContent = () => {
   const [selectedServices, setSelectedServices] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showGoogleSheetsConfig, setShowGoogleSheetsConfig] = useState(false);
   const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { addToast } = useToast();
   
   // Customer data
@@ -144,39 +142,50 @@ const MasterFlowContent = () => {
     }
   };
 
-  // Google Sheets integration
-  const saveQuoteData = async () => {
-    if (!customerData) {
-      addToast('No customer data to save', 'warning');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      
-      // Prepare comprehensive quote data
-      const quoteData = {
-        totalMonthly: calculateTotalQuote(),
-        services: getSelectedServicesSummary(),
-        voiceLines: voiceLinesData.quantity || 0,
-        dataLines: dataLinesData.quantity || 0,
-        iotLines: iotLinesData.quantity || 0,
-        homeInternet: homeInternetData.device ? 'Yes' : 'No',
-        discounts: getAppliedDiscountsSummary(),
-        equipmentCredit: equipmentCreditData.amount || 0,
-        downPayment: equipmentCreditData.downPayment || 0,
-        tradeIns: equipmentCreditData.tradeIns || {},
-        timestamp: new Date().toISOString()
-      };
-
-      await saveQuoteToGoogleSheet(customerData, quoteData);
-      addToast('Quote data saved to Google Sheets successfully!', 'success');
-    } catch (error) {
-      console.error('Error saving quote data:', error);
-      addToast('Failed to save quote data to Google Sheets', 'error');
-    } finally {
-      setIsLoading(false);
-    }
+  // Clear all data function for one-time quote
+  const clearAllData = () => {
+    setCurrentStep(0);
+    setCompletedSteps([]);
+    setSelectedServices([]);
+    setCustomerData(null);
+    setVoiceLinesData({
+      quantity: 0,
+      plans: {},
+      devices: {},
+      protection: {},
+      promotions: {},
+      ports: {}
+    });
+    setDataLinesData({
+      quantity: 0,
+      category: '',
+      devices: {},
+      plans: {},
+      protection: {},
+      promotions: {}
+    });
+    setIotLinesData({
+      quantity: 0,
+      devices: {},
+      plans: {},
+      protection: {},
+      promotions: {}
+    });
+    setHomeInternetData({
+      device: null,
+      plan: null
+    });
+    setEquipmentCreditData({
+      amount: '',
+      downPayment: '',
+      tradeIns: {}
+    });
+    setDiscountsData({
+      autoPay: false,
+      senior55: false,
+      tmobileInsider: false
+    });
+    addToast('All data cleared. Ready for new quote!', 'success');
   };
 
   const calculateTotalQuote = () => {
@@ -475,7 +484,7 @@ const MasterFlowContent = () => {
               equipmentCreditData={equipmentCreditData}
               discountsData={discountsData}
               onPrev={prevStep}
-              onSaveQuote={saveQuoteData}
+              onClearData={clearAllData}
               currentQuote={{
                 customerData,
                 voiceLinesData,
@@ -499,38 +508,6 @@ const MasterFlowContent = () => {
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      {/* Settings Button */}
-      <button
-        onClick={() => setShowGoogleSheetsConfig(true)}
-        style={{
-          position: 'fixed',
-          top: '100px',
-          right: '20px',
-          background: '#E20074',
-          color: 'white',
-          border: 'none',
-          borderRadius: '50%',
-          width: '50px',
-          height: '50px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          zIndex: 1000,
-          boxShadow: '0 4px 12px rgba(226, 0, 116, 0.3)',
-          transition: 'all 0.3s ease'
-        }}
-        onMouseOver={(e) => {
-          e.target.style.transform = 'scale(1.1)';
-          e.target.style.boxShadow = '0 6px 16px rgba(226, 0, 116, 0.4)';
-        }}
-        onMouseOut={(e) => {
-          e.target.style.transform = 'scale(1)';
-          e.target.style.boxShadow = '0 4px 12px rgba(226, 0, 116, 0.3)';
-        }}
-      >
-        <Settings size={24} />
-      </button>
 
       {/* Performance Monitor Toggle */}
       <button
@@ -572,13 +549,15 @@ const MasterFlowContent = () => {
           selectedServices={selectedServices}
           onStepClick={goToStep}
           isMobile={isMobile}
+          isCollapsed={isSidebarCollapsed}
+          onCollapseChange={setIsSidebarCollapsed}
         />
       </Suspense>
       
       {/* Main Content */}
       <div style={{
         flex: 1,
-        marginLeft: isMobile ? '0' : '280px',
+        marginLeft: isMobile ? '0' : (isSidebarCollapsed ? '0' : '280px'),
         marginTop: '80px', // Account for StatusBar height
         padding: '10px',
         background: '#f8f9fa',
@@ -591,14 +570,6 @@ const MasterFlowContent = () => {
           </FadeIn>
         </LoadingOverlay>
       </div>
-
-      {/* Google Sheets Configuration Modal */}
-      <Suspense fallback={null}>
-        <GoogleSheetsConfig
-          isOpen={showGoogleSheetsConfig}
-          onClose={() => setShowGoogleSheetsConfig(false)}
-        />
-      </Suspense>
 
       {/* Performance Monitor */}
       <Suspense fallback={null}>

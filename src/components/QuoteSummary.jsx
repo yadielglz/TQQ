@@ -11,7 +11,7 @@ const QuoteSummary = ({
   equipmentCreditData, 
   discountsData, 
   onPrev, 
-  onRestart 
+  onClearData 
 }) => {
   const [showDetailedBreakdown, setShowDetailedBreakdown] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
@@ -781,7 +781,7 @@ const QuoteSummary = ({
         </button>
         <button
           className="button-secondary"
-          onClick={onRestart}
+          onClick={onClearData}
           style={{ flex: 1 }}
         >
           <RotateCcw size={16} style={{ marginRight: '8px' }} />
