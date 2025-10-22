@@ -661,7 +661,7 @@ export const promotions = [
     status: 'active',
     startDate: '2025-10-17',
     endDate: null,
-    eligibleDevices: ['apple-watch-series-10', 'apple-watch-series-9', 'galaxy-watch-7', 'ipad-a16', 'galaxy-tab-a9-plus'],
+    eligibleDevices: ['apple-watch-series-10', 'apple-watch-series-9', 'galaxy-watch-7', 'ipad-a16', 'galaxy-tab-a9-plus', 'galaxy-tab-s10-plus-5g'],
     aal: 'Y', // New Line Required
     redemption: {
       tradeTiers: [],
@@ -789,7 +789,7 @@ export const promotions = [
     status: 'active',
     startDate: '2025-03-20',
     endDate: null,
-    eligibleDevices: ['galaxy-a16', 'galaxy-a15', 'revvl-6x', 'revvl-6x-pro'],
+    eligibleDevices: ['galaxy-a16', 'galaxy-a15', 'revvl-6x', 'revvl-6x-pro', 'revvl-8'],
     aal: 'N', // Upgrade Only
     redemption: {
       tradeTiers: ['Any Phone, Good Condition'],
@@ -829,7 +829,7 @@ export const promotions = [
     status: 'active',
     startDate: '2025-08-21',
     endDate: null,
-    eligibleDevices: ['galaxy-a15', 'revvl-6x', 'revvl-6x-pro'],
+    eligibleDevices: ['galaxy-a15', 'revvl-6x', 'revvl-6x-pro', 'revvl-8'],
     aal: 'Y', // New Line Required
     redemption: {
       tradeTiers: ['Any Phone, Any Condition'],

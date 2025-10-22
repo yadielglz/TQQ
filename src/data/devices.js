@@ -92,7 +92,7 @@ export const devices = {
     name: 'iPhone 16e',
     brand: 'Apple',
     category: 'smartphone',
-    price: 599,
+    price: 599.99,
     monthlyPayment: 25,
     storage: ['128GB', '256GB'],
     colors: ['Pink', 'Yellow', 'Green', 'Blue', 'Black'],
@@ -389,6 +389,20 @@ export const devices = {
     availability: 'in-stock',
     promotions: ['assorted-5g-devices-on-us', 'affordables-300-99-off']
   },
+  'revvl-8': {
+    id: 'revvl-8',
+    name: 'T-Mobile REVVL 8',
+    brand: 'T-Mobile',
+    category: 'smartphone',
+    price: 199.99,
+    monthlyPayment: 8,
+    storage: ['64GB', '128GB'],
+    colors: ['Black'],
+    features: ['6.6" HD+', 'MediaTek Helio G85', '50MP camera', '5G'],
+    image: '/devices/revvl-8.jpg',
+    availability: 'in-stock',
+    promotions: ['assorted-5g-devices-on-us', 'affordables-300-99-off']
+  },
 
   // BYOD Option
   'bring-your-own': {
@@ -454,14 +468,28 @@ export const devices = {
     name: 'T-Mobile REVVL Tab 2',
     brand: 'T-Mobile',
     category: 'tablet',
-    price: 199,
-    monthlyPayment: 8,
+    price: 169.99,
+    monthlyPayment: 7,
     storage: ['32GB'],
     colors: ['Black'],
     features: ['10.1" HD', 'MediaTek Helio G85', '8MP camera', '5G'],
     image: '/devices/revvl-tab-2.jpg',
     availability: 'in-stock',
     promotions: ['revvl-tab-2-on-us', 'watch-tablet-laptop-5-off']
+  },
+  'galaxy-tab-s10-plus-5g': {
+    id: 'galaxy-tab-s10-plus-5g',
+    name: 'Samsung Galaxy Tab S10+ 5G',
+    brand: 'Samsung',
+    category: 'tablet',
+    price: 1149.99,
+    monthlyPayment: 48,
+    storage: ['256GB', '512GB', '1TB'],
+    colors: ['Graphite', 'Silver', 'Mint'],
+    features: ['14.6" Dynamic AMOLED 2X', 'Snapdragon 8 Gen 4', '12MP camera', '5G', 'S Pen support'],
+    image: '/devices/galaxy-tab-s10-plus-5g.jpg',
+    availability: 'in-stock',
+    promotions: ['watch-tablet-laptop-5-off']
   },
 
   // Wearables
@@ -578,6 +606,20 @@ export const devices = {
     image: '/devices/tcl-linkport-ik511.jpg',
     availability: 'in-stock',
     promotions: ['tcl-linkport-on-us']
+  },
+  'jextream-rg2100': {
+    id: 'jextream-rg2100',
+    name: 'JEXtream RG2100',
+    brand: 'JEXtream',
+    category: 'hotspot',
+    price: 299,
+    monthlyPayment: 12,
+    storage: ['N/A'],
+    colors: ['Black'],
+    features: ['5G', 'WiFi 6E', 'Up to 32 devices', 'Battery powered', 'Ethernet port'],
+    image: '/devices/jextream-rg2100.jpg',
+    availability: 'in-stock',
+    promotions: []
   },
 
   // IoT Devices

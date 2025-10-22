@@ -187,7 +187,7 @@ export class PerLinePromotionManager {
       'iphone-17-pro': 1099,
       'iphone-17-plus': 899,
       'iphone-17': 799,
-      'iphone-16e': 599,
+      'iphone-16e': 599.99,
       'iphone-16-pro-max': 1199,
       'iphone-16-pro': 1099,
       'iphone-16-plus': 899,
@@ -226,10 +226,12 @@ export class PerLinePromotionManager {
       'revvl-pro-8': 399,
       'revvl-6x-pro': 299,
       'revvl-6x': 199,
+      'revvl-8': 199.99,
       'ipad-a16': 449,
       'galaxy-tab-a9-plus': 199,
       'galaxy-tab-s10-fe-5g': 399,
-      'revvl-tab-2': 149,
+      'galaxy-tab-s10-plus-5g': 1149.99,
+      'revvl-tab-2': 169.99,
       'apple-watch-series-10': 399,
       'apple-watch-series-9': 399,
       'apple-watch-se-3rd': 249,
@@ -241,6 +243,7 @@ export class PerLinePromotionManager {
       'tmobile-home-internet-plus': 70,
       'metronet-fiber': 60,
       'tcl-linkport-ik511': 199,
+      'jextream-rg2100': 299,
       'syncup-tracker': 25
     };
     return devicePrices[deviceId] || 0;
