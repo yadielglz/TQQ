@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
-import { Phone, CreditCard, Smartphone, Shield, Hash } from 'lucide-react';
-import LineSelection from './LineSelection';
-import PlanSelection from './PlanSelection';
+import React, { useState, useCallback } from 'react';
+import { Phone, ArrowLeft, ArrowRight, CheckCircle, Circle } from 'lucide-react';
 import DeviceSelection from './DeviceSelection';
-import ProtectionSelection from './ProtectionSelection';
-import PromotionsSelection from './PromotionsSelection';
 import PortInSelection from './PortInSelection';
+import PromotionsSelection from './PromotionsSelection';
+import ProtectionSelection from './ProtectionSelection';
+import { pricingEngine } from '../utils/pricingEngine';
 
 const VoiceLinesFlow = ({ 
   data, 
   onDataChange, 
   onComplete, 
-  onAddAnother, 
-  onPrev 
+  onPrev,
+  onNext
 }) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentSubStep, setCurrentSubStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   // Initialize data from props or defaults
@@ -23,158 +22,92 @@ const VoiceLinesFlow = ({
   const [devices, setDevices] = useState(data?.devices || {});
   const [protection, setProtection] = useState(data?.protection || {});
   const [promotions, setPromotions] = useState(data?.promotions || {});
-  const [ports, setPorts] = useState(data?.ports || {});
+  const [portInData, setPortInData] = useState(data?.portInData || {});
 
-  const steps = [
-    { id: 0, title: 'Lines & Plans', icon: Phone, component: 'lines', description: 'Select number of lines and rate plans' },
-    { id: 1, title: 'Devices', icon: Smartphone, component: 'devices', description: 'Choose devices for each line' },
-    { id: 2, title: 'Port-In Info', icon: Hash, component: 'ports', description: 'Port existing numbers (affects promotions)' },
-    { id: 3, title: 'Promotions', icon: Phone, component: 'promotions', description: 'Apply per-line promotions and savings' },
-    { id: 4, title: 'Protection', icon: Shield, component: 'protection', description: 'Add device protection plans' },
-    { id: 5, title: 'Review & Pricing', icon: CreditCard, component: 'summary', description: 'Final review and pricing breakdown' }
+  const subSteps = [
+    { id: 0, title: 'Lines & Plans', description: 'Select number of lines and rate plans' },
+    { id: 1, title: 'Devices', description: 'Choose devices for each line' },
+    { id: 2, title: 'Port-In Info', description: 'Port existing numbers (affects promotions)' },
+    { id: 3, title: 'Promotions', description: 'Apply per-line promotions and savings' },
+    { id: 4, title: 'Protection', description: 'Add device protection plans' },
+    { id: 5, title: 'Review & Pricing', description: 'Final review and pricing breakdown' }
   ];
 
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+  // Navigation handlers
+  const nextSubStep = useCallback(() => {
+    if (currentSubStep < subSteps.length - 1) {
       setIsLoading(true);
       setTimeout(() => {
-        setCurrentStep(currentStep + 1);
+        setCurrentSubStep(prev => prev + 1);
         setIsLoading(false);
       }, 300);
     } else {
       handleComplete();
     }
-  };
+  }, [currentSubStep, subSteps.length]);
 
-  const prevStep = () => {
-    if (currentStep > 0) {
+  const prevSubStep = useCallback(() => {
+    if (currentSubStep > 0) {
       setIsLoading(true);
       setTimeout(() => {
-        setCurrentStep(currentStep - 1);
+        setCurrentSubStep(prev => prev - 1);
         setIsLoading(false);
       }, 300);
     } else {
       onPrev();
     }
-  };
+  }, [currentSubStep, onPrev]);
 
-  const handleComplete = () => {
+  // Data change handler
+  const handleDataChange = useCallback(() => {
     const voiceLinesData = {
       quantity: lines,
       plans,
       devices,
       protection,
       promotions,
-      ports,
+      portInData,
       totalMonthly: calculateTotal()
     };
-    
+    onDataChange(voiceLinesData);
+  }, [lines, plans, devices, protection, promotions, portInData, onDataChange]);
+
+  // Complete handler
+  const handleComplete = useCallback(() => {
+    const voiceLinesData = {
+      quantity: lines,
+      plans,
+      devices,
+      protection,
+      promotions,
+      portInData,
+      totalMonthly: calculateTotal()
+    };
     onDataChange(voiceLinesData);
     onComplete();
-  };
+  }, [lines, plans, devices, protection, promotions, portInData, onDataChange, onComplete]);
 
-  const handleAddAnother = () => {
+  // Calculate total monthly cost
+  const calculateTotal = useCallback(() => {
     const voiceLinesData = {
       quantity: lines,
       plans,
       devices,
       protection,
-      promotions,
-      ports,
-      totalMonthly: calculateTotal()
+      promotions
     };
     
-    onDataChange(voiceLinesData);
-    onAddAnother();
-  };
+    const pricing = pricingEngine.calculateVoiceLinesPricing(voiceLinesData);
+    return pricing.monthly;
+  }, [lines, plans, devices, protection, promotions]);
 
-  const calculateTotal = () => {
-    let total = 0;
-    
-    // Updated plan pricing with correct Experience plan IDs
-    const planPricing = {
-      'experience-essentials-saver': { 1: 50, 2: 80, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
-      'experience-essentials': { 1: 60, 2: 90, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
-      'experience-more': { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 },
-      'experience-beyond': { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 },
-      // 55+ Plans
-      'essentials-choice-55': { 1: 45, 2: 60, 3: 75, 4: 90, 5: 105, 6: 120, additional: 35 },
-      'experience-more-55': { 1: 70, 2: 100, 3: 130, 4: 160, 5: 190, 6: 220, additional: 35 },
-      'experience-beyond-55': { 1: 85, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
-      // Military/First Responder Plans
-      'experience-beyond-military': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
-      'experience-beyond-first-responder': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 }
-    };
-
-    // Calculate plan total - family plans have shared pricing
-    if (Object.keys(plans).length > 0) {
-      const firstPlanId = Object.values(plans)[0];
-      const plan = planPricing[firstPlanId];
-      if (plan) {
-        if (lines <= 6) {
-          total += plan[lines] || 0;
-        } else {
-          total += plan[6] + (lines - 6) * plan.additional;
-        }
-      }
-    }
-
-    // Add device financing costs (monthly device payments)
-    Object.values(devices).forEach(deviceId => {
-      if (deviceId && deviceId !== 'bring-your-own') {
-        const devicePrices = {
-          'iphone-17-pro-max': 1199, 'iphone-17-pro': 1099, 'iphone-17-plus': 899, 'iphone-17': 799,
-          'iphone-16e': 599, 'iphone-16-pro-max': 1199, 'iphone-16-pro': 1099, 'iphone-16-plus': 899, 'iphone-16': 799,
-          'iphone-15-pro-max': 1099, 'iphone-15-pro': 999, 'iphone-15-plus': 899, 'iphone-15': 699, 'iphone-se-3rd': 429,
-          'pixel-10-pro-xl': 1199, 'pixel-10-pro': 999, 'pixel-10': 699, 'pixel-9-pro': 999, 'pixel-9-xl': 899, 'pixel-9': 699, 'pixel-9a': 499,
-          'galaxy-s25-edge': 1299, 'galaxy-s25-ultra': 1299, 'galaxy-s25-plus': 999, 'galaxy-s25': 799, 'galaxy-s25-fe': 599,
-          'galaxy-s24-ultra': 1299, 'galaxy-s24-plus': 999, 'galaxy-s24': 799, 'galaxy-a36': 399, 'galaxy-a16': 299, 'galaxy-a15': 199,
-          'galaxy-z-fold-7': 1799, 'galaxy-z-flip-7': 999, 'razr-ultra': 999, 'razr-plus-2025': 799, 'razr-2025': 599,
-          'edge-2025': 699, 'g-power-2025': 299, 'g-2025': 199, 'revvl-pro-8': 399, 'revvl-6x-pro': 299, 'revvl-6x': 199
-        };
-        const devicePrice = devicePrices[deviceId] || 0;
-        // Calculate monthly payment (assuming 24-month financing)
-        const monthlyPayment = Math.round(devicePrice / 24);
-        total += monthlyPayment;
-      }
-    });
-
-    // Add protection costs - these are per-line
-    Object.values(protection).forEach(protectionId => {
-      const protectionPrices = {
-        'p360-tier1': 7, 'p360-tier2': 9, 'p360-tier3': 13,
-        'p360-tier4': 16, 'p360-tier5': 18, 'p360-tier6': 25
-      };
-      total += protectionPrices[protectionId] || 0;
-    });
-
-    // Subtract promotion savings
-    if (promotions && promotions.totalSavings) {
-      total -= promotions.totalSavings;
-    }
-
-    return Math.max(0, total); // Ensure total is never negative
-  };
-
-  const renderStepContent = () => {
-    switch (steps[currentStep].component) {
-      case 'lines':
+  // Render sub-step content
+  const renderSubStepContent = () => {
+    switch (currentSubStep) {
+      case 0: // Lines & Plans
         return (
-          <div style={{
-            maxWidth: '100%',
-            margin: '0 auto',
-            padding: '20px 15px',
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-            height: 'calc(100vh - 120px)',
-            overflowY: 'auto'
-          }}>
-            {/* Combined Lines & Plans Selection */}
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '30px'
-            }}>
+          <div style={{ padding: '20px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
               <div style={{
                 background: '#E20074',
                 borderRadius: '50%',
@@ -188,19 +121,10 @@ const VoiceLinesFlow = ({
               }}>
                 <Phone size={30} />
               </div>
-              <h1 style={{
-                fontSize: '24px',
-                fontWeight: '700',
-                color: '#E20074',
-                marginBottom: '8px'
-              }}>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#E20074', marginBottom: '8px' }}>
                 Lines & Plans
               </h1>
-              <p style={{
-                fontSize: '14px',
-                color: '#666',
-                lineHeight: '1.4'
-              }}>
+              <p style={{ fontSize: '14px', color: '#666', lineHeight: '1.4' }}>
                 Select the number of voice lines and choose your rate plans
               </p>
             </div>
@@ -213,12 +137,7 @@ const VoiceLinesFlow = ({
               marginBottom: '20px',
               border: '1px solid #e0e0e0'
             }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                marginBottom: '15px',
-                color: '#333'
-              }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px', color: '#333' }}>
                 Number of Lines
               </h3>
               <div style={{
@@ -257,12 +176,7 @@ const VoiceLinesFlow = ({
               marginBottom: '20px',
               border: '1px solid #e0e0e0'
             }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                marginBottom: '15px',
-                color: '#333'
-              }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px', color: '#333' }}>
                 Rate Plans
               </h3>
               
@@ -300,28 +214,13 @@ const VoiceLinesFlow = ({
                         transition: 'all 0.3s ease'
                       }}
                     >
-                      <h4 style={{
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        marginBottom: '8px',
-                        color: '#333'
-                      }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', color: '#333' }}>
                         {plan.name}
                       </h4>
-                      <div style={{
-                        fontSize: '20px',
-                        fontWeight: '700',
-                        color: '#E20074',
-                        marginBottom: '8px'
-                      }}>
+                      <div style={{ fontSize: '20px', fontWeight: '700', color: '#E20074', marginBottom: '8px' }}>
                         ${plan.price}/line
                       </div>
-                      <ul style={{
-                        fontSize: '12px',
-                        color: '#666',
-                        margin: 0,
-                        paddingLeft: '15px'
-                      }}>
+                      <ul style={{ fontSize: '12px', color: '#666', margin: 0, paddingLeft: '15px' }}>
                         {plan.features.map(feature => (
                           <li key={feature}>{feature}</li>
                         ))}
@@ -366,28 +265,13 @@ const VoiceLinesFlow = ({
                         transition: 'all 0.3s ease'
                       }}
                     >
-                      <h4 style={{
-                        fontSize: '16px',
-                        fontWeight: '600',
-                        marginBottom: '8px',
-                        color: '#333'
-                      }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', color: '#333' }}>
                         {plan.name}
                       </h4>
-                      <div style={{
-                        fontSize: '20px',
-                        fontWeight: '700',
-                        color: '#E20074',
-                        marginBottom: '8px'
-                      }}>
+                      <div style={{ fontSize: '20px', fontWeight: '700', color: '#E20074', marginBottom: '8px' }}>
                         ${plan.price}/line
                       </div>
-                      <ul style={{
-                        fontSize: '12px',
-                        color: '#666',
-                        margin: 0,
-                        paddingLeft: '15px'
-                      }}>
+                      <ul style={{ fontSize: '12px', color: '#666', margin: 0, paddingLeft: '15px' }}>
                         {plan.features.map(feature => (
                           <li key={feature}>{feature}</li>
                         ))}
@@ -397,156 +281,65 @@ const VoiceLinesFlow = ({
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'center'
-            }}>
-              <button
-                onClick={onPrev}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  background: '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s ease'
-                }}
-                onMouseOver={(e) => e.target.style.background = '#5a6268'}
-                onMouseOut={(e) => e.target.style.background = '#6c757d'}
-              >
-                Back to Services
-              </button>
-              <button
-                onClick={nextStep}
-                disabled={lines === 0 || Object.keys(plans).length === 0}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  background: lines === 0 || Object.keys(plans).length === 0 ? '#ccc' : '#E20074',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: lines === 0 || Object.keys(plans).length === 0 ? 'not-allowed' : 'pointer',
-                  transition: 'background-color 0.3s ease'
-                }}
-                onMouseOver={(e) => {
-                  if (lines > 0 && Object.keys(plans).length > 0) {
-                    e.target.style.background = '#C1005F';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (lines > 0 && Object.keys(plans).length > 0) {
-                    e.target.style.background = '#E20074';
-                  }
-                }}
-              >
-                Continue to Devices
-              </button>
-            </div>
           </div>
         );
-      
-      case 'devices':
+
+      case 1: // Devices
         return (
           <DeviceSelection
             lines={lines}
             devices={devices}
             onDevicesChange={setDevices}
-            onNext={nextStep}
-            onPrev={prevStep}
+            onNext={nextSubStep}
+            onPrev={prevSubStep}
           />
         );
-      
-      case 'ports':
+
+      case 2: // Port-In Info
         return (
           <PortInSelection
             lines={lines}
-            portInData={ports}
-            onPortInDataChange={setPorts}
-            onNext={nextStep}
-            onPrev={prevStep}
+            portInData={portInData}
+            onPortInDataChange={setPortInData}
+            onNext={nextSubStep}
+            onPrev={prevSubStep}
           />
         );
-      
-      case 'promotions':
+
+      case 3: // Promotions
         return (
           <PromotionsSelection
             lines={lines}
-            quoteData={{
-              devices: Object.values(devices),
-              plans: Object.values(plans)
-            }}
-            portInData={ports}
+            devices={devices}
+            plans={plans}
+            portInData={portInData}
+            promotions={promotions}
             onPromotionsChange={setPromotions}
-            onNext={nextStep}
-            onPrev={prevStep}
+            onNext={nextSubStep}
+            onPrev={prevSubStep}
           />
         );
-      
-      case 'protection':
+
+      case 4: // Protection
         return (
           <ProtectionSelection
             lines={lines}
             devices={devices}
             protection={protection}
             onProtectionChange={setProtection}
-            onNext={nextStep}
-            onPrev={prevStep}
+            onNext={nextSubStep}
+            onPrev={prevSubStep}
           />
         );
-      
-      case 'summary':
+
+      case 5: // Review & Pricing
         return (
-          <div style={{
-            maxWidth: '100%',
-            margin: '0 auto',
-            padding: '20px 15px',
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-            height: 'calc(100vh - 120px)',
-            overflowY: 'auto'
-          }}>
-            {/* Summary Header */}
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '30px'
-            }}>
-              <div style={{
-                background: '#E20074',
-                borderRadius: '50%',
-                width: '60px',
-                height: '60px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 15px',
-                color: 'white'
-              }}>
-                <CreditCard size={30} />
-              </div>
-              <h1 style={{
-                fontSize: '24px',
-                fontWeight: '700',
-                color: '#E20074',
-                marginBottom: '8px'
-              }}>
+          <div style={{ padding: '20px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+              <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#E20074', marginBottom: '8px' }}>
                 Review & Pricing
               </h1>
-              <p style={{
-                fontSize: '14px',
-                color: '#666',
-                lineHeight: '1.4'
-              }}>
+              <p style={{ fontSize: '14px', color: '#666', lineHeight: '1.4' }}>
                 Review your selections and see the total monthly cost
               </p>
             </div>
@@ -559,12 +352,7 @@ const VoiceLinesFlow = ({
               marginBottom: '20px',
               border: '1px solid #e0e0e0'
             }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                marginBottom: '15px',
-                color: '#333'
-              }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px', color: '#333' }}>
                 Monthly Pricing Breakdown
               </h3>
               
@@ -596,7 +384,7 @@ const VoiceLinesFlow = ({
                   Device Payments
                 </span>
                 <span style={{ fontSize: '16px', fontWeight: '600', color: '#333' }}>
-                  $0 (Financed)
+                  $0 (BYOD)
                 </span>
               </div>
 
@@ -612,30 +400,9 @@ const VoiceLinesFlow = ({
                   Protection Plans
                 </span>
                 <span style={{ fontSize: '16px', fontWeight: '600', color: '#333' }}>
-                  ${Object.values(protection).reduce((total, id) => {
-                    const prices = { 'p360-tier1': 7, 'p360-tier2': 9, 'p360-tier3': 13, 'p360-tier4': 16, 'p360-tier5': 18, 'p360-tier6': 25 };
-                    return total + (prices[id] || 0);
-                  }, 0)}
+                  $0
                 </span>
               </div>
-
-              {/* Promotion Savings */}
-              {promotions && promotions.totalSavings > 0 && (
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '10px 0',
-                  borderBottom: '1px solid #e0e0e0'
-                }}>
-                  <span style={{ fontSize: '14px', color: '#28a745' }}>
-                    Promotion Savings
-                  </span>
-                  <span style={{ fontSize: '16px', fontWeight: '600', color: '#28a745' }}>
-                    -${promotions.totalSavings?.toFixed(2) || '0.00'}
-                  </span>
-                </div>
-              )}
 
               {/* Total */}
               <div style={{
@@ -648,65 +415,32 @@ const VoiceLinesFlow = ({
                 color: '#E20074'
               }}>
                 <span>Total Monthly Cost</span>
-                <span>
-                  ${(calculateTotal() + Object.values(protection).reduce((total, id) => {
-                    const prices = { 'p360-tier1': 7, 'p360-tier2': 9, 'p360-tier3': 13, 'p360-tier4': 16, 'p360-tier5': 18, 'p360-tier6': 25 };
-                    return total + (prices[id] || 0);
-                  }, 0) - (promotions?.totalSavings || 0)).toFixed(2)}
-                </span>
+                <span>${calculateTotal().toFixed(2)}</span>
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Summary */}
             <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'center'
+              background: '#e8f5e8',
+              padding: '20px',
+              borderRadius: '8px',
+              border: '1px solid #4CAF50'
             }}>
-              <button
-                onClick={prevStep}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  background: '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s ease'
-                }}
-                onMouseOver={(e) => e.target.style.background = '#5a6268'}
-                onMouseOut={(e) => e.target.style.background = '#6c757d'}
-              >
-                Back to Protection
-              </button>
-              <button
-                onClick={handleComplete}
-                style={{
-                  flex: 1,
-                  padding: '12px 20px',
-                  background: '#E20074',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s ease'
-                }}
-                onMouseOver={(e) => e.target.style.background = '#C1005F'}
-                onMouseOut={(e) => e.target.style.background = '#E20074'}
-              >
-                Complete Voice Lines
-              </button>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '10px', color: '#2e7d32' }}>
+                Voice Lines Summary
+              </h3>
+              <div style={{ fontSize: '14px', color: '#2e7d32', lineHeight: '1.5' }}>
+                <div>• {lines} voice line{lines > 1 ? 's' : ''} configured</div>
+                <div>• Plan: {Object.values(plans)[0] ? Object.values(plans)[0].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Not selected'}</div>
+                <div>• Devices: BYOD (Bring Your Own Device)</div>
+                <div>• Estimated monthly cost: ${calculateTotal().toFixed(2)}</div>
+              </div>
             </div>
           </div>
         );
-      
+
       default:
-        return <div>Step not found</div>;
+        return <div>Sub-step not found</div>;
     }
   };
 
@@ -714,187 +448,158 @@ const VoiceLinesFlow = ({
     <div style={{
       maxWidth: '100%',
       margin: '0 auto',
-      padding: '15px 10px',
       background: 'white',
-      borderRadius: '10px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      height: 'calc(100vh - 120px)',
-      overflowY: 'auto'
+      borderRadius: '12px',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+      height: 'calc(100vh - 140px)',
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
+      {/* Header */}
       <div style={{
-        textAlign: 'center',
-        marginBottom: '20px'
+        padding: '20px',
+        borderBottom: '1px solid #e0e0e0',
+        background: '#f8f9fa'
       }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '10px',
-          marginBottom: '8px'
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
           <Phone size={24} color="#E20074" />
-          <h2 style={{
-            fontSize: '24px',
-            fontWeight: '700',
-            color: '#E20074',
-            margin: 0
-          }}>
+          <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#E20074', margin: 0 }}>
             Voice Lines Setup
           </h2>
         </div>
-        <p style={{ 
-          color: '#666', 
-          fontSize: '14px',
-          margin: 0,
-          lineHeight: '1.4'
-        }}>
+        <p style={{ color: '#666', fontSize: '14px', margin: 0, lineHeight: '1.4' }}>
           Configure voice lines for your account. Complete all steps to finish voice line setup.
         </p>
       </div>
 
       {/* Step Progress */}
       <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: '20px',
-        flexWrap: 'wrap',
-        gap: '8px'
+        padding: '20px',
+        borderBottom: '1px solid #e0e0e0',
+        background: 'white'
       }}>
-        {steps.map((step, index) => {
-          const Icon = step.icon;
-          const isActive = currentStep === step.id;
-          const isCompleted = currentStep > step.id;
-          
-          return (
-            <React.Fragment key={step.id}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '8px 16px',
-                background: isActive 
-                  ? '#E20074' 
-                  : isCompleted 
-                    ? '#4CAF50' 
-                    : 'rgba(255,255,255,0.1)',
-                borderRadius: '20px',
-                color: 'white',
-                transition: 'all 0.3s ease',
-                backdropFilter: 'blur(10px)',
-                border: isActive ? '2px solid rgba(255,255,255,0.3)' : '2px solid transparent'
-              }}>
-                <div style={{
-                  marginRight: '6px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  <Icon size={16} />
-                </div>
-                <span style={{ 
-                  fontSize: '12px', 
-                  fontWeight: '600',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {step.title}
-                </span>
-              </div>
-              
-              {index < steps.length - 1 && (
-                <div style={{
-                  width: '20px',
-                  height: '2px',
-                  background: currentStep > step.id ? '#4CAF50' : 'rgba(255,255,255,0.3)',
-                  transition: 'background 0.3s ease'
-                }} />
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-
-      {/* Step Content */}
-      {isLoading ? (
-            <div style={{
-              display: 'flex',
-          justifyContent: 'center',
-              alignItems: 'center',
-          height: '200px',
-          fontSize: '18px',
-          color: '#666'
-        }}>
-              Loading...
-        </div>
-      ) : (
-        renderStepContent()
-      )}
-
-      {/* Summary */}
-      {currentStep > 0 && (
-        <div style={{
-          background: '#f8f9fa',
-          padding: '15px',
-          borderRadius: '8px',
-          marginTop: '20px',
-          border: '1px solid #e0e0e0'
-        }}>
-          <div style={{ fontWeight: '600', marginBottom: '8px', color: '#E20074', fontSize: '14px' }}>
-            Voice Lines Summary
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-            <span>Lines: {lines}</span>
-            <span>Estimated Monthly: ${calculateTotal()}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Final Navigation */}
-      {currentStep === steps.length - 1 && (
         <div style={{
           display: 'flex',
-          gap: '12px',
           justifyContent: 'center',
-          marginTop: '20px'
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '8px'
         }}>
-          <button
-            onClick={handleAddAnother}
-            style={{
-              flex: 1,
-              padding: '12px 20px',
-              background: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s ease'
-            }}
-            onMouseOver={(e) => e.target.style.background = '#5a6268'}
-            onMouseOut={(e) => e.target.style.background = '#6c757d'}
-          >
-            Add Another Service
-          </button>
-          <button
-            onClick={handleComplete}
-            style={{
-              flex: 1,
-              padding: '12px 20px',
-              background: '#E20074',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s ease'
-            }}
-            onMouseOver={(e) => e.target.style.background = '#C1005F'}
-            onMouseOut={(e) => e.target.style.background = '#E20074'}
-          >
-            Complete Voice Lines
-          </button>
+          {subSteps.map((step, index) => {
+            const isActive = currentSubStep === step.id;
+            const isCompleted = currentSubStep > step.id;
+            
+            return (
+              <React.Fragment key={step.id}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '8px 16px',
+                  background: isActive 
+                    ? '#E20074' 
+                    : isCompleted 
+                      ? '#4CAF50' 
+                      : 'rgba(255,255,255,0.1)',
+                  borderRadius: '20px',
+                  color: 'white',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)',
+                  border: isActive ? '2px solid rgba(255,255,255,0.3)' : '2px solid transparent'
+                }}>
+                  <div style={{ marginRight: '6px', display: 'flex', alignItems: 'center' }}>
+                    {isCompleted ? <CheckCircle size={16} /> : <Circle size={16} />}
+                  </div>
+                  <span style={{ fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' }}>
+                    {step.title}
+                  </span>
+                </div>
+                
+                {index < subSteps.length - 1 && (
+                  <div style={{
+                    width: '20px',
+                    height: '2px',
+                    background: currentSubStep > step.id ? '#4CAF50' : 'rgba(255,255,255,0.3)',
+                    transition: 'background 0.3s ease'
+                  }} />
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
-      )}
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: 'auto' }}>
+        {isLoading ? (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '200px',
+            fontSize: '18px',
+            color: '#666'
+          }}>
+            Loading...
+          </div>
+        ) : (
+          renderSubStepContent()
+        )}
+      </div>
+
+      {/* Navigation */}
+      <div style={{
+        padding: '20px',
+        borderTop: '1px solid #e0e0e0',
+        background: '#f8f9fa',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <button
+          onClick={prevSubStep}
+          style={{
+            padding: '12px 24px',
+            border: '2px solid #E20074',
+            borderRadius: '8px',
+            background: 'white',
+            color: '#E20074',
+            fontSize: '16px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          <ArrowLeft size={16} />
+          {currentSubStep === 0 ? 'Back to Services' : 'Previous'}
+        </button>
+        
+        <div style={{ fontSize: '14px', color: '#666', textAlign: 'center' }}>
+          Step {currentSubStep + 1} of {subSteps.length}
+        </div>
+        
+        <button
+          onClick={nextSubStep}
+          style={{
+            padding: '12px 24px',
+            border: '2px solid #E20074',
+            borderRadius: '8px',
+            background: '#E20074',
+            color: 'white',
+            fontSize: '16px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          {currentSubStep === subSteps.length - 1 ? 'Complete Voice Lines' : 'Next'}
+          <ArrowRight size={16} />
+        </button>
+      </div>
     </div>
   );
 };

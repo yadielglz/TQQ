@@ -8,7 +8,9 @@ import {
   ChevronDown, 
   ChevronUp, 
   Menu, 
-  X 
+  X,
+  ArrowLeft,
+  ArrowRight
 } from 'lucide-react';
 
 const LeftNavigation = ({ 
@@ -19,7 +21,10 @@ const LeftNavigation = ({
   onStepClick, 
   isMobile,
   isCollapsed: externalCollapsed,
-  onCollapseChange
+  onCollapseChange,
+  onNext,
+  onPrevious,
+  subStepNavigation
 }) => {
   const [internalCollapsed, setInternalCollapsed] = useState(false);
   
@@ -92,6 +97,24 @@ const LeftNavigation = ({
       case 4: return selectedServices.includes('iot');
       case 5: return selectedServices.includes('hsi');
       default: return true;
+    }
+  };
+
+  const handleNext = () => {
+    // Check if current step has sub-navigation
+    if (currentStep === 2 && subStepNavigation?.next) {
+      subStepNavigation.next();
+    } else if (onNext) {
+      onNext();
+    }
+  };
+
+  const handlePrevious = () => {
+    // Check if current step has sub-navigation
+    if (currentStep === 2 && subStepNavigation?.prev) {
+      subStepNavigation.prev();
+    } else if (onPrevious) {
+      onPrevious();
     }
   };
 
@@ -238,6 +261,60 @@ const LeftNavigation = ({
         <div style={{ flex: 1, padding: '20px' }}>
           {steps.map(renderStepItem)}
         </div>
+
+        {/* Mobile Navigation Buttons */}
+        <div style={{
+          padding: '20px',
+          borderTop: '1px solid #e0e0e0',
+          display: 'flex',
+          gap: '10px'
+        }}>
+          <button
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              border: '2px solid #E20074',
+              borderRadius: '8px',
+              background: currentStep === 0 ? '#f5f5f5' : 'white',
+              color: currentStep === 0 ? '#999' : '#E20074',
+              fontSize: '14px',
+              cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              opacity: currentStep === 0 ? 0.5 : 1
+            }}
+          >
+            <ArrowLeft size={14} />
+            Previous
+          </button>
+          
+          <button
+            onClick={handleNext}
+            disabled={currentStep === steps.length - 1}
+            style={{
+              flex: 1,
+              padding: '12px 16px',
+              border: '2px solid #E20074',
+              borderRadius: '8px',
+              background: currentStep === steps.length - 1 ? '#f5f5f5' : '#E20074',
+              color: currentStep === steps.length - 1 ? '#999' : 'white',
+              fontSize: '14px',
+              cursor: currentStep === steps.length - 1 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              opacity: currentStep === steps.length - 1 ? 0.5 : 1
+            }}
+          >
+            Next
+            <ArrowRight size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -286,7 +363,9 @@ const LeftNavigation = ({
         background: 'white',
         borderRight: '1px solid #e0e0e0',
         overflowY: 'auto',
-        zIndex: 100
+        zIndex: 100,
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         {/* Desktop Header */}
         <div style={{
@@ -321,8 +400,72 @@ const LeftNavigation = ({
         </div>
         
         {/* Desktop Content */}
-        <div style={{ padding: '20px' }}>
+        <div style={{ flex: 1, padding: '20px' }}>
           {steps.map(renderStepItem)}
+        </div>
+
+        {/* Desktop Navigation Buttons */}
+        <div style={{
+          padding: '20px',
+          borderTop: '1px solid #e0e0e0',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px'
+        }}>
+          <div style={{
+            fontSize: '12px',
+            color: '#666',
+            textAlign: 'center',
+            marginBottom: '5px'
+          }}>
+            Step {currentStep + 1} of {steps.length}: {steps[currentStep]?.title}
+          </div>
+          
+          <button
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            style={{
+              padding: '12px 16px',
+              border: '2px solid #E20074',
+              borderRadius: '8px',
+              background: currentStep === 0 ? '#f5f5f5' : 'white',
+              color: currentStep === 0 ? '#999' : '#E20074',
+              fontSize: '14px',
+              cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              opacity: currentStep === 0 ? 0.5 : 1,
+              transition: 'all 0.3s ease'
+            }}
+          >
+            <ArrowLeft size={16} />
+            Previous
+          </button>
+          
+          <button
+            onClick={handleNext}
+            disabled={currentStep === steps.length - 1}
+            style={{
+              padding: '12px 16px',
+              border: '2px solid #E20074',
+              borderRadius: '8px',
+              background: currentStep === steps.length - 1 ? '#f5f5f5' : '#E20074',
+              color: currentStep === steps.length - 1 ? '#999' : 'white',
+              fontSize: '14px',
+              cursor: currentStep === steps.length - 1 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              opacity: currentStep === steps.length - 1 ? 0.5 : 1,
+              transition: 'all 0.3s ease'
+            }}
+          >
+            Next
+            <ArrowRight size={16} />
+          </button>
         </div>
       </div>
     );

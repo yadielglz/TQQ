@@ -261,7 +261,11 @@ export class PerLinePromotionManager {
       lineData.hasPortIn
     );
 
-    return validation;
+    if (!validation.eligible) {
+      return { valid: false, reason: validation.reason };
+    }
+
+    return { valid: true };
   }
 
   // Validate all promotions for conflicts and limits

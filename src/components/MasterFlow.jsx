@@ -1,35 +1,28 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { Phone, Tablet, Watch, Wifi, Home, CreditCard, Percent, FileText, Settings, Activity } from 'lucide-react';
-import { LoadingOverlay, FadeIn, ToastProvider, useToast } from './Animations';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Phone, Tablet, Watch, Wifi, Home, CreditCard, Percent, FileText, Settings, Activity, ArrowLeft, ArrowRight, Menu, X } from 'lucide-react';
 
-// Lazy load components for better performance
-const WelcomeScreen = lazy(() => import('./WelcomeScreen'));
-const ServiceSelection = lazy(() => import('./ServiceSelection'));
-const VoiceLinesFlow = lazy(() => import('./VoiceLinesFlow'));
-const DataLinesFlow = lazy(() => import('./DataLinesFlow'));
-const IoTLinesFlow = lazy(() => import('./IoTLinesFlow'));
-const HomeInternetFlow = lazy(() => import('./HomeInternetFlow'));
-const EquipmentCreditSelection = lazy(() => import('./EquipmentCreditSelection'));
-const DiscountSelection = lazy(() => import('./DiscountSelection'));
-const QuoteSummary = lazy(() => import('./QuoteSummary'));
-const LeftNavigation = lazy(() => import('./LeftNavigation'));
-const PerformanceMonitor = lazy(() => import('./PerformanceMonitor'));
+// Import step components
+import WelcomeScreen from './WelcomeScreen';
+import ServiceSelection from './ServiceSelection';
+import VoiceLinesFlow from './VoiceLinesFlow';
+import DataLinesFlow from './DataLinesFlow';
+import IoTLinesFlow from './IoTLinesFlow';
+import HomeInternetFlow from './HomeInternetFlow';
+import EquipmentCreditSelection from './EquipmentCreditSelection';
+import DiscountSelection from './DiscountSelection';
+import QuoteSummary from './QuoteSummary';
 
-const MasterFlowContent = () => {
-  // Master state management
+const MasterFlow = () => {
+  // Core state management
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const { addToast } = useToast();
-  
-  // Customer data
+
+  // Service data state
   const [customerData, setCustomerData] = useState(null);
-  
-  // Service-specific data
   const [voiceLinesData, setVoiceLinesData] = useState({
     quantity: 0,
     plans: {},
@@ -38,16 +31,14 @@ const MasterFlowContent = () => {
     promotions: {},
     ports: {}
   });
-  
   const [dataLinesData, setDataLinesData] = useState({
     quantity: 0,
-    category: '', // 'tablet' or 'wearable'
+    category: '',
     devices: {},
     plans: {},
     protection: {},
     promotions: {}
   });
-  
   const [iotLinesData, setIotLinesData] = useState({
     quantity: 0,
     devices: {},
@@ -55,279 +46,163 @@ const MasterFlowContent = () => {
     protection: {},
     promotions: {}
   });
-  
   const [homeInternetData, setHomeInternetData] = useState({
     device: null,
-    plan: null
+    plan: null,
+    promotions: {}
   });
-  
   const [equipmentCreditData, setEquipmentCreditData] = useState({
-    amount: '',
-    downPayment: '',
-    tradeIns: {}
+    amount: 0,
+    downPayment: 0,
+    tradeIns: []
   });
-  
   const [discountsData, setDiscountsData] = useState({
     autoPay: false,
     senior55: false,
-    tmobileInsider: false
+    insider: false,
+    workPerks: false
   });
 
   // Step definitions
   const steps = [
-    { id: 0, title: 'Customer Info', icon: Phone, skippable: true },
-    { id: 1, title: 'Service Selection', icon: Wifi, skippable: false },
-    { id: 2, title: 'Voice Lines', icon: Phone, skippable: true },
-    { id: 3, title: 'Data Lines', icon: Tablet, skippable: true },
-    { id: 4, title: 'IoT Lines', icon: Watch, skippable: true },
-    { id: 5, title: 'Home Internet', icon: Home, skippable: true },
-    { id: 6, title: 'Equipment Credit', icon: CreditCard, skippable: false },
-    { id: 7, title: 'Account Discounts', icon: Percent, skippable: false },
-    { id: 8, title: 'Quote Summary', icon: FileText, skippable: false }
+    { 
+      id: 0, 
+      title: 'Welcome', 
+      icon: Phone, 
+      description: 'Get started with your quote',
+      required: false,
+      component: 'welcome'
+    },
+    { 
+      id: 1, 
+      title: 'Services', 
+      icon: Settings, 
+      description: 'Select services to configure',
+      required: true,
+      component: 'services'
+    },
+    { 
+      id: 2, 
+      title: 'Voice Lines', 
+      icon: Phone, 
+      description: 'Configure voice lines and plans',
+      required: false,
+      component: 'voice',
+      dependsOn: ['voice']
+    },
+    { 
+      id: 3, 
+      title: 'Data Lines', 
+      icon: Tablet, 
+      description: 'Configure tablets and wearables',
+      required: false,
+      component: 'data',
+      dependsOn: ['data']
+    },
+    { 
+      id: 4, 
+      title: 'IoT Lines', 
+      icon: Watch, 
+      description: 'Configure IoT devices',
+      required: false,
+      component: 'iot',
+      dependsOn: ['iot']
+    },
+    { 
+      id: 5, 
+      title: 'Home Internet', 
+      icon: Home, 
+      description: 'Configure home internet',
+      required: false,
+      component: 'hsi',
+      dependsOn: ['hsi']
+    },
+    { 
+      id: 6, 
+      title: 'Equipment Credit', 
+      icon: CreditCard, 
+      description: 'Apply equipment credits',
+      required: false,
+      component: 'equipment'
+    },
+    { 
+      id: 7, 
+      title: 'Discounts', 
+      icon: Percent, 
+      description: 'Apply account discounts',
+      required: false,
+      component: 'discounts'
+    },
+    { 
+      id: 8, 
+      title: 'Quote Summary', 
+      icon: FileText, 
+      description: 'Review and finalize quote',
+      required: true,
+      component: 'summary'
+    }
   ];
 
-  // Handle responsive design
+  // Responsive handling
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(false);
+      }
     };
-    
+
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Navigation functions
-  const goToStep = (stepId) => {
-    if (stepId >= 0 && stepId < steps.length) {
-      // Allow navigation to completed steps or next available step
-      if (completedSteps.includes(stepId) || stepId === currentStep + 1) {
-        setIsLoading(true);
-        setTimeout(() => {
-          setCurrentStep(stepId);
-          setIsLoading(false);
-          addToast(`Navigated to ${steps[stepId].title}`, 'info');
-        }, 300);
-      } else {
-        addToast('Please complete previous steps first', 'warning');
-      }
-    }
-  };
-
-  const nextStep = () => {
+  // Navigation handlers
+  const nextStep = useCallback(() => {
     if (currentStep < steps.length - 1) {
       setIsLoading(true);
       setTimeout(() => {
-        setCurrentStep(currentStep + 1);
+        setCurrentStep(prev => prev + 1);
         setIsLoading(false);
-        addToast(`Moving to ${steps[currentStep + 1].title}`, 'success');
       }, 300);
     }
-  };
+  }, [currentStep, steps.length]);
 
-  const prevStep = () => {
+  const prevStep = useCallback(() => {
     if (currentStep > 0) {
       setIsLoading(true);
       setTimeout(() => {
-        setCurrentStep(currentStep - 1);
+        setCurrentStep(prev => prev - 1);
         setIsLoading(false);
-        addToast(`Going back to ${steps[currentStep - 1].title}`, 'info');
       }, 300);
     }
-  };
+  }, [currentStep]);
 
-  const markStepComplete = (stepId) => {
-    if (!completedSteps.includes(stepId)) {
-      setCompletedSteps([...completedSteps, stepId]);
+  const goToStep = useCallback((stepId) => {
+    if (stepId >= 0 && stepId < steps.length) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setCurrentStep(stepId);
+        setIsLoading(false);
+      }, 300);
     }
-  };
+  }, [steps.length]);
 
-  // Clear all data function for one-time quote
-  const clearAllData = () => {
-    setCurrentStep(0);
-    setCompletedSteps([]);
-    setSelectedServices([]);
-    setCustomerData(null);
-    setVoiceLinesData({
-      quantity: 0,
-      plans: {},
-      devices: {},
-      protection: {},
-      promotions: {},
-      ports: {}
-    });
-    setDataLinesData({
-      quantity: 0,
-      category: '',
-      devices: {},
-      plans: {},
-      protection: {},
-      promotions: {}
-    });
-    setIotLinesData({
-      quantity: 0,
-      devices: {},
-      plans: {},
-      protection: {},
-      promotions: {}
-    });
-    setHomeInternetData({
-      device: null,
-      plan: null
-    });
-    setEquipmentCreditData({
-      amount: '',
-      downPayment: '',
-      tradeIns: {}
-    });
-    setDiscountsData({
-      autoPay: false,
-      senior55: false,
-      tmobileInsider: false
-    });
-    addToast('All data cleared. Ready for new quote!', 'success');
-  };
-
-  const calculateTotalQuote = () => {
-    // Calculate total monthly cost
-    let total = 0;
-    
-    // Voice lines total
-    if (voiceLinesData.quantity > 0) {
-      const planOptions = [
-        { id: 'essentials', pricing: { 1: 50, 2: 80, 3: 90, 4: 100, 5: 120, 6: 135, additional: 35 }},
-        { id: 'more', pricing: { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 }},
-        { id: 'beyond', pricing: { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 }}
-      ];
-      
-      if (Object.keys(voiceLinesData.plans).length > 0) {
-        const firstPlanId = Object.values(voiceLinesData.plans)[0];
-        const plan = planOptions.find(p => p.id === firstPlanId);
-        if (plan) {
-          const lines = voiceLinesData.quantity || 1;
-          if (lines <= 6) {
-            total += plan.pricing[lines] || 0;
-          } else {
-            total += plan.pricing[6] + (lines - 6) * plan.pricing.additional;
-          }
-        }
-      }
-    }
-    
-    // Add other service totals
-    total += dataLinesData.totalMonthly || 0;
-    total += iotLinesData.totalMonthly || 0;
-    total += homeInternetData.totalMonthly || 0;
-    
-    // Apply discounts
-    if (discountsData.autoPay) {
-      const totalLines = (voiceLinesData.quantity || 0) + (dataLinesData.quantity || 0) + (iotLinesData.quantity || 0);
-      total -= Math.min(totalLines, 8) * 5;
-    }
-    
-    if (discountsData.senior55) {
-      total *= 0.8; // 20% off
-    }
-    
-    if (discountsData.tmobileInsider) {
-      total *= 0.85; // 15% off
-    }
-    
-    return total;
-  };
-
-  const getSelectedServicesSummary = () => {
-    const services = [];
-    if (voiceLinesData.quantity > 0) services.push(`${voiceLinesData.quantity} Voice Lines`);
-    if (dataLinesData.quantity > 0) services.push(`${dataLinesData.quantity} Data Lines`);
-    if (iotLinesData.quantity > 0) services.push(`${iotLinesData.quantity} IoT Lines`);
-    if (homeInternetData.device) services.push('Home Internet');
-    return services.join(', ');
-  };
-
-  const getAppliedDiscountsSummary = () => {
-    const discounts = [];
-    if (discountsData.autoPay) discounts.push('Auto Pay');
-    if (discountsData.senior55) discounts.push('Senior 55+');
-    if (discountsData.tmobileInsider) discounts.push('T-Mobile Insider');
-    return discounts.join(', ');
-  };
-
-  const isStepComplete = (stepId) => {
-    return completedSteps.includes(stepId);
-  };
-
-  const canProceedFromStep = (stepId) => {
-    switch (stepId) {
-      case 0: // Customer Info
-        return true; // Always skippable
-      case 1: // Service Selection
-        return selectedServices.length > 0;
-      case 2: // Voice Lines
-        return !selectedServices.includes('voice') || voiceLinesData.quantity > 0;
-      case 3: // Data Lines
-        return !selectedServices.includes('data') || dataLinesData.quantity > 0;
-      case 4: // IoT Lines
-        return !selectedServices.includes('iot') || iotLinesData.quantity > 0;
-      case 5: // Home Internet
-        return !selectedServices.includes('hsi') || homeInternetData.device;
-      case 6: // Equipment Credit
-        return equipmentCreditData.amount.trim() !== '';
-      case 7: // Account Discounts
-        return true; // Always can proceed
-      case 8: // Quote Summary
-        return true; // Final step
-      default:
-        return false;
-    }
-  };
-
-  const getNextRequiredStep = () => {
-    // Find next incomplete service that was selected
-    if (selectedServices.includes('voice') && !isStepComplete(2)) {
-      return 2;
-    }
-    if (selectedServices.includes('data') && !isStepComplete(3)) {
-      return 3;
-    }
-    if (selectedServices.includes('iot') && !isStepComplete(4)) {
-      return 4;
-    }
-    if (selectedServices.includes('hsi') && !isStepComplete(5)) {
-      return 5;
-    }
-    // If all services complete, go to equipment credit
-    return 6;
-  };
-
-  const handleServiceSelection = (services) => {
+  // Service selection handler
+  const handleServiceSelection = useCallback((services) => {
     setSelectedServices(services);
-    markStepComplete(1);
+    setCompletedSteps(prev => [...prev, 1]);
     
     // Auto-navigate to first selected service
     if (services.length > 0) {
-      const nextStep = getNextRequiredStep();
-      setCurrentStep(nextStep);
+      const firstServiceStep = getServiceStepId(services[0]);
+      if (firstServiceStep !== -1) {
+        goToStep(firstServiceStep);
+      }
     }
-  };
+  }, [goToStep]);
 
-  const handleAddAnotherService = () => {
-    setCurrentStep(1); // Return to service selection
-  };
-
-  const handleServiceComplete = (serviceType) => {
-    markStepComplete(getServiceStepId(serviceType));
-    
-    // Check if there are more services to configure
-    const nextStep = getNextRequiredStep();
-    if (nextStep !== 6) {
-      setCurrentStep(nextStep);
-    } else {
-      // All services complete, go to equipment credit
-      setCurrentStep(6);
-    }
-  };
-
+  // Helper functions
   const getServiceStepId = (serviceType) => {
     switch (serviceType) {
       case 'voice': return 2;
@@ -338,167 +213,169 @@ const MasterFlowContent = () => {
     }
   };
 
-  const renderStepContent = () => {
-    const LoadingFallback = () => (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '200px',
-        fontSize: '16px',
-        color: '#666'
-      }}>
-        Loading...
-      </div>
-    );
+  const isStepRequired = (step) => {
+    if (step.required) return true;
+    if (step.dependsOn) {
+      return step.dependsOn.some(service => selectedServices.includes(service));
+    }
+    return false;
+  };
 
-    switch (currentStep) {
-      case 0:
+  const isStepCompleted = (stepId) => {
+    return completedSteps.includes(stepId);
+  };
+
+  const canNavigateToStep = (stepId) => {
+    // Can always go to welcome and services
+    if (stepId <= 1) return true;
+    
+    // Must have completed service selection
+    if (!completedSteps.includes(1)) return false;
+    
+    // Check if step is required or depends on selected services
+    const step = steps[stepId];
+    return isStepRequired(step);
+  };
+
+  // Step completion handlers
+  const markStepComplete = useCallback((stepId) => {
+    if (!completedSteps.includes(stepId)) {
+      setCompletedSteps(prev => [...prev, stepId]);
+    }
+  }, [completedSteps]);
+
+  const handleServiceComplete = useCallback((serviceType) => {
+    const stepId = getServiceStepId(serviceType);
+    markStepComplete(stepId);
+    
+    // Find next required step
+    const nextRequiredStep = steps.findIndex((step, index) => 
+      index > stepId && isStepRequired(step)
+    );
+    
+    if (nextRequiredStep !== -1) {
+      goToStep(nextRequiredStep);
+    } else {
+      // Go to equipment credit or summary
+      goToStep(6);
+    }
+  }, [markStepComplete, goToStep, steps]);
+
+  // Render step content
+  const renderStepContent = () => {
+    const step = steps[currentStep];
+    
+    switch (step.component) {
+      case 'welcome':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <WelcomeScreen
-              onNext={(data) => {
-                setCustomerData(data);
-                markStepComplete(0);
-                nextStep();
-              }}
-              onSkip={() => {
-                markStepComplete(0);
-                nextStep();
-              }}
-            />
-          </Suspense>
+          <WelcomeScreen
+            onNext={(data) => {
+              setCustomerData(data);
+              markStepComplete(0);
+              nextStep();
+            }}
+            onSkip={() => nextStep()}
+          />
         );
       
-      case 1:
+      case 'services':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <ServiceSelection
-              selectedServices={selectedServices}
-              onServicesChange={handleServiceSelection}
-              onNext={nextStep}
-              onPrev={prevStep}
-            />
-          </Suspense>
+          <ServiceSelection
+            selectedServices={selectedServices}
+            onServicesChange={handleServiceSelection}
+            onNext={nextStep}
+            onPrev={prevStep}
+          />
         );
       
-      case 2:
+      case 'voice':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <VoiceLinesFlow
-              data={voiceLinesData}
-              onDataChange={setVoiceLinesData}
-              onComplete={() => handleServiceComplete('voice')}
-              onAddAnother={handleAddAnotherService}
-              onPrev={prevStep}
-            />
-          </Suspense>
+          <VoiceLinesFlow
+            data={voiceLinesData}
+            onDataChange={setVoiceLinesData}
+            onComplete={() => handleServiceComplete('voice')}
+            onPrev={prevStep}
+            onNext={nextStep}
+          />
         );
       
-      case 3:
+      case 'data':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <DataLinesFlow
-              data={dataLinesData}
-              onDataChange={setDataLinesData}
-              onComplete={() => handleServiceComplete('data')}
-              onAddAnother={handleAddAnotherService}
-              onPrev={prevStep}
-            />
-          </Suspense>
+          <DataLinesFlow
+            data={dataLinesData}
+            onDataChange={setDataLinesData}
+            onComplete={() => handleServiceComplete('data')}
+            onPrev={prevStep}
+            onNext={nextStep}
+          />
         );
       
-      case 4:
+      case 'iot':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <IoTLinesFlow
-              data={iotLinesData}
-              onDataChange={setIotLinesData}
-              onComplete={() => handleServiceComplete('iot')}
-              onAddAnother={handleAddAnotherService}
-              onPrev={prevStep}
-            />
-          </Suspense>
+          <IoTLinesFlow
+            data={iotLinesData}
+            onDataChange={setIotLinesData}
+            onComplete={() => handleServiceComplete('iot')}
+            onPrev={prevStep}
+            onNext={nextStep}
+          />
         );
       
-      case 5:
+      case 'hsi':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <HomeInternetFlow
-              data={homeInternetData}
-              onDataChange={setHomeInternetData}
-              onComplete={() => handleServiceComplete('hsi')}
-              onAddAnother={handleAddAnotherService}
-              onPrev={prevStep}
-            />
-          </Suspense>
+          <HomeInternetFlow
+            data={homeInternetData}
+            onDataChange={setHomeInternetData}
+            onComplete={() => handleServiceComplete('hsi')}
+            onPrev={prevStep}
+            onNext={nextStep}
+          />
         );
       
-      case 6:
+      case 'equipment':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <EquipmentCreditSelection
-              data={equipmentCreditData}
-              onDataChange={setEquipmentCreditData}
-              voiceLinesData={voiceLinesData}
-              dataLinesData={dataLinesData}
-              iotLinesData={iotLinesData}
-              homeInternetData={homeInternetData}
-              onNext={() => {
-                markStepComplete(6);
-                nextStep();
-              }}
-              onPrev={prevStep}
-            />
-          </Suspense>
+          <EquipmentCreditSelection
+            data={equipmentCreditData}
+            onDataChange={setEquipmentCreditData}
+            onNext={nextStep}
+            onPrev={prevStep}
+          />
         );
       
-      case 7:
+      case 'discounts':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <DiscountSelection
-              data={discountsData}
-              onDataChange={setDiscountsData}
-              voiceLinesData={voiceLinesData}
-              dataLinesData={dataLinesData}
-              iotLinesData={iotLinesData}
-              homeInternetData={homeInternetData}
-              onNext={() => {
-                markStepComplete(7);
-                nextStep();
-              }}
-              onPrev={prevStep}
-            />
-          </Suspense>
+          <DiscountSelection
+            data={discountsData}
+            onDataChange={setDiscountsData}
+            onNext={nextStep}
+            onPrev={prevStep}
+          />
         );
       
-      case 8:
+      case 'summary':
         return (
-          <Suspense fallback={<LoadingFallback />}>
-            <QuoteSummary
-              customerData={customerData}
-              voiceLinesData={voiceLinesData}
-              dataLinesData={dataLinesData}
-              iotLinesData={iotLinesData}
-              homeInternetData={homeInternetData}
-              equipmentCreditData={equipmentCreditData}
-              discountsData={discountsData}
-              onPrev={prevStep}
-              onClearData={clearAllData}
-              currentQuote={{
-                customerData,
-                voiceLinesData,
-                dataLinesData,
-                iotLinesData,
-                homeInternetData,
-                equipmentCreditData,
-                discountsData
-              }}
-              savedQuotes={[]}
-              onLoadQuote={() => {}}
-              onDeleteQuote={() => {}}
-            />
-          </Suspense>
+          <QuoteSummary
+            customerData={customerData}
+            voiceLinesData={voiceLinesData}
+            dataLinesData={dataLinesData}
+            iotLinesData={iotLinesData}
+            homeInternetData={homeInternetData}
+            equipmentCreditData={equipmentCreditData}
+            discountsData={discountsData}
+            onPrev={prevStep}
+            onClearData={() => {
+              setCurrentStep(0);
+              setCompletedSteps([]);
+              setSelectedServices([]);
+              setCustomerData(null);
+              setVoiceLinesData({ quantity: 0, plans: {}, devices: {}, protection: {}, promotions: {}, ports: {} });
+              setDataLinesData({ quantity: 0, category: '', devices: {}, plans: {}, protection: {}, promotions: {} });
+              setIotLinesData({ quantity: 0, devices: {}, plans: {}, protection: {}, promotions: {} });
+              setHomeInternetData({ device: null, plan: null, promotions: {} });
+              setEquipmentCreditData({ amount: 0, downPayment: 0, tradeIns: [] });
+              setDiscountsData({ autoPay: false, senior55: false, insider: false, workPerks: false });
+            }}
+          />
         );
       
       default:
@@ -506,87 +383,250 @@ const MasterFlowContent = () => {
     }
   };
 
-  return (
-    <div style={{ display: 'flex', height: '100vh' }}>
+  // Render sidebar
+  const renderSidebar = () => {
+    return (
+      <div style={{
+        position: 'fixed',
+        left: 0,
+        top: '80px',
+        width: isSidebarOpen || !isMobile ? '280px' : '0',
+        height: 'calc(100vh - 80px)',
+        background: 'white',
+        borderRight: '1px solid #e0e0e0',
+        overflowY: 'auto',
+        zIndex: 100,
+        transition: 'width 0.3s ease',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Sidebar Header */}
+        <div style={{
+          padding: '20px',
+          borderBottom: '1px solid #e0e0e0',
+          background: '#f8f9fa'
+        }}>
+          <h3 style={{
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#E20074',
+            margin: 0,
+            marginBottom: '8px'
+          }}>
+            Quote Progress
+          </h3>
+          <p style={{
+            fontSize: '12px',
+            color: '#666',
+            margin: 0
+          }}>
+            Step {currentStep + 1} of {steps.length}
+          </p>
+        </div>
 
-      {/* Performance Monitor Toggle */}
-      <button
-        onClick={() => setShowPerformanceMonitor(!showPerformanceMonitor)}
-        style={{
-          position: 'fixed',
-          top: '160px',
-          right: '20px',
-          background: showPerformanceMonitor ? '#E20074' : '#E20074',
-          color: 'white',
-          border: 'none',
-          borderRadius: '50%',
-          width: '40px',
-          height: '40px',
+        {/* Step List */}
+        <div style={{ flex: 1, padding: '20px' }}>
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            const isActive = currentStep === index;
+            const isCompleted = isStepCompleted(index);
+            const isRequired = isStepRequired(step);
+            const canNavigate = canNavigateToStep(index);
+            
+            return (
+              <div
+                key={step.id}
+                onClick={() => canNavigate && goToStep(index)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '12px',
+                  marginBottom: '8px',
+                  borderRadius: '8px',
+                  cursor: canNavigate ? 'pointer' : 'not-allowed',
+                  background: isActive ? '#fdf2f8' : isCompleted ? '#f0f9ff' : 'transparent',
+                  border: isActive ? '2px solid #E20074' : '2px solid transparent',
+                  opacity: canNavigate ? 1 : 0.5,
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: isCompleted ? '#4CAF50' : isActive ? '#E20074' : '#e0e0e0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: '12px',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}>
+                  {isCompleted ? '✓' : <Icon size={16} />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: isActive ? '#E20074' : '#333',
+                    marginBottom: '2px'
+                  }}>
+                    {step.title}
+                    {isRequired && <span style={{ color: '#ff6b6b', marginLeft: '4px' }}>*</span>}
+                  </div>
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#666'
+                  }}>
+                    {step.description}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div style={{
+          padding: '20px',
+          borderTop: '1px solid #e0e0e0',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          zIndex: 1000,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          transition: 'all 0.3s ease'
-        }}
-        onMouseOver={(e) => {
-          e.target.style.transform = 'scale(1.1)';
-        }}
-        onMouseOut={(e) => {
-          e.target.style.transform = 'scale(1)';
-        }}
-      >
-        <Activity size={20} />
-      </button>
+          flexDirection: 'column',
+          gap: '10px'
+        }}>
+          <div style={{
+            fontSize: '12px',
+            color: '#666',
+            textAlign: 'center',
+            marginBottom: '5px'
+          }}>
+            {steps[currentStep]?.title}
+          </div>
+          
+          <button
+            onClick={prevStep}
+            disabled={currentStep === 0}
+            style={{
+              padding: '12px 16px',
+              border: '2px solid #E20074',
+              borderRadius: '8px',
+              background: currentStep === 0 ? '#f5f5f5' : 'white',
+              color: currentStep === 0 ? '#999' : '#E20074',
+              fontSize: '14px',
+              cursor: currentStep === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              opacity: currentStep === 0 ? 0.5 : 1,
+              transition: 'all 0.3s ease'
+            }}
+          >
+            <ArrowLeft size={16} />
+            Previous
+          </button>
+          
+          <button
+            onClick={nextStep}
+            disabled={currentStep === steps.length - 1}
+            style={{
+              padding: '12px 16px',
+              border: '2px solid #E20074',
+              borderRadius: '8px',
+              background: currentStep === steps.length - 1 ? '#f5f5f5' : '#E20074',
+              color: currentStep === steps.length - 1 ? '#999' : 'white',
+              fontSize: '14px',
+              cursor: currentStep === steps.length - 1 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              opacity: currentStep === steps.length - 1 ? 0.5 : 1,
+              transition: 'all 0.3s ease'
+            }}
+          >
+            Next
+            <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    );
+  };
 
-      {/* Left Navigation */}
-      <Suspense fallback={<div style={{ width: '280px', background: '#f8f9fa' }}>Loading navigation...</div>}>
-        <LeftNavigation
-          steps={steps}
-          currentStep={currentStep}
-          completedSteps={completedSteps}
-          selectedServices={selectedServices}
-          onStepClick={goToStep}
-          isMobile={isMobile}
-          isCollapsed={isSidebarCollapsed}
-          onCollapseChange={setIsSidebarCollapsed}
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#f8f9fa',
+      display: 'flex'
+    }}>
+      {/* Mobile Menu Button */}
+      {isMobile && (
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          style={{
+            position: 'fixed',
+            top: '90px',
+            left: '20px',
+            zIndex: 200,
+            background: '#E20074',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '12px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}
+        >
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
+
+      {/* Sidebar */}
+      {renderSidebar()}
+
+      {/* Mobile Overlay */}
+      {isMobile && isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            zIndex: 99
+          }}
         />
-      </Suspense>
-      
+      )}
+
       {/* Main Content */}
       <div style={{
         flex: 1,
-        marginLeft: isMobile ? '0' : (isSidebarCollapsed ? '0' : '280px'),
-        marginTop: '80px', // Account for StatusBar height
-        padding: '10px',
-        background: '#f8f9fa',
-        height: 'calc(100vh - 90px)', // Fixed height to prevent scrolling
-        overflow: 'hidden' // Prevent scrolling
+        marginLeft: isMobile ? '0' : '280px',
+        padding: '20px',
+        transition: 'margin-left 0.3s ease'
       }}>
-        <LoadingOverlay isLoading={isLoading} text="Loading...">
-          <FadeIn delay={0.1}>
-            {renderStepContent()}
-          </FadeIn>
-        </LoadingOverlay>
+        {isLoading ? (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+            fontSize: '18px',
+            color: '#666'
+          }}>
+            Loading...
+          </div>
+        ) : (
+          renderStepContent()
+        )}
       </div>
-
-      {/* Performance Monitor */}
-      <Suspense fallback={null}>
-        <PerformanceMonitor
-          isVisible={showPerformanceMonitor}
-          onClose={() => setShowPerformanceMonitor(false)}
-        />
-      </Suspense>
     </div>
-  );
-};
-
-const MasterFlow = () => {
-  return (
-    <ToastProvider>
-      <MasterFlowContent />
-    </ToastProvider>
   );
 };
 

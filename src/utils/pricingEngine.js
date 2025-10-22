@@ -1,6 +1,9 @@
 // Dynamic Pricing Engine for T-Mobile Quote App
 // Handles location-based pricing, tax calculations, and promotional pricing optimization
 
+import { devices } from '../data/devices';
+import { promotions } from '../data/promotions';
+
 export class PricingEngine {
   constructor() {
     this.basePricing = {
@@ -16,802 +19,469 @@ export class PricingEngine {
         // Military/First Responder Plans
         'experience-beyond-military': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
         'experience-beyond-first-responder': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 }
-      },
-      devices: {
-        // iPhone Series
-        'iphone-air': 999,
-        'iphone-17-pro-max': 1199,
-        'iphone-17-pro': 1099,
-        'iphone-17-plus': 899,
-        'iphone-17': 799,
-        'iphone-16e': 599,
-        'iphone-16-pro-max': 1199,
-        'iphone-16-pro': 1099,
-        'iphone-16-plus': 899,
-        'iphone-16': 799,
-        'iphone-15-pro-max': 1099,
-        'iphone-15-pro': 999,
-        'iphone-15-plus': 899,
-        'iphone-15': 699,
-        'iphone-se-3rd': 429,
-        
-        // Google Pixel Series
-        'pixel-10-pro-xl': 1199,
-        'pixel-10-pro': 999,
-        'pixel-10': 699,
-        'pixel-9-pro': 999,
-        'pixel-9-xl': 899,
-        'pixel-9': 699,
-        'pixel-9a': 499,
-        
-        // Samsung Galaxy Series
-        'galaxy-s25-edge': 1299,
-        'galaxy-s25-ultra': 1299,
-        'galaxy-s25-plus': 999,
-        'galaxy-s25': 799,
-        'galaxy-s25-fe': 599,
-        'galaxy-s24-ultra': 1299,
-        'galaxy-s24-plus': 999,
-        'galaxy-s24': 799,
-        'galaxy-a36': 399,
-        'galaxy-a16': 299,
-        'galaxy-a15': 199,
-        'galaxy-z-fold-7': 1799,
-        'galaxy-z-flip-7': 999,
-        
-        // Motorola Series
-        'razr-ultra': 999,
-        'razr-plus-2025': 799,
-        'razr-2025': 599,
-        'edge-2025': 699,
-        'g-power-2025': 299,
-        'g-2025': 199,
-        
-        // T-Mobile Revvl Series
-        'revvl-pro-8': 399,
-        'revvl-6x-pro': 299,
-        'revvl-6x': 199,
-        
-        // Tablets
-        'ipad-a16': 449,
-        'galaxy-tab-a9-plus': 199,
-        'galaxy-tab-s10-fe-5g': 399,
-        'revvl-tab-2': 149,
-        
-        // Wearables
-        'apple-watch-series-10': 399,
-        'apple-watch-series-9': 399,
-        'apple-watch-se-3rd': 249,
-        'galaxy-watch-7': 299,
-        'galaxy-watch-classic-7': 449,
-        'galaxy-watch-pro-7': 649,
-        'pixel-watch-2': 349,
-        
-        // Home Internet
-        'tmobile-home-internet': 50,
-        'tmobile-home-internet-plus': 70,
-        'metronet-fiber': 60,
-        
-        // IoT Devices
-        'tcl-linkport-ik511': 199,
-        'syncup-tracker': 25,
-        
-        // Other
-        'bring-your-own': 0
-      },
-      protection: {
-        1: 7, 2: 9, 3: 13, 4: 16, 5: 18, 6: 25
-      },
-      dataPlans: {
-        tablet: { basic: 10, standard: 20, premium: 35 },
-        wearable: { basic: 5, standard: 10, premium: 15 },
-        iot: { basic: 2, standard: 5, premium: 10 }
-      },
-      homeInternet: {
-        'gateway': 0,
-        'backup-gateway': 15
       }
     };
-
-    this.locationMultipliers = {
-      // State-based pricing adjustments
-      'CA': { multiplier: 1.1, taxRate: 0.0875, surcharge: 0 },
-      'NY': { multiplier: 1.05, taxRate: 0.08, surcharge: 0 },
-      'TX': { multiplier: 1.0, taxRate: 0.0625, surcharge: 0 },
-      'FL': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'WA': { multiplier: 1.08, taxRate: 0.065, surcharge: 0 },
-      'IL': { multiplier: 1.02, taxRate: 0.0625, surcharge: 0 },
-      'PA': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'OH': { multiplier: 1.0, taxRate: 0.0575, surcharge: 0 },
-      'GA': { multiplier: 1.0, taxRate: 0.04, surcharge: 0 },
-      'NC': { multiplier: 1.0, taxRate: 0.0475, surcharge: 0 },
-      'MI': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'NJ': { multiplier: 1.05, taxRate: 0.06625, surcharge: 0 },
-      'VA': { multiplier: 1.0, taxRate: 0.053, surcharge: 0 },
-      'TN': { multiplier: 1.0, taxRate: 0.07, surcharge: 0 },
-      'IN': { multiplier: 1.0, taxRate: 0.07, surcharge: 0 },
-      'AZ': { multiplier: 1.0, taxRate: 0.056, surcharge: 0 },
-      'MA': { multiplier: 1.08, taxRate: 0.0625, surcharge: 0 },
-      'MO': { multiplier: 1.0, taxRate: 0.04225, surcharge: 0 },
-      'MD': { multiplier: 1.02, taxRate: 0.06, surcharge: 0 },
-      'WI': { multiplier: 1.0, taxRate: 0.05, surcharge: 0 },
-      'CO': { multiplier: 1.0, taxRate: 0.029, surcharge: 0 },
-      'MN': { multiplier: 1.0, taxRate: 0.06875, surcharge: 0 },
-      'SC': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'AL': { multiplier: 1.0, taxRate: 0.04, surcharge: 0 },
-      'LA': { multiplier: 1.0, taxRate: 0.0445, surcharge: 0 },
-      'KY': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'OR': { multiplier: 1.0, taxRate: 0, surcharge: 0 },
-      'OK': { multiplier: 1.0, taxRate: 0.045, surcharge: 0 },
-      'CT': { multiplier: 1.05, taxRate: 0.0635, surcharge: 0 },
-      'UT': { multiplier: 1.0, taxRate: 0.047, surcharge: 0 },
-      'IA': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'NV': { multiplier: 1.0, taxRate: 0.0685, surcharge: 0 },
-      'AR': { multiplier: 1.0, taxRate: 0.065, surcharge: 0 },
-      'MS': { multiplier: 1.0, taxRate: 0.07, surcharge: 0 },
-      'KS': { multiplier: 1.0, taxRate: 0.065, surcharge: 0 },
-      'NM': { multiplier: 1.0, taxRate: 0.05125, surcharge: 0 },
-      'NE': { multiplier: 1.0, taxRate: 0.055, surcharge: 0 },
-      'WV': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'ID': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'HI': { multiplier: 1.15, taxRate: 0.04, surcharge: 0 },
-      'NH': { multiplier: 1.0, taxRate: 0, surcharge: 0 },
-      'ME': { multiplier: 1.0, taxRate: 0.055, surcharge: 0 },
-      'RI': { multiplier: 1.05, taxRate: 0.07, surcharge: 0 },
-      'MT': { multiplier: 1.0, taxRate: 0, surcharge: 0 },
-      'DE': { multiplier: 1.0, taxRate: 0, surcharge: 0 },
-      'SD': { multiplier: 1.0, taxRate: 0.045, surcharge: 0 },
-      'ND': { multiplier: 1.0, taxRate: 0.05, surcharge: 0 },
-      'AK': { multiplier: 1.2, taxRate: 0, surcharge: 0 },
-      'VT': { multiplier: 1.0, taxRate: 0.06, surcharge: 0 },
-      'WY': { multiplier: 1.0, taxRate: 0.04, surcharge: 0 },
-      'DC': { multiplier: 1.1, taxRate: 0.06, surcharge: 0 }
-    };
-
-    this.promotionalPricing = {
-      // Time-based promotional pricing
-      'black-friday': {
-        active: false,
-        startDate: '2024-11-24',
-        endDate: '2024-11-30',
-        discounts: {
-          plans: 0.2, // 20% off plans
-          devices: 0.15, // 15% off devices
-          protection: 0.1 // 10% off protection
-        }
-      },
-      'holiday': {
-        active: false,
-        startDate: '2024-12-15',
-        endDate: '2024-12-31',
-        discounts: {
-          plans: 0.1,
-          devices: 0.1,
-          protection: 0.05
-        }
-      },
-      'back-to-school': {
-        active: false,
-        startDate: '2024-08-01',
-        endDate: '2024-09-15',
-        discounts: {
-          plans: 0.15,
-          devices: 0.2,
-          protection: 0.1
-        }
-      }
-    };
-
-    this.customerTierPricing = {
-      // Customer tier-based pricing adjustments
-      'premium': { multiplier: 0.95, description: 'Premium customer discount' },
-      'standard': { multiplier: 1.0, description: 'Standard pricing' },
-      'new': { multiplier: 1.05, description: 'New customer pricing' },
-      'senior': { multiplier: 0.8, description: 'Senior 55+ discount' },
-      'military': { multiplier: 0.85, description: 'Military discount' },
-      'first-responder': { multiplier: 0.9, description: 'First responder discount' }
-    };
   }
 
-  // Get location-based pricing adjustments
-  getLocationPricing(location) {
-    const state = location?.state || 'TX'; // Default to Texas
-    return this.locationMultipliers[state] || this.locationMultipliers['TX'];
-  }
-
-  // Calculate plan pricing with location adjustments
-  calculatePlanPricing(planId, lines, location, customerTier = 'standard') {
-    const basePlan = this.basePricing.plans[planId];
-    if (!basePlan) return 0;
-
-    let basePrice = 0;
-    if (lines <= 6) {
-      basePrice = basePlan[lines] || 0;
-    } else {
-      basePrice = basePlan[6] + (lines - 6) * basePlan.additional;
-    }
-
-    const locationPricing = this.getLocationPricing(location);
-    const customerTierPricing = this.customerTierPricing[customerTier];
-    
-    // Apply location multiplier
-    let adjustedPrice = basePrice * locationPricing.multiplier;
-    
-    // Apply customer tier multiplier
-    adjustedPrice *= customerTierPricing.multiplier;
-
-    // Apply promotional pricing if active
-    const promotionalDiscount = this.getActivePromotionalDiscount('plans');
-    if (promotionalDiscount > 0) {
-      adjustedPrice *= (1 - promotionalDiscount);
-    }
-
-    return Math.round(adjustedPrice * 100) / 100;
-  }
-
-  // Calculate device pricing with location adjustments
-  calculateDevicePricing(deviceId, location, customerTier = 'standard') {
-    const basePrice = this.basePricing.devices[deviceId] || 0;
-    
-    const locationPricing = this.getLocationPricing(location);
-    const customerTierPricing = this.customerTierPricing[customerTier];
-    
-    let adjustedPrice = basePrice * locationPricing.multiplier * customerTierPricing.multiplier;
-
-    // Apply promotional pricing if active
-    const promotionalDiscount = this.getActivePromotionalDiscount('devices');
-    if (promotionalDiscount > 0) {
-      adjustedPrice *= (1 - promotionalDiscount);
-    }
-
-    return Math.round(adjustedPrice * 100) / 100;
-  }
-
-  // Calculate protection pricing
-  calculateProtectionPricing(tier, location, customerTier = 'standard') {
-    const basePrice = this.basePricing.protection[tier] || 0;
-    
-    const locationPricing = this.getLocationPricing(location);
-    const customerTierPricing = this.customerTierPricing[customerTier];
-    
-    let adjustedPrice = basePrice * locationPricing.multiplier * customerTierPricing.multiplier;
-
-    // Apply promotional pricing if active
-    const promotionalDiscount = this.getActivePromotionalDiscount('protection');
-    if (promotionalDiscount > 0) {
-      adjustedPrice *= (1 - promotionalDiscount);
-    }
-
-    return Math.round(adjustedPrice * 100) / 100;
-  }
-
-  // Calculate data plan pricing
-  calculateDataPlanPricing(category, planType, location, customerTier = 'standard') {
-    const basePrice = this.basePricing.dataPlans[category]?.[planType] || 0;
-    
-    const locationPricing = this.getLocationPricing(location);
-    const customerTierPricing = this.customerTierPricing[customerTier];
-    
-    let adjustedPrice = basePrice * locationPricing.multiplier * customerTierPricing.multiplier;
-
-    return Math.round(adjustedPrice * 100) / 100;
-  }
-
-  // Calculate home internet pricing
-  calculateHomeInternetPricing(deviceId, location, customerTier = 'standard') {
-    const basePrice = this.basePricing.homeInternet[deviceId] || 0;
-    
-    const locationPricing = this.getLocationPricing(location);
-    const customerTierPricing = this.customerTierPricing[customerTier];
-    
-    let adjustedPrice = basePrice * locationPricing.multiplier * customerTierPricing.multiplier;
-
-    return Math.round(adjustedPrice * 100) / 100;
-  }
-
-  // Calculate taxes based on location
-  calculateTaxes(subtotal, location) {
-    const locationPricing = this.getLocationPricing(location);
-    const taxAmount = subtotal * locationPricing.taxRate;
-    return Math.round(taxAmount * 100) / 100;
-  }
-
-  // Calculate surcharges based on location
-  calculateSurcharges(subtotal, location) {
-    const locationPricing = this.getLocationPricing(location);
-    const surchargeAmount = subtotal * locationPricing.surcharge;
-    return Math.round(surchargeAmount * 100) / 100;
-  }
-
-  // Get active promotional discount for a category
-  getActivePromotionalDiscount(category) {
-    const now = new Date();
-    
-    for (const [promoName, promo] of Object.entries(this.promotionalPricing)) {
-      if (promo.active) {
-        const startDate = new Date(promo.startDate);
-        const endDate = new Date(promo.endDate);
-        
-        if (now >= startDate && now <= endDate) {
-          return promo.discounts[category] || 0;
-        }
-      }
-    }
-    
-    return 0;
-  }
-
-  // Calculate total monthly cost with all adjustments
-  calculateTotalMonthlyCost(quoteData, location, customerTier = 'standard') {
+  // Calculate voice lines pricing
+  calculateVoiceLinesPricing(voiceLinesData, location = 'US', customerTier = 'standard') {
     let total = 0;
-
-    // Voice lines
-    if (quoteData.voiceLinesData?.quantity > 0) {
-      const voiceTotal = this.calculateVoiceTotal(quoteData.voiceLinesData, location, customerTier);
-      total += voiceTotal;
-    }
-
-    // Data lines
-    if (quoteData.dataLinesData?.quantity > 0) {
-      const dataTotal = this.calculateDataTotal(quoteData.dataLinesData, location, customerTier);
-      total += dataTotal;
-    }
-
-    // IoT lines
-    if (quoteData.iotLinesData?.quantity > 0) {
-      const iotTotal = this.calculateIoTTotal(quoteData.iotLinesData, location, customerTier);
-      total += iotTotal;
-    }
-
-    // Home internet
-    if (quoteData.homeInternetData?.device) {
-      const hsiTotal = this.calculateHomeInternetTotal(quoteData.homeInternetData, location, customerTier);
-      total += hsiTotal;
-    }
-
-    // Equipment financing
-    if (quoteData.equipmentCreditData?.monthlyFinancing) {
-      total += quoteData.equipmentCreditData.monthlyFinancing;
-    }
-
-    // Apply discounts
-    const discounts = this.calculateDiscounts(quoteData);
-    total -= discounts;
-
-    return Math.round(total * 100) / 100;
-  }
-
-  // Calculate voice lines total
-  calculateVoiceTotal(voiceLinesData, location, customerTier) {
-    let total = 0;
-
-    // Plan costs
-    if (voiceLinesData.plans && Object.keys(voiceLinesData.plans).length > 0) {
-      const firstPlanId = Object.values(voiceLinesData.plans)[0];
-      total += this.calculatePlanPricing(firstPlanId, voiceLinesData.quantity, location, customerTier);
-    }
-
-    // Device costs
-    if (voiceLinesData.devices) {
-      Object.values(voiceLinesData.devices).forEach(deviceId => {
-        total += this.calculateDevicePricing(deviceId, location, customerTier) / 24; // Monthly device payment
-      });
-    }
-
-    // Protection costs
-    if (voiceLinesData.protection) {
-      Object.values(voiceLinesData.protection).forEach(protectionId => {
-        const tier = parseInt(protectionId.replace('p360-tier', ''));
-        total += this.calculateProtectionPricing(tier, location, customerTier);
-      });
-    }
-
-    return total;
-  }
-
-  // Calculate data lines total
-  calculateDataTotal(dataLinesData, location, customerTier) {
-    let total = 0;
-
-    if (dataLinesData.plans) {
-      Object.values(dataLinesData.plans).forEach(planType => {
-        total += this.calculateDataPlanPricing(dataLinesData.category, planType, location, customerTier);
-      });
-    }
-
-    if (dataLinesData.devices) {
-      Object.values(dataLinesData.devices).forEach(deviceId => {
-        total += this.calculateDevicePricing(deviceId, location, customerTier) / 24;
-      });
-    }
-
-    if (dataLinesData.protection) {
-      Object.values(dataLinesData.protection).forEach(protectionId => {
-        const tier = parseInt(protectionId.replace('p360-tier', ''));
-        total += this.calculateProtectionPricing(tier, location, customerTier);
-      });
-    }
-
-    return total;
-  }
-
-  // Calculate IoT lines total
-  calculateIoTTotal(iotLinesData, location, customerTier) {
-    let total = 0;
-
-    if (iotLinesData.plans) {
-      Object.values(iotLinesData.plans).forEach(planType => {
-        total += this.calculateDataPlanPricing('iot', planType, location, customerTier);
-      });
-    }
-
-    if (iotLinesData.devices) {
-      Object.values(iotLinesData.devices).forEach(deviceId => {
-        total += this.calculateDevicePricing(deviceId, location, customerTier) / 24;
-      });
-    }
-
-    if (iotLinesData.protection) {
-      Object.values(iotLinesData.protection).forEach(protectionId => {
-        const tier = parseInt(protectionId.replace('p360-tier', ''));
-        total += this.calculateProtectionPricing(tier, location, customerTier);
-      });
-    }
-
-    return total;
-  }
-
-  // Calculate home internet total
-  calculateHomeInternetTotal(homeInternetData, location, customerTier) {
-    let total = 0;
-
-    if (homeInternetData.device) {
-      total += this.calculateHomeInternetPricing(homeInternetData.device, location, customerTier);
-    }
-
-    if (homeInternetData.plan) {
-      // Home internet plan pricing (typically $50-70/month)
-      const basePrice = 60; // Default home internet price
-      const locationPricing = this.getLocationPricing(location);
-      const customerTierPricing = this.customerTierPricing[customerTier];
-      
-      total += basePrice * locationPricing.multiplier * customerTierPricing.multiplier;
-    }
-
-    return total;
-  }
-
-  // Calculate discounts
-  calculateDiscounts(quoteData) {
-    let totalDiscounts = 0;
-
-    if (quoteData.discountsData?.autoPay) {
-      const totalLines = (quoteData.voiceLinesData?.quantity || 0) + 
-                        (quoteData.dataLinesData?.quantity || 0) + 
-                        (quoteData.iotLinesData?.quantity || 0);
-      totalDiscounts += Math.min(totalLines, 8) * 5;
-    }
-
-    if (quoteData.discountsData?.senior55) {
-      // 20% off voice plans only
-      if (quoteData.voiceLinesData?.plans && Object.keys(quoteData.voiceLinesData.plans).length > 0) {
-        const firstPlanId = Object.values(quoteData.voiceLinesData.plans)[0];
-        const planPrice = this.calculatePlanPricing(firstPlanId, quoteData.voiceLinesData.quantity, {}, 'senior');
-        totalDiscounts += planPrice * 0.2;
-      }
-    }
-
-    if (quoteData.discountsData?.tmobileInsider) {
-      // 15% off all services
-      const allServicesTotal = this.calculateTotalMonthlyCost(quoteData, {}, 'standard');
-      totalDiscounts += allServicesTotal * 0.15;
-    }
-
-    return totalDiscounts;
-  }
-
-  // Calculate per-line promotion savings
-  calculatePerLinePromotionSavings(lineIndex, promotionData, deviceId, planId) {
-    if (!promotionData) return 0;
-
-    const promotion = promotionData;
-    const devicePrice = this.getDevicePrice(deviceId);
-    const planPrice = this.getPlanPrice(planId);
-
-    let savings = 0;
-
-    // Calculate savings based on promotion type
-    if (promotion.name && promotion.name.includes('On Us')) {
-      // Device On Us promotions
-      savings = Math.min(devicePrice, promotion.maxPayout || devicePrice);
-    } else if (promotion.name && promotion.name.includes('Off')) {
-      // Fixed dollar amount off
-      const discountAmount = parseFloat(promotion.name.match(/\$(\d+(?:\.\d+)?)/)?.[1] || '0');
-      savings = Math.min(discountAmount, promotion.maxPayout || discountAmount);
-    } else if (promotion.name && promotion.name.includes('% Off')) {
-      // Percentage off
-      const discountPercent = parseFloat(promotion.name.match(/(\d+)%/)?.[1] || '0');
-      savings = Math.min((devicePrice * discountPercent / 100), promotion.maxPayout || devicePrice);
-    } else if (promotion.tradeInValue) {
-      // Trade-in promotions
-      savings = Math.min(promotion.tradeInValue, promotion.maxPayout || promotion.tradeInValue);
-    } else if (promotion.savings) {
-      // Direct savings amount
-      savings = Math.min(promotion.savings, promotion.maxPayout || promotion.savings);
-    }
-
-    return Math.max(0, savings);
-  }
-
-  // Calculate total promotion savings across all lines
-  calculateTotalPromotionSavings(promotionData) {
-    if (!promotionData || !promotionData.linePromotions) return 0;
-
-    let totalSavings = 0;
-    Object.keys(promotionData.linePromotions).forEach(lineIndex => {
-      const promotion = promotionData.linePromotions[lineIndex];
-      if (promotion) {
-        totalSavings += promotion.savings || 0;
-      }
-    });
-
-    return totalSavings;
-  }
-
-  // Get per-line pricing breakdown with promotions
-  getPerLinePricingBreakdown(lineIndex, lineData, promotionData, location, customerTier = 'standard') {
-    const deviceId = lineData.deviceId;
-    const planId = lineData.planId;
-    const protectionId = lineData.protectionId;
-
     const breakdown = {
-      lineIndex: parseInt(lineIndex),
-      device: {
-        id: deviceId,
-        price: this.getDevicePrice(deviceId),
-        name: this.getDeviceName(deviceId)
-      },
-      plan: {
-        id: planId,
-        price: this.getPlanPrice(planId),
-        name: this.getPlanName(planId)
-      },
-      protection: {
-        id: protectionId,
-        price: this.getProtectionPrice(protectionId),
-        name: this.getProtectionName(protectionId)
-      },
-      promotion: null,
-      subtotal: 0,
+      planCost: 0,
+      deviceCost: 0,
+      protectionCost: 0,
       promotionSavings: 0,
+      subtotal: 0,
+      taxes: 0,
       total: 0
     };
 
-    // Calculate subtotal
-    breakdown.subtotal = breakdown.device.price + breakdown.plan.price + breakdown.protection.price;
+    const { quantity, plans, devices: selectedDevices, protection, promotions: selectedPromotions } = voiceLinesData;
 
-    // Apply promotion if exists
-    if (promotionData && promotionData.linePromotions && promotionData.linePromotions[lineIndex]) {
-      const promotion = promotionData.linePromotions[lineIndex];
-      breakdown.promotion = {
-        id: promotion.promotionId,
-        name: promotion.name,
-        tradeInDevice: promotion.tradeInDevice,
-        tradeInValue: promotion.tradeInValue,
-        savings: promotion.savings
-      };
-      breakdown.promotionSavings = promotion.savings || 0;
+    // Plan pricing
+    if (Object.keys(plans).length > 0) {
+      const firstPlanId = Object.values(plans)[0];
+      const plan = this.basePricing.plans[firstPlanId];
+      if (plan) {
+        if (quantity <= 6) {
+          breakdown.planCost = plan[quantity] || 0;
+        } else {
+          breakdown.planCost = plan[6] + (quantity - 6) * plan.additional;
+        }
+        total += breakdown.planCost;
+      }
     }
 
-    // Calculate total after promotion
-    breakdown.total = Math.max(0, breakdown.subtotal - breakdown.promotionSavings);
+    // Device financing costs
+    Object.values(selectedDevices).forEach(deviceId => {
+      if (deviceId && deviceId !== 'bring-your-own') {
+        const device = devices[deviceId];
+        if (device) {
+          const monthlyPayment = device.monthlyPayment || Math.round(device.price / 24);
+          breakdown.deviceCost += monthlyPayment;
+          total += monthlyPayment;
+        }
+      }
+    });
 
-    return breakdown;
+    // Protection costs
+    Object.values(protection).forEach(protectionId => {
+      if (typeof protectionId === 'string' && protectionId.includes('p360-tier')) {
+        const protectionPrices = {
+          'p360-tier1': 7, 'p360-tier2': 9, 'p360-tier3': 13,
+          'p360-tier4': 16, 'p360-tier5': 18, 'p360-tier6': 25
+        };
+        const protectionCost = protectionPrices[protectionId] || 0;
+        breakdown.protectionCost += protectionCost;
+        total += protectionCost;
+      }
+    });
+
+    // Promotion savings
+    if (selectedPromotions) {
+      Object.values(selectedPromotions).forEach(linePromotions => {
+        linePromotions.forEach(promoId => {
+          const promotion = promotions.find(p => p.id === promoId);
+          if (promotion) {
+            breakdown.promotionSavings += promotion.maxPayout;
+            total -= promotion.maxPayout;
+          }
+        });
+      });
+    }
+
+    // Ensure total doesn't go below 0
+    total = Math.max(0, total);
+    breakdown.subtotal = total;
+
+    // Calculate taxes (simplified - would normally be location-based)
+    breakdown.taxes = total * 0.08; // 8% average tax rate
+    breakdown.total = total + breakdown.taxes;
+
+    return {
+      monthly: breakdown.total,
+      breakdown
+    };
   }
 
-  // Get comprehensive pricing breakdown with per-line promotions
-  getComprehensivePricingBreakdown(quoteData, promotionData, location, customerTier = 'standard') {
+  // Calculate data lines pricing
+  calculateDataLinesPricing(dataLinesData, location = 'US', customerTier = 'standard') {
+    let total = 0;
     const breakdown = {
-      lines: [],
+      planCost: 0,
+      deviceCost: 0,
+      protectionCost: 0,
+      promotionSavings: 0,
       subtotal: 0,
-      totalPromotionSavings: 0,
       taxes: 0,
-      surcharges: 0,
-      discounts: 0,
-      total: 0,
-      location: this.getLocationPricing(location),
-      customerTier: this.customerTierPricing[customerTier],
-      promotionStats: {
-        totalLines: 0,
-        linesWithPromotions: 0,
-        totalSavings: 0,
-        promotionTypes: {}
-      }
+      total: 0
     };
 
-    // Process each line
-    if (quoteData.voiceLines && quoteData.voiceLines.quantity > 0) {
-      for (let i = 0; i < quoteData.voiceLines.quantity; i++) {
-        const lineData = {
-          deviceId: quoteData.voiceLines.devices?.[i],
-          planId: quoteData.voiceLines.plans?.[i],
-          protectionId: quoteData.voiceLines.protection?.[i]
+    const { quantity, plans, devices: selectedDevices, protection, promotions: selectedPromotions } = dataLinesData;
+
+    // Data plan pricing (simplified)
+    const dataPlanPricing = {
+      'tablet-unlimited': 20,
+      'tablet-10gb': 15,
+      'tablet-5gb': 10,
+      'wearable-unlimited': 10,
+      'wearable-5gb': 5
+    };
+
+    Object.values(plans).forEach(planId => {
+      const planCost = dataPlanPricing[planId] || 0;
+      breakdown.planCost += planCost;
+      total += planCost;
+    });
+
+    // Device costs
+    Object.values(selectedDevices).forEach(deviceId => {
+      if (deviceId && deviceId !== 'bring-your-own') {
+        const device = devices[deviceId];
+        if (device) {
+          const monthlyPayment = device.monthlyPayment || Math.round(device.price / 24);
+          breakdown.deviceCost += monthlyPayment;
+          total += monthlyPayment;
+        }
+      }
+    });
+
+    // Protection costs
+    Object.values(protection).forEach(protectionId => {
+      if (typeof protectionId === 'string' && protectionId.includes('p360-tier')) {
+        const protectionPrices = {
+          'p360-tier1': 7, 'p360-tier2': 9, 'p360-tier3': 13,
+          'p360-tier4': 16, 'p360-tier5': 18, 'p360-tier6': 25
         };
+        const protectionCost = protectionPrices[protectionId] || 0;
+        breakdown.protectionCost += protectionCost;
+        total += protectionCost;
+      }
+    });
 
-        const lineBreakdown = this.getPerLinePricingBreakdown(
-          i, 
-          lineData, 
-          promotionData, 
-          location, 
-          customerTier
-        );
+    // Promotion savings
+    if (selectedPromotions) {
+      Object.values(selectedPromotions).forEach(linePromotions => {
+        linePromotions.forEach(promoId => {
+          const promotion = promotions.find(p => p.id === promoId);
+          if (promotion) {
+            breakdown.promotionSavings += promotion.maxPayout;
+            total -= promotion.maxPayout;
+          }
+        });
+      });
+    }
 
-        breakdown.lines.push(lineBreakdown);
-        breakdown.subtotal += lineBreakdown.subtotal;
-        breakdown.totalPromotionSavings += lineBreakdown.promotionSavings;
+    total = Math.max(0, total);
+    breakdown.subtotal = total;
+    breakdown.taxes = total * 0.08;
+    breakdown.total = total + breakdown.taxes;
+
+    return {
+      monthly: breakdown.total,
+      breakdown
+    };
+  }
+
+  // Calculate IoT lines pricing
+  calculateIoTLinesPricing(iotLinesData, location = 'US', customerTier = 'standard') {
+    let total = 0;
+    const breakdown = {
+      planCost: 0,
+      deviceCost: 0,
+      protectionCost: 0,
+      promotionSavings: 0,
+      subtotal: 0,
+      taxes: 0,
+      total: 0
+    };
+
+    const { quantity, plans, devices: selectedDevices, protection, promotions: selectedPromotions } = iotLinesData;
+
+    // IoT plan pricing
+    const iotPlanPricing = {
+      'iot-unlimited': 15,
+      'iot-5gb': 10,
+      'iot-2gb': 5
+    };
+
+    Object.values(plans).forEach(planId => {
+      const planCost = iotPlanPricing[planId] || 0;
+      breakdown.planCost += planCost;
+      total += planCost;
+    });
+
+    // Device costs
+    Object.values(selectedDevices).forEach(deviceId => {
+      if (deviceId && deviceId !== 'bring-your-own') {
+        const device = devices[deviceId];
+        if (device) {
+          const monthlyPayment = device.monthlyPayment || Math.round(device.price / 24);
+          breakdown.deviceCost += monthlyPayment;
+          total += monthlyPayment;
+        }
+      }
+    });
+
+    // Protection costs
+    Object.values(protection).forEach(protectionId => {
+      if (typeof protectionId === 'string' && protectionId.includes('p360-tier')) {
+        const protectionPrices = {
+          'p360-tier1': 7, 'p360-tier2': 9, 'p360-tier3': 13,
+          'p360-tier4': 16, 'p360-tier5': 18, 'p360-tier6': 25
+        };
+        const protectionCost = protectionPrices[protectionId] || 0;
+        breakdown.protectionCost += protectionCost;
+        total += protectionCost;
+      }
+    });
+
+    // Promotion savings
+    if (selectedPromotions) {
+      Object.values(selectedPromotions).forEach(linePromotions => {
+        linePromotions.forEach(promoId => {
+          const promotion = promotions.find(p => p.id === promoId);
+          if (promotion) {
+            breakdown.promotionSavings += promotion.maxPayout;
+            total -= promotion.maxPayout;
+          }
+        });
+      });
+    }
+
+    total = Math.max(0, total);
+    breakdown.subtotal = total;
+    breakdown.taxes = total * 0.08;
+    breakdown.total = total + breakdown.taxes;
+
+    return {
+      monthly: breakdown.total,
+      breakdown
+    };
+  }
+
+  // Calculate home internet pricing
+  calculateHomeInternetPricing(homeInternetData, location = 'US', customerTier = 'standard') {
+    let total = 0;
+    const breakdown = {
+      planCost: 0,
+      deviceCost: 0,
+      promotionSavings: 0,
+      subtotal: 0,
+      taxes: 0,
+      total: 0
+    };
+
+    const { plan, device, promotions: selectedPromotions } = homeInternetData;
+
+    // Home internet plan pricing
+    const hsiPlanPricing = {
+      'hsi-standard': 50,
+      'hsi-plus': 60,
+      'fiber-100': 70,
+      'fiber-300': 90,
+      'fiber-1000': 120
+    };
+
+    if (plan) {
+      breakdown.planCost = hsiPlanPricing[plan] || 0;
+      total += breakdown.planCost;
+    }
+
+    // Device costs
+    if (device && device !== 'bring-your-own') {
+      const deviceObj = devices[device];
+      if (deviceObj) {
+        const monthlyPayment = deviceObj.monthlyPayment || Math.round(deviceObj.price / 24);
+        breakdown.deviceCost = monthlyPayment;
+        total += monthlyPayment;
       }
     }
 
-    // Add other services (Data Lines, IoT, Home Internet)
-    if (quoteData.dataLines && quoteData.dataLines.quantity > 0) {
-      for (let i = 0; i < quoteData.dataLines.quantity; i++) {
-        const lineData = {
-          deviceId: quoteData.dataLines.devices?.[i],
-          planId: quoteData.dataLines.plans?.[i],
-          protectionId: quoteData.dataLines.protection?.[i]
-        };
-
-        const lineBreakdown = this.getPerLinePricingBreakdown(
-          `data_${i}`, 
-          lineData, 
-          promotionData, 
-          location, 
-          customerTier
-        );
-
-        breakdown.lines.push(lineBreakdown);
-        breakdown.subtotal += lineBreakdown.subtotal;
-        breakdown.totalPromotionSavings += lineBreakdown.promotionSavings;
-      }
-    }
-
-    if (quoteData.iotLines && quoteData.iotLines.quantity > 0) {
-      for (let i = 0; i < quoteData.iotLines.quantity; i++) {
-        const lineData = {
-          deviceId: quoteData.iotLines.devices?.[i],
-          planId: quoteData.iotLines.plans?.[i],
-          protectionId: quoteData.iotLines.protection?.[i]
-        };
-
-        const lineBreakdown = this.getPerLinePricingBreakdown(
-          `iot_${i}`, 
-          lineData, 
-          promotionData, 
-          location, 
-          customerTier
-        );
-
-        breakdown.lines.push(lineBreakdown);
-        breakdown.subtotal += lineBreakdown.subtotal;
-        breakdown.totalPromotionSavings += lineBreakdown.promotionSavings;
-      }
-    }
-
-    if (quoteData.homeInternet) {
-      const lineData = {
-        deviceId: quoteData.homeInternet.device,
-        planId: quoteData.homeInternet.plan,
-        protectionId: null
-      };
-
-      const lineBreakdown = this.getPerLinePricingBreakdown(
-        'home_internet', 
-        lineData, 
-        promotionData, 
-        location, 
-        customerTier
-      );
-
-      breakdown.lines.push(lineBreakdown);
-      breakdown.subtotal += lineBreakdown.subtotal;
-      breakdown.totalPromotionSavings += lineBreakdown.promotionSavings;
-    }
-
-    // Calculate taxes and surcharges
-    breakdown.taxes = this.calculateTaxes(breakdown.subtotal, location);
-    breakdown.surcharges = this.calculateSurcharges(breakdown.subtotal, location);
-
-    // Calculate other discounts (AutoPay, Senior, etc.)
-    breakdown.discounts = this.calculateDiscounts(quoteData);
-
-    // Calculate final total
-    breakdown.total = breakdown.subtotal + breakdown.taxes + breakdown.surcharges - breakdown.discounts - breakdown.totalPromotionSavings;
-
-    // Calculate promotion stats
-    if (promotionData) {
-      breakdown.promotionStats = {
-        totalLines: breakdown.lines.length,
-        linesWithPromotions: breakdown.lines.filter(line => line.promotion).length,
-        totalSavings: breakdown.totalPromotionSavings,
-        promotionTypes: {}
-      };
-
-      // Count promotion types
-      breakdown.lines.forEach(line => {
-        if (line.promotion) {
-          const category = this.getPromotionCategory(line.promotion.id);
-          breakdown.promotionStats.promotionTypes[category] = 
-            (breakdown.promotionStats.promotionTypes[category] || 0) + 1;
+    // Promotion savings
+    if (selectedPromotions) {
+      Object.values(selectedPromotions).forEach(promoId => {
+        const promotion = promotions.find(p => p.id === promoId);
+        if (promotion) {
+          breakdown.promotionSavings += promotion.maxPayout;
+          total -= promotion.maxPayout;
         }
       });
     }
 
-    return breakdown;
-  }
+    total = Math.max(0, total);
+    breakdown.subtotal = total;
+    breakdown.taxes = total * 0.08;
+    breakdown.total = total + breakdown.taxes;
 
-  // Helper method to get promotion category
-  getPromotionCategory(promotionId) {
-    // This would typically come from the promotions data
-    if (promotionId.includes('iphone')) return 'iPhone';
-    if (promotionId.includes('galaxy') || promotionId.includes('samsung')) return 'Samsung';
-    if (promotionId.includes('pixel')) return 'Pixel';
-    if (promotionId.includes('tablet')) return 'Tablet';
-    if (promotionId.includes('watch') || promotionId.includes('wearable')) return 'Wearable';
-    if (promotionId.includes('home') || promotionId.includes('internet')) return 'Home Internet';
-    return 'Other';
-  }
-
-  // Update promotional pricing (for admin use)
-  updatePromotionalPricing(promoName, active, startDate, endDate, discounts) {
-    this.promotionalPricing[promoName] = {
-      active,
-      startDate,
-      endDate,
-      discounts
+    return {
+      monthly: breakdown.total,
+      breakdown
     };
   }
 
-  // Get all available customer tiers
-  getCustomerTiers() {
-    return Object.keys(this.customerTierPricing).map(tier => ({
-      id: tier,
-      name: this.customerTierPricing[tier].description,
-      multiplier: this.customerTierPricing[tier].multiplier
-    }));
+  // Calculate equipment credit impact
+  calculateEquipmentCreditImpact(equipmentCreditData) {
+    const { amount, downPayment, tradeIns } = equipmentCreditData;
+    
+    return {
+      totalCredit: amount,
+      downPayment: downPayment,
+      tradeInValue: tradeIns.reduce((total, tradeIn) => total + (tradeIn.value || 0), 0),
+      netCredit: amount - downPayment + tradeIns.reduce((total, tradeIn) => total + (tradeIn.value || 0), 0)
+    };
   }
 
-  // Get all available locations
-  getAvailableLocations() {
-    return Object.keys(this.locationMultipliers).map(state => ({
-      state,
-      multiplier: this.locationMultipliers[state].multiplier,
-      taxRate: this.locationMultipliers[state].taxRate,
-      surcharge: this.locationMultipliers[state].surcharge
-    }));
+  // Calculate discount impact
+  calculateDiscountImpact(discountsData, totalBeforeDiscounts) {
+    let totalDiscount = 0;
+    const breakdown = {
+      autoPay: 0,
+      senior55: 0,
+      insider: 0,
+      workPerks: 0,
+      total: 0
+    };
+
+    if (discountsData.autoPay) {
+      breakdown.autoPay = totalBeforeDiscounts * 0.05; // 5% discount
+      totalDiscount += breakdown.autoPay;
+    }
+
+    if (discountsData.senior55) {
+      breakdown.senior55 = totalBeforeDiscounts * 0.10; // 10% discount
+      totalDiscount += breakdown.senior55;
+    }
+
+    if (discountsData.insider) {
+      breakdown.insider = totalBeforeDiscounts * 0.20; // 20% discount
+      totalDiscount += breakdown.insider;
+    }
+
+    if (discountsData.workPerks) {
+      breakdown.workPerks = totalBeforeDiscounts * 0.15; // 15% discount
+      totalDiscount += breakdown.workPerks;
+    }
+
+    breakdown.total = totalDiscount;
+
+    return {
+      totalDiscount,
+      breakdown
+    };
+  }
+
+  // Calculate total quote pricing
+  calculateTotalPricing(quoteData, location = 'US', customerTier = 'standard') {
+    const {
+      voiceLinesData,
+      dataLinesData,
+      iotLinesData,
+      homeInternetData,
+      equipmentCreditData,
+      discountsData
+    } = quoteData;
+
+    let totalMonthly = 0;
+    const breakdown = {
+      voiceLines: { monthly: 0, breakdown: {} },
+      dataLines: { monthly: 0, breakdown: {} },
+      iotLines: { monthly: 0, breakdown: {} },
+      homeInternet: { monthly: 0, breakdown: {} },
+      equipmentCredit: { impact: 0 },
+      discounts: { impact: 0 },
+      subtotal: 0,
+      taxes: 0,
+      total: 0
+    };
+
+    // Calculate each service
+    if (voiceLinesData && voiceLinesData.quantity > 0) {
+      breakdown.voiceLines = this.calculateVoiceLinesPricing(voiceLinesData, location, customerTier);
+      totalMonthly += breakdown.voiceLines.monthly;
+    }
+
+    if (dataLinesData && dataLinesData.quantity > 0) {
+      breakdown.dataLines = this.calculateDataLinesPricing(dataLinesData, location, customerTier);
+      totalMonthly += breakdown.dataLines.monthly;
+    }
+
+    if (iotLinesData && iotLinesData.quantity > 0) {
+      breakdown.iotLines = this.calculateIoTLinesPricing(iotLinesData, location, customerTier);
+      totalMonthly += breakdown.iotLines.monthly;
+    }
+
+    if (homeInternetData && homeInternetData.plan) {
+      breakdown.homeInternet = this.calculateHomeInternetPricing(homeInternetData, location, customerTier);
+      totalMonthly += breakdown.homeInternet.monthly;
+    }
+
+    // Apply equipment credit
+    if (equipmentCreditData) {
+      breakdown.equipmentCredit = this.calculateEquipmentCreditImpact(equipmentCreditData);
+      totalMonthly -= breakdown.equipmentCredit.netCredit;
+    }
+
+    // Apply discounts
+    if (discountsData) {
+      breakdown.discounts = this.calculateDiscountImpact(discountsData, totalMonthly);
+      totalMonthly -= breakdown.discounts.impact;
+    }
+
+    // Ensure total doesn't go below 0
+    totalMonthly = Math.max(0, totalMonthly);
+    breakdown.subtotal = totalMonthly;
+    breakdown.taxes = totalMonthly * 0.08;
+    breakdown.total = totalMonthly + breakdown.taxes;
+
+    return {
+      monthly: breakdown.total,
+      breakdown
+    };
+  }
+
+  // Get device pricing
+  getDevicePricing(deviceId) {
+    const device = devices[deviceId];
+    if (!device) return { price: 0, monthlyPayment: 0 };
+    
+    return {
+      price: device.price,
+      monthlyPayment: device.monthlyPayment || Math.round(device.price / 24)
+    };
+  }
+
+  // Get promotion details
+  getPromotionDetails(promotionId) {
+    return promotions.find(p => p.id === promotionId);
+  }
+
+  // Validate promotion eligibility
+  validatePromotionEligibility(promotionId, deviceId, planId, lineType, hasPortIn) {
+    const promotion = promotions.find(p => p.id === promotionId);
+    if (!promotion) return { eligible: false, reason: 'Promotion not found' };
+
+    // Check device eligibility
+    if (!promotion.eligibleDevices.includes(deviceId)) {
+      return { eligible: false, reason: 'Device not eligible for this promotion' };
+    }
+
+    // Check AAL requirements
+    if (promotion.aal === 'Y' && lineType !== 'new') {
+      return { eligible: false, reason: 'This promotion requires a new line' };
+    }
+    
+    if (promotion.aal === 'N' && lineType !== 'upgrade') {
+      return { eligible: false, reason: 'This promotion is for upgrades only' };
+    }
+    
+    if (promotion.aal === 'Y+P' && (!hasPortIn || lineType !== 'new')) {
+      return { eligible: false, reason: 'This promotion requires a new line with port-in' };
+    }
+
+    return { eligible: true };
   }
 }
 
-// Export singleton instance
+// Create singleton instance
 export const pricingEngine = new PricingEngine();
-
-// Export utility functions
-export const calculateQuoteTotal = (quoteData, location, customerTier) => {
-  return pricingEngine.calculateTotalMonthlyCost(quoteData, location, customerTier);
-};
-
-export const getPricingBreakdown = (quoteData, location, customerTier) => {
-  return pricingEngine.getPricingBreakdown(quoteData, location, customerTier);
-};
-
-export const getLocationPricing = (location) => {
-  return pricingEngine.getLocationPricing(location);
-};
-
-export const getCustomerTiers = () => {
-  return pricingEngine.getCustomerTiers();
-};
-
-export const getAvailableLocations = () => {
-  return pricingEngine.getAvailableLocations();
-};
-
