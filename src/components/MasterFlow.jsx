@@ -49,12 +49,12 @@ const MasterFlow = () => {
   const [homeInternetData, setHomeInternetData] = useState({
     device: null,
     plan: null,
-    promotions: {}
+    promotions: []
   });
   const [equipmentCreditData, setEquipmentCreditData] = useState({
-    amount: 0,
-    downPayment: 0,
-    tradeIns: []
+    credits: {},
+    downPayments: {},
+    tradeIns: {}
   });
   const [discountsData, setDiscountsData] = useState({
     autoPay: false,
@@ -193,14 +193,29 @@ const MasterFlow = () => {
     setSelectedServices(services);
     setCompletedSteps(prev => [...prev, 1]);
     
-    // Auto-navigate to first selected service
+    // Find first unconfigured service step to navigate to
     if (services.length > 0) {
-      const firstServiceStep = getServiceStepId(services[0]);
-      if (firstServiceStep !== -1) {
-        goToStep(firstServiceStep);
+      // Check which services are already configured
+      const configuredServices = [];
+      if (voiceLinesData.quantity > 0) configuredServices.push('voice');
+      if (dataLinesData.quantity > 0) configuredServices.push('data');
+      if (iotLinesData.quantity > 0) configuredServices.push('iot');
+      if (homeInternetData.device) configuredServices.push('hsi');
+      
+      // Find first unconfigured service
+      const unconfiguredService = services.find(service => !configuredServices.includes(service));
+      
+      if (unconfiguredService) {
+        const firstServiceStep = getServiceStepId(unconfiguredService);
+        if (firstServiceStep !== -1) {
+          goToStep(firstServiceStep);
+        }
+      } else {
+        // All selected services are configured, go to equipment credit or summary
+        goToStep(6);
       }
     }
-  }, [goToStep]);
+  }, [goToStep, voiceLinesData, dataLinesData, iotLinesData, homeInternetData]);
 
   // Helper functions
   const getServiceStepId = (serviceType) => {
@@ -231,6 +246,9 @@ const MasterFlow = () => {
     
     // Must have completed service selection
     if (!completedSteps.includes(1)) return false;
+    
+    // Equipment Credit and Discounts are always accessible after service selection
+    if (stepId === 6 || stepId === 7) return true;
     
     // Check if step is required or depends on selected services
     const step = steps[stepId];
@@ -339,6 +357,7 @@ const MasterFlow = () => {
             onDataChange={setEquipmentCreditData}
             onNext={nextStep}
             onPrev={prevStep}
+            voiceLinesData={voiceLinesData}
           />
         );
       
@@ -363,6 +382,10 @@ const MasterFlow = () => {
             equipmentCreditData={equipmentCreditData}
             discountsData={discountsData}
             onPrev={prevStep}
+            onBackToServices={() => {
+              // Go back to service selection to add more services
+              setCurrentStep(1);
+            }}
             onClearData={() => {
               setCurrentStep(0);
               setCompletedSteps([]);
@@ -371,8 +394,8 @@ const MasterFlow = () => {
               setVoiceLinesData({ quantity: 0, plans: {}, devices: {}, protection: {}, promotions: {}, ports: {} });
               setDataLinesData({ quantity: 0, category: '', devices: {}, plans: {}, protection: {}, promotions: {} });
               setIotLinesData({ quantity: 0, devices: {}, plans: {}, protection: {}, promotions: {} });
-              setHomeInternetData({ device: null, plan: null, promotions: {} });
-              setEquipmentCreditData({ amount: 0, downPayment: 0, tradeIns: [] });
+              setHomeInternetData({ device: null, plan: null, promotions: [] });
+              setEquipmentCreditData({ credits: {}, downPayments: {}, tradeIns: {} });
               setDiscountsData({ autoPay: false, senior55: false, insider: false, workPerks: false });
             }}
           />

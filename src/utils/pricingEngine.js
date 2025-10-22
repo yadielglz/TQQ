@@ -8,17 +8,21 @@ export class PricingEngine {
   constructor() {
     this.basePricing = {
       plans: {
-        'experience-essentials-saver': { 1: 50, 2: 80, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
-        'experience-essentials': { 1: 60, 2: 90, 3: 90, 4: 100, 5: 110, 6: 120, additional: 35 },
-        'experience-more': { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, 6: 230, additional: 35 },
-        'experience-beyond': { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, 6: 305, additional: 35 },
+        // Experience Essentials Saver (when offered)
+        'experience-essentials-saver': { 1: 50, 2: 80, 3: 90, 4: 100, 5: 110, additional: 35 },
+        // Experience Essentials (base essentials)
+        'experience-essentials': { 1: 60, 2: 90, 3: 90, 4: 100, 5: 110, additional: 35 },
+        // Experience More (mid tier)
+        'experience-more': { 1: 85, 2: 140, 3: 140, 4: 170, 5: 200, additional: 35 },
+        // Experience Beyond (top tier)
+        'experience-beyond': { 1: 100, 2: 170, 3: 170, 4: 215, 5: 260, additional: 35 },
         // 55+ Plans
-        'essentials-choice-55': { 1: 45, 2: 60, 3: 75, 4: 90, 5: 105, 6: 120, additional: 35 },
-        'experience-more-55': { 1: 70, 2: 100, 3: 130, 4: 160, 5: 190, 6: 220, additional: 35 },
-        'experience-beyond-55': { 1: 85, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
+        'essentials-choice-55': { 1: 45, 2: 60, maxLines: 2 },
+        'experience-more-55': { 1: 70, 2: 100, maxLines: 2 },
+        'experience-beyond-55': { 1: 85, 2: 140, maxLines: 2 },
         // Military/First Responder Plans
-        'experience-beyond-military': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 },
-        'experience-beyond-first-responder': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, 6: 300, additional: 35 }
+        'experience-beyond-military': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, additional: 35 },
+        'experience-beyond-first-responder': { 1: 90, 2: 140, 3: 180, 4: 220, 5: 260, additional: 35 }
       }
     };
   }
@@ -43,10 +47,16 @@ export class PricingEngine {
       const firstPlanId = Object.values(plans)[0];
       const plan = this.basePricing.plans[firstPlanId];
       if (plan) {
-        if (quantity <= 6) {
+        // Handle 55+ plans with maxLines restriction
+        if (plan.maxLines && quantity > plan.maxLines) {
+          breakdown.planCost = 0; // 55+ plans max 2 lines
+        } else if (quantity <= 5) {
           breakdown.planCost = plan[quantity] || 0;
         } else {
-          breakdown.planCost = plan[6] + (quantity - 6) * plan.additional;
+          // For 5+ lines, use 5-line pricing + additional lines
+          const basePrice = plan[5] || 0;
+          const additionalLines = quantity - 5;
+          breakdown.planCost = basePrice + (additionalLines * plan.additional);
         }
         total += breakdown.planCost;
       }
@@ -95,7 +105,7 @@ export class PricingEngine {
     breakdown.subtotal = total;
 
     // Calculate taxes (simplified - would normally be location-based)
-    breakdown.taxes = total * 0.08; // 8% average tax rate
+    breakdown.taxes = total * 0.075; // 7.5% global tax rate
     breakdown.total = total + breakdown.taxes;
 
     return {
@@ -174,7 +184,7 @@ export class PricingEngine {
 
     total = Math.max(0, total);
     breakdown.subtotal = total;
-    breakdown.taxes = total * 0.08;
+    breakdown.taxes = total * 0.075; // 7.5% global tax rate
     breakdown.total = total + breakdown.taxes;
 
     return {
@@ -251,7 +261,7 @@ export class PricingEngine {
 
     total = Math.max(0, total);
     breakdown.subtotal = total;
-    breakdown.taxes = total * 0.08;
+    breakdown.taxes = total * 0.075; // 7.5% global tax rate
     breakdown.total = total + breakdown.taxes;
 
     return {
@@ -311,7 +321,7 @@ export class PricingEngine {
 
     total = Math.max(0, total);
     breakdown.subtotal = total;
-    breakdown.taxes = total * 0.08;
+    breakdown.taxes = total * 0.075; // 7.5% global tax rate
     breakdown.total = total + breakdown.taxes;
 
     return {

@@ -4,15 +4,14 @@ import { Wifi, Shield, Zap } from 'lucide-react';
 const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
   const planOptions = [
     {
-      id: 'essentials',
-      name: 'Experience Essentials',
+      id: 'experience-essentials-saver',
+      name: 'Experience Essentials Saver',
       pricing: {
         1: 50,
         2: 80,
         3: 90,
         4: 100,
-        5: 120,
-        6: 135,
+        5: 110,
         additional: 35
       },
       features: [
@@ -25,7 +24,27 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
       color: '#4CAF50'
     },
     {
-      id: 'more',
+      id: 'experience-essentials',
+      name: 'Experience Essentials',
+      pricing: {
+        1: 60,
+        2: 90,
+        3: 90,
+        4: 100,
+        5: 110,
+        additional: 35
+      },
+      features: [
+        'Unlimited talk, text & data',
+        '5G network access',
+        'Mobile hotspot',
+        'Basic streaming quality'
+      ],
+      icon: Wifi,
+      color: '#4CAF50'
+    },
+    {
+      id: 'experience-more',
       name: 'Experience More',
       pricing: {
         1: 85,
@@ -33,7 +52,6 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
         3: 140, // 3rd line free
         4: 170,
         5: 200,
-        6: 230,
         additional: 35
       },
       features: [
@@ -48,7 +66,7 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
       color: '#e20074'
     },
     {
-      id: 'beyond',
+      id: 'experience-beyond',
       name: 'Experience Beyond',
       pricing: {
         1: 100,
@@ -56,7 +74,6 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
         3: 170, // 3rd line free
         4: 215,
         5: 260,
-        6: 305,
         additional: 35
       },
       features: [
@@ -73,7 +90,7 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
       color: '#E20074'
     },
     {
-      id: 'essentials-55',
+      id: 'essentials-choice-55',
       name: 'Essentials Choice 55',
       pricing: {
         1: 45,
@@ -92,8 +109,8 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
       senior: true
     },
     {
-      id: 'more-55',
-      name: 'More w/55+ Savings',
+      id: 'experience-more-55',
+      name: 'Experience More w/ 55+ Savings',
       pricing: {
         1: 70,
         2: 100,
@@ -112,11 +129,11 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
       senior: true
     },
     {
-      id: 'beyond-55',
-      name: 'Beyond w/55+ Savings',
+      id: 'experience-beyond-55',
+      name: 'Experience Beyond w/ 55+ Savings',
       pricing: {
         1: 85,
-        2: 130,
+        2: 140,
         maxLines: 2
       },
       features: [
@@ -130,6 +147,58 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
       icon: Zap,
       color: '#E20074',
       senior: true
+    },
+    {
+      id: 'experience-beyond-military',
+      name: 'Experience Beyond w/ Military Savings',
+      pricing: {
+        1: 90,
+        2: 140,
+        3: 180,
+        4: 220,
+        5: 260,
+        additional: 35
+      },
+      features: [
+        'Unlimited talk, text & data',
+        '5G network access',
+        'Mobile hotspot',
+        '4K streaming',
+        'Netflix Standard included',
+        'Apple TV+ included',
+        'T-Mobile Tuesdays',
+        'Scam Shield Premium',
+        'Military Savings'
+      ],
+      icon: Zap,
+      color: '#E20074',
+      military: true
+    },
+    {
+      id: 'experience-beyond-first-responder',
+      name: 'Experience Beyond w/ First Responder Savings',
+      pricing: {
+        1: 90,
+        2: 140,
+        3: 180,
+        4: 220,
+        5: 260,
+        additional: 35
+      },
+      features: [
+        'Unlimited talk, text & data',
+        '5G network access',
+        'Mobile hotspot',
+        '4K streaming',
+        'Netflix Standard included',
+        'Apple TV+ included',
+        'T-Mobile Tuesdays',
+        'Scam Shield Premium',
+        'First Responder Savings'
+      ],
+      icon: Zap,
+      color: '#E20074',
+      firstResponder: true
     }
   ];
 
@@ -141,12 +210,12 @@ const PlanSelection = ({ lines, plans, onPlansChange, onNext, onPrev }) => {
       return 0; // Senior plans max 2 lines
     }
     
-    if (lineCount <= 6) {
+    if (lineCount <= 5) {
       return plan.pricing[lineCount] || 0;
     } else {
-      // For 6+ lines, use 6-line pricing + additional lines
-      const basePrice = plan.pricing[6] || 0;
-      const additionalLines = lineCount - 6;
+      // For 5+ lines, use 5-line pricing + additional lines
+      const basePrice = plan.pricing[5] || 0;
+      const additionalLines = lineCount - 5;
       return basePrice + (additionalLines * plan.pricing.additional);
     }
   };

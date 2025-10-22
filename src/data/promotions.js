@@ -911,11 +911,11 @@ export const isRatePlanEligible = (promotionId, planId) => {
   const ratePlan = promotion.redemption.ratePlan.toLowerCase();
   
   // Check if plan is eligible based on promotion requirements
-  if (ratePlan.includes('experience beyond')) {
+  if (ratePlan.includes('experience beyond') || ratePlan.includes('go5g next')) {
     return ['experience-beyond', 'experience-beyond-55', 'experience-beyond-military', 'experience-beyond-first-responder'].includes(planId);
   }
   
-  if (ratePlan.includes('experience more')) {
+  if (ratePlan.includes('experience more') || ratePlan.includes('go5g plus')) {
     return ['experience-more', 'experience-more-55'].includes(planId);
   }
   
@@ -932,7 +932,8 @@ export const isRatePlanEligible = (promotionId, planId) => {
   }
   
   if (ratePlan.includes('most voice plans')) {
-    return !['essentials-saver', 'choice', 'value'].includes(planId);
+    // Exclude Essentials Saver, Choice, and Value plans
+    return !['experience-essentials-saver', 'choice', 'value'].includes(planId);
   }
   
   return true; // Default to eligible
